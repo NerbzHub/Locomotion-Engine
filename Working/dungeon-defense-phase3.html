@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Dungeon Defense</title>
+<style>
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+  html, body {
+    margin: 0; padding: 0; width: 100%; height: 100%;
+    background: #0b0a14; overflow: hidden; touch-action: none;
+    font-family: 'Courier New', monospace;
+    image-rendering: pixelated;
+  }
+  #app {
+    position: fixed; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: #0b0a14;
+  }
+  #gameCanvas {
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    background: #1a1430;
+    touch-action: none;
+  }
+  .screen {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    color: #f0e6d2;
+    background: radial-gradient(ellipse at center, #2a1f4a 0%, #0b0a14 100%);
+    z-index: 50;
+  }
+  .hidden { display: none !important; }
+  .title {
+    font-size: 38px; letter-spacing: 2px; color: #ffd866;
+    text-shadow: 3px 3px 0 #4a1d6a, -2px -2px 0 #1a0a2a;
+    margin-bottom: 8px; text-align: center;
+  }
+  .subtitle { color: #b9a6e0; font-size: 13px; margin-bottom: 28px; letter-spacing: 1px;}
+  .menuBtn {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(#7b4ea3, #4a2d6a);
+    border: 3px solid #ffd866;
+    color: #fff3d6;
+    font-size: 18px;
+    padding: 12px 34px;
+    margin: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 0 #2a1540, 0 4px 10px rgba(0,0,0,.5);
+    letter-spacing: 1px;
+  }
+  .menuBtn:active { transform: translateY(3px); box-shadow: 0 1px 0 #2a1540; }
+  .loadingBarOuter {
+    width: 260px; height: 18px; border: 3px solid #ffd866; border-radius: 4px;
+    margin-top: 18px; overflow: hidden; background: #1a0a2a;
+  }
+  .loadingBarInner { height: 100%; width: 0%; background: linear-gradient(90deg,#ffd866,#ff8c42); transition: width .15s; }
+  .loadingText { margin-top: 10px; font-size: 12px; color: #b9a6e0; }
+  #hud {
+    position: absolute; top: 0; left: 0; right: 0;
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 10px;
+    background: linear-gradient(#241836, #1a1228);
+    border-bottom: 3px solid #4a2d6a;
+    color: #fff3d6; font-size: 13px; z-index: 20;
+  }
+  #hud .stat { display: flex; align-items: center; gap: 4px; margin: 0 6px; white-space: nowrap;}
+  #hud .stat b { color: #ffd866; }
+  #bottomBar {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(#1a1228, #100b1c);
+    border-top: 3px solid #4a2d6a;
+    z-index: 20;
+    padding: 6px;
+    display: flex; flex-direction: column; gap: 4px;
+  }
+  #towerShop {
+    display: flex; gap: 6px; overflow-x: auto; padding: 2px;
+  }
+  .towerCard {
+    flex: 0 0 auto;
+    width: 64px;
+    background: #2a1f44;
+    border: 2px solid #5a3d7a;
+    border-radius: 6px;
+    text-align: center;
+    padding: 4px 2px;
+    color: #f0e6d2;
+    font-size: 9px;
+  }
+  .towerCard.selected { border-color: #ffd866; box-shadow: 0 0 6px #ffd866; }
+  .towerCard canvas { width: 28px; height: 28px; image-rendering: pixelated; }
+  .towerCard .cost { color: #6fe07a; font-size: 9px; }
+  .towerCard.disabled { opacity: .4; }
+  #actionRow { display:flex; gap:6px; justify-content: center; align-items:center; }
+  .smallBtn {
+    font-family: 'Courier New', monospace;
+    background: #4a2d6a; border: 2px solid #7b4ea3; color: #fff3d6;
+    border-radius: 5px; padding: 6px 12px; font-size: 12px;
+  }
+  #infoPanel {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    background: #1a1228; border-top: 3px solid #ffd866;
+    color: #f0e6d2; padding: 8px 10px; font-size: 11px;
+    z-index: 25; display: none;
+  }
+  #infoPanel.show { display: block; }
+  #infoPanel .row { display:flex; justify-content: space-between; margin: 2px 0;}
+  #infoPanel .btns { display:flex; gap:6px; margin-top:6px; }
+  #waveBanner {
+    position: absolute; top: 40%; left: 0; right: 0; text-align: center;
+    color: #ffd866; font-size: 26px; text-shadow: 2px 2px 0 #2a1540;
+    z-index: 30; pointer-events: none; opacity: 0; transition: opacity .4s;
+  }
+  #gameOverScreen, #pauseScreen { z-index: 60; }
+  .statLine { font-size: 14px; margin: 4px 0; color: #d8c8f0; }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- MENU -->
+  <div id="menuScreen" class="screen">
+    <div class="title">⚔ DUNGEON DEFENSE ⚔</div>
+    <div class="subtitle">a whimsical pixel tower defence</div>
+    <button class="menuBtn" id="playBtn">PLAY</button>
+    <button class="menuBtn" id="howBtn">HOW TO PLAY</button>
+  </div>
+
+  <!-- HOW TO PLAY -->
+  <div id="howScreen" class="screen hidden">
+    <div class="title" style="font-size:22px;">HOW TO PLAY</div>
+    <div style="max-width:300px; font-size:12px; line-height:1.6; color:#e6dcf5; text-align:left; padding: 0 10px;">
+      ⬩ Monsters march down the dungeon path toward your gate.<br>
+      ⬩ Tap a tile next to the path to build a tower.<br>
+      ⬩ Towers auto-attack enemies in range.<br>
+      ⬩ Kill enemies for gold. Spend gold on more towers or upgrades.<br>
+      ⬩ Tap an existing tower to upgrade or sell it.<br>
+      ⬩ Survive all waves. Each wave is tougher, but pays more gold!<br>
+    </div>
+    <button class="menuBtn" id="backBtn" style="margin-top:20px;">BACK</button>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingScreen" class="screen hidden">
+    <div class="title" style="font-size:24px;">CONJURING ASSETS...</div>
+    <div class="loadingBarOuter"><div class="loadingBarInner" id="loadingBarInner"></div></div>
+    <div class="loadingText" id="loadingText">summoning goblins...</div>
+  </div>
+
+  <!-- GAME -->
+  <div id="gameScreen" class="hidden" style="position:absolute; inset:0;">
+    <div id="hud">
+      <div class="stat">💰 <b id="goldStat">0</b></div>
+      <div class="stat">❤ <b id="livesStat">0</b></div>
+      <div class="stat">🌊 <b id="waveStat">0</b>/<span id="waveTotal">0</span></div>
+      <div class="stat"><button class="smallBtn" id="pauseBtn">II</button></div>
+    </div>
+    <canvas id="gameCanvas"></canvas>
+    <div id="waveBanner"></div>
+
+    <div id="infoPanel">
+      <div class="row"><span id="infoName">Tower</span><span id="infoLvl">Lv.1</span></div>
+      <div class="row"><span>Damage</span><span id="infoDmg">-</span></div>
+      <div class="row"><span>Range</span><span id="infoRange">-</span></div>
+      <div class="row"><span>Speed</span><span id="infoSpeed">-</span></div>
+      <div class="btns">
+        <button class="smallBtn" id="upgradeBtn">Upgrade (💰 -)</button>
+        <button class="smallBtn" id="sellBtn">Sell (💰 +)</button>
+        <button class="smallBtn" id="closeInfoBtn">Close</button>
+      </div>
+    </div>
+
+    <div id="bottomBar">
+      <div id="towerShop"></div>
+      <div id="actionRow">
+        <button class="smallBtn" id="startWaveBtn">START WAVE</button>
+        <button class="smallBtn" id="speedBtn">SPEED x1</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PAUSE -->
+  <div id="pauseScreen" class="screen hidden">
+    <div class="title" style="font-size:24px;">PAUSED</div>
+    <button class="menuBtn" id="resumeBtn">RESUME</button>
+    <button class="menuBtn" id="quitBtn">QUIT TO MENU</button>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOverScreen" class="screen hidden">
+    <div class="title" style="font-size:28px; color:#ff6b6b;" id="gameOverTitle">YOUR GATE HAS FALLEN</div>
+    <div class="statLine" id="finalWave">Reached Wave: 0</div>
+    <div class="statLine" id="finalGold">Gold earned: 0</div>
+    <button class="menuBtn" id="retryBtn">RETRY</button>
+    <button class="menuBtn" id="menuBtn2">MAIN MENU</button>
+  </div>
+
+</div>
+
+<script>
+'use strict';
+
+/* =========================================================
+   DUNGEON DEFENSE
+   Whimsical pixel-art tower defense, fully procedural assets
+   Single-file HTML/CSS/JS game
+   ========================================================= */
+
+//////////////////////// UTIL ////////////////////////
+function rand(a,b){ return a + Math.random()*(b-a); }
+function randi(a,b){ return Math.floor(rand(a,b+1)); }
+function choice(arr){ return arr[randi(0,arr.length-1)]; }
+function clamp(v,a,b){ return Math.max(a,Math.min(b,v)); }
+function dist(x1,y1,x2,y2){ return Math.hypot(x2-x1, y2-y1); }
+function lerp(a,b,t){ return a+(b-a)*t; }
+
+// seeded-ish palette helpers
+function shade(hex, amt){
+  // hex like #rrggbb, amt -255..255
+  let c = hex.replace('#','');
+  let r = clamp(parseInt(c.substr(0,2),16)+amt,0,255);
+  let g = clamp(parseInt(c.substr(2,2),16)+amt,0,255);
+  let b = clamp(parseInt(c.substr(4,2),16)+amt,0,255);
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+
+//////////////////////// PIXEL ART GENERATOR ////////////////////////
+// All sprites are generated onto offscreen canvases at "loading" time.
+// Each sprite generator draws onto a small grid (e.g. 16x16) using filled
+// pixel rects, mirrored for symmetry, to create a whimsical creature/tower look.
+
+const PixelArt = {
+  cache: {},
+
+  makeCanvas(size){
+    const c = document.createElement('canvas');
+    c.width = size; c.height = size;
+    return c;
+  },
+
+  // draw a single "pixel" (block) at grid coords with given block scale
+  px(ctx, gx, gy, scale, color){
+    ctx.fillStyle = color;
+    ctx.fillRect(gx*scale, gy*scale, scale, scale);
+  },
+
+  // Generic symmetric body drawer: pattern is array of rows of chars for LEFT half (mirrored to right)
+  // '.' = empty, otherwise a key into colorMap
+  drawSymmetric(ctx, pattern, colorMap, scale, offsetX, offsetY){
+    const rows = pattern.length;
+    const halfW = pattern[0].length;
+    for(let y=0;y<rows;y++){
+      for(let x=0;x<halfW;x++){
+        const ch = pattern[y][x];
+        if(ch === '.' ) continue;
+        const color = colorMap[ch];
+        if(!color) continue;
+        // left half
+        this.px(ctx, offsetX + x, offsetY + y, scale, color);
+        // mirrored right half
+        this.px(ctx, offsetX + (halfW*2 - 1 - x), offsetY + y, scale, color);
+      }
+    }
+  },
+
+  outline(ctx, size){
+    // subtle vignette / outline pass omitted for performance; pixel style inherently crisp
+  },
+
+  // ---------------- ENEMY SPRITES ----------------
+  // each returns a canvas (32x32) with 2 animation frames drawn side by side internally is overkill;
+  // instead we generate 2 frames as separate canvases for simple walk-bob animation.
+  generateEnemy(type){
+    const size = 32, scale = 2; // 16x16 grid at 2px = 32
+    const grid = size/scale;
+    const half = grid/2;
+
+    const palettes = {
+      goblin:   { skin: '#5fae4a', skinD:'#3f7e32', cloth:'#8a4b2b', clothD:'#5e3119', eye:'#ffe566', weapon:'#b8b8b8' },
+      orc:      { skin: '#6f8f4a', skinD:'#4a602f', cloth:'#5a4030', clothD:'#3a281c', eye:'#ff4d4d', weapon:'#9a9a9a' },
+      bat:      { skin: '#5b3a73', skinD:'#3a2350', cloth:'#2b1840', clothD:'#190d28', eye:'#ff66cc', weapon:'#000' },
+      skeleton: { skin: '#e8e2cf', skinD:'#bdb494', cloth:'#3a3a4a', clothD:'#23232f', eye:'#7fffd4', weapon:'#cfcfcf' },
+      troll:    { skin: '#7a8f9e', skinD:'#52626d', cloth:'#5a4b3b', clothD:'#3a3024', eye:'#ffb347', weapon:'#8a8a8a' },
+      wraith:   { skin: '#3a2d55', skinD:'#241a3a', cloth:'#1c1430', clothD:'#100a1f', eye:'#a4ffea', weapon:'#000' },
+      dragonling:{ skin:'#c94f4f', skinD:'#8e2f2f', cloth:'#ffae42', clothD:'#cc7d1a', eye:'#fff066', weapon:'#5a3a2a' },
+      golem:    { skin:'#8c7a5e', skinD:'#5e5040', cloth:'#3a3a3a', clothD:'#222222', eye:'#ff8c42', weapon:'#444' },
+    };
+    const p = palettes[type] || palettes.goblin;
+
+    function frame(bob){
+      const cv = PixelArt.makeCanvas(size);
+      const ctx = cv.getContext('2d');
+      ctx.clearRect(0,0,size,size);
+      const oy = bob; // offset y for bob animation
+
+      // base humanoid-ish silhouette, 8-wide half grid (16 total), 16 rows
+      // we customize per type by varying head size / extra bits
+      const headColor = 's', headColorD='d', clothC='c', clothD2='cd', eyeC='e';
+      const cmap = { s:p.skin, d:p.skinD, c:p.cloth, cd:p.clothD, e:p.eye, w:p.weapon };
+
+      let pattern;
+      if(type==='bat' || type==='wraith'){
+        pattern = [
+          '.....cc.',
+          '....cccc',
+          '...cccccc'.slice(0,8),
+          '..ssss..',
+          '.ssssss.',
+          '.sdeesd.',
+          '.ssssss.',
+          '..ssss..',
+          'ccssssc.',
+          'cccssccc'.slice(0,8),
+          '.cc..cc.',
+          '.c....c.',
+          '........',
+          '........',
+          '........',
+          '........',
+        ];
+      } else if(type==='golem' || type==='troll'){
+        pattern = [
+          '..ssss..',
+          '.ssssss.',
+          '.sdeesd.',
+          '.ssssss.',
+          'ssssssss',
+          'ssccccss',
+          'sscccc ss'.slice(0,8),
+          'ssccccss',
+          'ssccccss',
+          '.scccs..',
+          '.sc..cs.',
+          '.cc..cc.',
+          '.cc..cc.',
+          '.dd..dd.',
+          '........',
+          '........',
+        ];
+      } else if(type==='dragonling'){
+        pattern = [
+          '..ss....',
+          '.ssss...',
+          '.sdes...',
+          '.ssss...',
+          'csssss..',
+          'ccsssscc'.slice(0,8),
+          '.ccssccc'.slice(0,8),
+          '..ccccc.',
+          '..scsc..',
+          '..scsc..',
+          '..sc.cs.',
+          '........',
+          '........',
+          '........',
+          '........',
+          '........',
+        ];
+      } else {
+        // goblin / orc / skeleton default humanoid
+        pattern = [
+          '..ssss..',
+          '.ssssss.',
+          '.sdeesd.',
+          '.ssssss.',
+          '..cccc..',
+          '.cccccc.',
+          '.cwcccc.'.slice(0,8),
+          '.cccccc.',
+          '.cccccc.',
+          '..cccc..',
+          '..s..s..',
+          '..s..s..',
+          '..s..s..',
+          '..d..d..',
+          '........',
+          '........',
+        ];
+      }
+
+      PixelArt.drawSymmetric(ctx, pattern, cmap, scale, 0, Math.max(0, 1+oy));
+      return cv;
+    }
+
+    return { f1: frame(0), f2: frame(1), boss: type==='golem' };
+  },
+
+  // ---------------- TOWER SPRITES ----------------
+  generateTower(type, level){
+    const size = 32, scale = 2;
+    const lvlBoost = (level-1)*14;
+    const palettes = {
+      archer: { base:'#6b4a2a', baseD:'#4a3019', accent:'#3a6e3a', accentD:'#234d23', detail:'#ffd866' },
+      mage:   { base:'#3a2d6a', baseD:'#241a4a', accent:'#7b4ea3', accentD:'#4a2d6a', detail:'#9fe8ff' },
+      cannon: { base:'#5a5a5a', baseD:'#3a3a3a', accent:'#7a2e2e', accentD:'#4a1c1c', detail:'#ffae42' },
+      frost:  { base:'#3a6e8a', baseD:'#244a5e', accent:'#bfe9ff', accentD:'#8fd0f0', detail:'#ffffff' },
+    };
+    const p = palettes[type] || palettes.archer;
+    const cmap = { b:shade(p.base, lvlBoost*0.3), bd:p.baseD, a:shade(p.accent,lvlBoost*0.3), ad:p.accentD, t:p.detail };
+
+    const cv = PixelArt.makeCanvas(size);
+    const ctx = cv.getContext('2d');
+
+    let pattern;
+    if(type==='archer'){
+      pattern = [
+        '...tt...',
+        '..tatat.'.slice(0,8),
+        '.aaaaaa.',
+        '.abaaba.',
+        'bbbbbbbb',
+        'bbabbbab'.slice(0,8),
+        'bbbbbbbb',
+        '.bbbbbb.',
+        '.bdbbdb.',
+        '.bbbbbb.',
+        '.bb..bb.',
+        '.bb..bb.',
+        '........',
+        '........',
+        '........',
+        '........',
+      ];
+    } else if(type==='mage'){
+      pattern = [
+        '...t....',
+        '..ata...',
+        '..aaa...',
+        '.aaaaa..',
+        '.abaaab.'.slice(0,8),
+        'bbaaaabb'.slice(0,8),
+        'bbbaabbb',
+        '.bbaabb.',
+        '.bbbbbb.',
+        '.bdbbdb.',
+        '.bbbbbb.',
+        '.bb..bb.',
+        '........',
+        '........',
+        '........',
+        '........',
+      ];
+    } else if(type==='cannon'){
+      pattern = [
+        '........',
+        '..aaaa..',
+        '.aatttaa'.slice(0,8),
+        '.aaaaaa.',
+        'bbbbbbbb',
+        'bbbaabbb',
+        'bbbaabbb',
+        'bbbbbbbb',
+        '.bbbbbb.',
+        '.bdbbdb.',
+        '.bbbbbb.',
+        '.bb..bb.',
+        '........',
+        '........',
+        '........',
+        '........',
+      ];
+    } else { // frost
+      pattern = [
+        '...t....',
+        '..ttt...',
+        '.attta..',
+        '.aaaaa..',
+        '.abaaab.'.slice(0,8),
+        'bbaaaabb'.slice(0,8),
+        'bbbttbbb',
+        '.bbttbb.',
+        '.bbbbbb.',
+        '.bdbbdb.',
+        '.bbbbbb.',
+        '.bb..bb.',
+        '........',
+        '........',
+        '........',
+        '........',
+      ];
+    }
+    PixelArt.drawSymmetric(ctx, pattern, cmap, scale, 0, 1);
+
+    // level pips on top
+    for(let i=0;i<level-1;i++){
+      ctx.fillStyle = '#ffd866';
+      ctx.fillRect(2 + i*5, 1, 3, 3);
+    }
+    return cv;
+  },
+
+  generateProjectile(type){
+    const size = 8, scale = 2;
+    const cv = PixelArt.makeCanvas(size);
+    const ctx = cv.getContext('2d');
+    const colors = { arrow:'#caa56a', bolt:'#9fe8ff', cannonball:'#3a3a3a', frostshard:'#ffffff' };
+    const c = colors[type] || '#fff';
+    if(type==='cannonball'){
+      ctx.fillStyle = c;
+      ctx.fillRect(1,1,6,6);
+      ctx.fillStyle = shade(c,-40);
+      ctx.fillRect(1,5,6,2);
+    } else {
+      ctx.fillStyle = c;
+      ctx.fillRect(2,0,2,8);
+      ctx.fillStyle = shade(c,40);
+      ctx.fillRect(2,0,2,3);
+    }
+    return cv;
+  },
+
+  // tile textures: grass, path, decoration
+  generateTile(type){
+    const size = 32, scale=2;
+    const cv = PixelArt.makeCanvas(size);
+    const ctx = cv.getContext('2d');
+    if(type==='grass'){
+      ctx.fillStyle = '#2e5e34';
+      ctx.fillRect(0,0,size,size);
+      for(let i=0;i<10;i++){
+        ctx.fillStyle = choice(['#356b3b','#274f2c','#3d7a44']);
+        const x = randi(0,14)*2, y = randi(0,14)*2;
+        ctx.fillRect(x,y,scale,scale);
+      }
+    } else if(type==='path'){
+      ctx.fillStyle = '#6b5440';
+      ctx.fillRect(0,0,size,size);
+      for(let i=0;i<14;i++){
+        ctx.fillStyle = choice(['#5e4a38','#7a6249','#574330']);
+        const x = randi(0,14)*2, y = randi(0,14)*2;
+        ctx.fillRect(x,y,scale,scale);
+      }
+    } else if(type==='buildable'){
+      ctx.fillStyle = '#274a2c';
+      ctx.fillRect(0,0,size,size);
+      ctx.strokeStyle = 'rgba(255,216,102,0.25)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(1,1,size-2,size-2);
+    }
+    return cv;
+  },
+
+  generateGate(){
+    const size=32, scale=2;
+    const cv = PixelArt.makeCanvas(size);
+    const ctx = cv.getContext('2d');
+    const cmap = { b:'#5a4a3a', bd:'#3a2d22', s:'#9a8a6a', t:'#ffd866' };
+    const pattern = [
+      'bbbbbbbb',
+      'btttttbb'.slice(0,8),
+      'bbbbbbbb',
+      'bbssssbb',
+      'bbssssbb',
+      'bbssssbb',
+      'bbssssbb',
+      'bbssssbb',
+      'bbssssbb',
+      'bbssssbb',
+      'bdddddbb'.slice(0,8),
+      'bbbbbbbb',
+      '........',
+      '........',
+      '........',
+      '........',
+    ];
+    PixelArt.drawSymmetric(ctx, pattern, cmap, scale, 0, 1);
+    return cv;
+  },
+
+  generateSpawn(){
+    const size=32, scale=2;
+    const cv = PixelArt.makeCanvas(size);
+    const ctx = cv.getContext('2d');
+    const cmap = { b:'#3a2d44', bd:'#241a30', t:'#a4ffea' };
+    const pattern = [
+      '..bbbb..',
+      '.bbbbbb.',
+      'bbbtttbb'.slice(0,8),
+      'bbbtttbb'.slice(0,8),
+      'bbbtttbb'.slice(0,8),
+      'bbbbbbbb',
+      'bbbbbbbb',
+      '.bbbbbb.',
+      '..bdbd..',
+      '........',
+      '........',
+      '........',
+      '........',
+      '........',
+      '........',
+      '........',
+    ];
+    PixelArt.drawSymmetric(ctx, pattern, cmap, scale, 0, 1);
+    return cv;
+  },
+
+  generateGoldCoin(){
+    const size=10;
+    const cv = PixelArt.makeCanvas(size);
+    const ctx = cv.getContext('2d');
+    ctx.fillStyle = '#ffd866';
+    ctx.beginPath(); ctx.arc(5,5,4,0,7); ctx.fill();
+    ctx.fillStyle = '#ff8c42';
+    ctx.beginPath(); ctx.arc(5,5,2,0,7); ctx.fill();
+    return cv;
+  }
+};
+
+//////////////////////// ASSET MANIFEST ////////////////////////
+const ENEMY_TYPES = ['goblin','orc','bat','skeleton','troll','wraith','dragonling','golem'];
+const TOWER_TYPES = ['archer','mage','cannon','frost'];
+
+const Assets = {
+  enemies: {},
+  towers: {}, // towers[type][level] = canvas
+  projectiles: {},
+  tiles: {},
+  gate: null,
+  spawn: null,
+  coin: null,
+};
+
+function buildAllAssets(onProgress){
+  return new Promise((resolve)=>{
+    const tasks = [];
+    ENEMY_TYPES.forEach(t => tasks.push(()=>{ Assets.enemies[t] = PixelArt.generateEnemy(t); }));
+    TOWER_TYPES.forEach(t => {
+      Assets.towers[t] = {};
+      for(let lvl=1; lvl<=4; lvl++){
+        tasks.push(()=>{ Assets.towers[t][lvl] = PixelArt.generateTower(t, lvl); });
+      }
+    });
+    ['arrow','bolt','cannonball','frostshard'].forEach(t=> tasks.push(()=>{ Assets.projectiles[t] = PixelArt.generateProjectile(t); }));
+    ['grass','path','buildable'].forEach(t=> tasks.push(()=>{ Assets.tiles[t] = PixelArt.generateTile(t); }));
+    tasks.push(()=>{ Assets.gate = PixelArt.generateGate(); });
+    tasks.push(()=>{ Assets.spawn = PixelArt.generateSpawn(); });
+    tasks.push(()=>{ Assets.coin = PixelArt.generateGoldCoin(); });
+
+    let i = 0;
+    const flavorTexts = [
+      'sketching goblins...', 'forging arrow towers...', 'brewing mage robes...',
+      'casting frost shards...', 'painting dungeon stones...', 'summoning trolls...',
+      'polishing dragon scales...', 'carving the gate...', 'lighting torches...',
+      'finishing touches...'
+    ];
+    function step(){
+      const batch = Math.max(1, Math.ceil(tasks.length/30));
+      for(let b=0;b<batch && i<tasks.length;b++,i++){
+        tasks[i]();
+      }
+      const progress = i/tasks.length;
+      onProgress(progress, flavorTexts[Math.floor(progress*(flavorTexts.length-1))]);
+      if(i < tasks.length){
+        requestAnimationFrame(step);
+      } else {
+        resolve();
+      }
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+//////////////////////// GRID / MAP ////////////////////////
+const COLS = 12, ROWS = 16;
+let TILE = 32;
+
+// Path defined as grid coordinates (col,row), winding from top spawn to bottom gate.
+function buildPath(){
+  // a snake path across the grid
+  const path = [];
+  let col = 0;
+  for(let row=0; row<ROWS; row++){
+    // travel along a fixed snake pattern
+  }
+  // Manually craft a winding path for visual interest
+  const waypoints = [
+    [0,0],[0,3],[3,3],[3,6],[9,6],[9,2],[11,2],[11,9],[5,9],[5,12],[10,12],[10,15]
+  ];
+  for(let i=0;i<waypoints.length-1;i++){
+    let [x1,y1] = waypoints[i];
+    let [x2,y2] = waypoints[i+1];
+    if(x1===x2){
+      const step = y2>y1?1:-1;
+      for(let y=y1; y!==y2; y+=step) path.push([x1,y]);
+    } else {
+      const step = x2>x1?1:-1;
+      for(let x=x1; x!==x2; x+=step) path.push([x,y1]);
+    }
+  }
+  path.push(waypoints[waypoints.length-1]);
+  return path;
+}
+
+let PATH_TILES = buildPath();
+let PATH_SET = new Set(PATH_TILES.map(([x,y])=>x+','+y));
+
+function tileCenter(col,row){
+  return { x: col*TILE + TILE/2, y: row*TILE + TILE/2 };
+}
+
+// convert path tiles to pixel waypoints (centers), dedup consecutive duplicates
+function pathToWaypoints(){
+  const pts = [];
+  PATH_TILES.forEach(([c,r])=>{
+    const {x,y} = tileCenter(c,r);
+    if(pts.length===0 || pts[pts.length-1].x!==x || pts[pts.length-1].y!==y) pts.push({x,y});
+  });
+  return pts;
+}
+let WAYPOINTS = pathToWaypoints();
+
+//////////////////////// GAME STATE ////////////////////////
+const TowerDefs = {
+  archer: { name:'Archer', cost:50, baseDmg:8, baseRange:110, baseRate:0.7, proj:'arrow', projSpeed:340, splash:0, slow:0, color:'#6b4a2a', desc:'Fast, balanced shots' },
+  mage:   { name:'Mage', cost:80, baseDmg:16, baseRange:95, baseRate:1.1, proj:'bolt', projSpeed:300, splash:30, slow:0, color:'#3a2d6a', desc:'Splash magic damage' },
+  cannon: { name:'Cannon', cost:110, baseDmg:34, baseRange:85, baseRate:1.6, proj:'cannonball', projSpeed:240, splash:45, slow:0, color:'#5a5a5a', desc:'Heavy splash damage' },
+  frost:  { name:'Frost', cost:70, baseDmg:5, baseRange:100, baseRate:0.9, proj:'frostshard', projSpeed:320, splash:0, slow:0.45, color:'#3a6e8a', desc:'Slows enemies' },
+};
+
+const EnemyDefs = {
+  goblin:    { name:'Goblin', baseHp:28, baseSpeed:48, baseGold:4, },
+  orc:       { name:'Orc', baseHp:55, baseSpeed:36, baseGold:7, },
+  bat:       { name:'Bat', baseHp:18, baseSpeed:78, baseGold:5, },
+  skeleton:  { name:'Skeleton', baseHp:40, baseSpeed:42, baseGold:6, },
+  troll:     { name:'Troll', baseHp:120, baseSpeed:28, baseGold:14, },
+  wraith:    { name:'Wraith', baseHp:65, baseSpeed:58, baseGold:10, },
+  dragonling:{ name:'Dragonling', baseHp:90, baseSpeed:50, baseGold:16, },
+  golem:     { name:'Golem', baseHp:320, baseSpeed:20, baseGold:45, boss:true },
+  treasureGoblin:{ name:'Treasure Goblin', baseHp:40, baseSpeed:90, baseGold:150 },
+};
+
+let state = {
+  gold: 150,
+  lives: 20,
+  wave: 0,
+  totalWaves: 999999,
+  towers: [],
+  enemies: [],
+  projectiles: [],
+  particles: [],
+  selectedTowerType: null,
+  selectedTower: null,
+  waveActive: false,
+  enemiesToSpawn: [],
+  spawnTimer: 0,
+  gameSpeed: 1,
+  paused: false,
+  gameOver: false,
+  occupied: {}, // 'c,r' -> tower
+  earnedGoldTotal: 0,
+  animTick: 0,
+};
+
+function tileKey(c,r){ return c+','+r; }
+
+function isBuildable(c,r){
+  if(c<0||r<0||c>=COLS||r>=ROWS) return false;
+  if(PATH_SET.has(tileKey(c,r))) return false;
+  if(state.occupied[tileKey(c,r)]) return false;
+  return true;
+}
+
+//////////////////////// WAVE GENERATION ////////////////////////
+// Difficulty scaling proportional to gold rewards: as enemy HP/count scales up,
+// gold-per-kill also scales up at a similar rate so the player can afford new defenses.
+
+function generateWave(waveNum){
+  const enemiesList = [];
+  const scale = 1 + (waveNum-1)*0.22;
+  const goldScale = 1 + (waveNum-1)*0.20;
+
+  let available = ['goblin'];
+
+  if(waveNum>=5) available.push('bat','skeleton');
+  if(waveNum>=10) available.push('orc');
+  if(waveNum>=20) available.push('wraith');
+  if(waveNum>=30) available.push('dragonling');
+  if(waveNum>=40) available.push('troll');
+
+  const count = Math.floor(6 + waveNum * 1.8);
+
+  for(let i=0;i<count;i++){
+    enemiesList.push({
+      type: choice(available),
+      hpScale: scale,
+      goldScale,
+      speedScale: 1 + Math.min(1.5, waveNum*0.01)
+    });
+  }
+
+  if(waveNum % 7 === 0){
+    enemiesList.push({
+      type:'treasureGoblin',
+      hpScale:1,
+      goldScale:1,
+      speedScale:1.5
+    });
+  }
+
+  if(waveNum % 10 === 0){
+    enemiesList.push({
+      type:'golem',
+      hpScale: scale * (2 + waveNum*0.03),
+      goldScale: goldScale * 3,
+      speedScale:1
+    });
+  }
+
+  return enemiesList;
+}
+
+
+//////////////////////// ENTITIES ////////////////////////
+class Enemy {
+  constructor(def, waveNum){
+    this.type = def.type;
+    const base = EnemyDefs[def.type];
+    this.maxHp = Math.round(base.baseHp * def.hpScale);
+    this.hp = this.maxHp;
+    this.speed = base.baseSpeed * def.speedScale;
+    this.goldValue = Math.round(base.baseGold * def.goldScale);
+    this.boss = !!base.boss;
+    this.wpIndex = 0;
+    this.x = WAYPOINTS[0].x;
+    this.y = WAYPOINTS[0].y;
+    this.slowTimer = 0;
+    this.slowFactor = 1;
+    this.dead = false;
+    this.reachedEnd = false;
+    this.r = this.boss ? 14 : 9;
+    this.flashTimer = 0;
+  }
+  update(dt){
+    if(this.slowTimer > 0){
+      this.slowTimer -= dt;
+      if(this.slowTimer <= 0) this.slowFactor = 1;
+    }
+    if(this.flashTimer > 0) this.flashTimer -= dt;
+    const target = WAYPOINTS[this.wpIndex+1];
+    if(!target){ this.reachedEnd = true; return; }
+    const d = dist(this.x,this.y,target.x,target.y);
+    const moveDist = this.speed * this.slowFactor * dt;
+    if(moveDist >= d){
+      this.x = target.x; this.y = target.y;
+      this.wpIndex++;
+      if(this.wpIndex >= WAYPOINTS.length-1) this.reachedEnd = true;
+    } else {
+      const ang = Math.atan2(target.y-this.y, target.x-this.x);
+      this.x += Math.cos(ang)*moveDist;
+      this.y += Math.sin(ang)*moveDist;
+    }
+  }
+  applySlow(factor, duration){
+    this.slowFactor = Math.min(this.slowFactor, factor);
+    this.slowTimer = Math.max(this.slowTimer, duration);
+  }
+  takeDamage(dmg){
+    this.hp -= dmg;
+    this.flashTimer = 0.08;
+    if(this.hp <= 0 && !this.dead){
+      this.dead = true;
+      return true;
+    }
+    return false;
+  }
+}
+
+class Tower {
+  constructor(type, col, row){
+    this.type = type;
+    this.col = col; this.row = row;
+    const c = tileCenter(col,row);
+    this.x = c.x; this.y = c.y;
+    this.level = 1;
+    this.cooldown = 0;
+    this.target = null;
+    this.angle = 0;
+    this.totalSpent = TowerDefs[type].cost;
+  }
+  stats(){
+    const def = TowerDefs[this.type];
+    const lvl = this.level;
+    return {
+      dmg: def.baseDmg * (1 + (lvl-1)*0.55),
+      range: def.baseRange * (1 + (lvl-1)*0.12),
+      rate: def.baseRate * (1 - (lvl-1)*0.12), // lower = faster
+      splash: def.splash,
+      slow: def.slow,
+    };
+  }
+  upgradeCost(){
+    return Math.round(TowerDefs[this.type].cost * 0.75 * this.level);
+  }
+  sellValue(){
+    return Math.round(this.totalSpent * 0.6);
+  }
+  findTarget(){
+    const st = this.stats();
+    let best = null, bestProgress = -1;
+    for(const e of state.enemies){
+      if(e.dead || e.reachedEnd) continue;
+      const d = dist(this.x,this.y,e.x,e.y);
+      if(d <= st.range){
+        const progress = e.wpIndex; // prioritize furthest-along enemy
+        if(progress > bestProgress){
+          bestProgress = progress; best = e;
+        }
+      }
+    }
+    return best;
+  }
+  update(dt){
+    this.cooldown -= dt;
+    if(!this.target || this.target.dead || this.target.reachedEnd || dist(this.x,this.y,this.target.x,this.target.y) > this.stats().range){
+      this.target = this.findTarget();
+    }
+    if(this.target){
+      this.angle = Math.atan2(this.target.y-this.y, this.target.x-this.x);
+    }
+    if(this.target && this.cooldown <= 0){
+      this.fire(this.target);
+      this.cooldown = this.stats().rate;
+    }
+  }
+  fire(target){
+    const def = TowerDefs[this.type];
+    const st = this.stats();
+    state.projectiles.push(new Projectile(this.x, this.y-6, target, st.dmg, def.proj, def.projSpeed, st.splash, st.slow));
+    spawnMuzzleParticle(this.x, this.y-6);
+  }
+}
+
+class Projectile {
+  constructor(x,y,target,dmg,type,speed,splash,slow){
+    this.x=x; this.y=y; this.target=target; this.dmg=dmg; this.type=type; this.speed=speed;
+    this.splash=splash; this.slow=slow; this.dead=false;
+    this.tx = target.x; this.ty = target.y;
+  }
+  update(dt){
+    if(this.target && !this.target.dead && !this.target.reachedEnd){
+      this.tx = this.target.x; this.ty = this.target.y;
+    }
+    const d = dist(this.x,this.y,this.tx,this.ty);
+    const moveDist = this.speed*dt;
+    if(d <= moveDist || d < 4){
+      this.hit();
+      this.dead = true;
+      return;
+    }
+    const ang = Math.atan2(this.ty-this.y, this.tx-this.x);
+    this.x += Math.cos(ang)*moveDist;
+    this.y += Math.sin(ang)*moveDist;
+  }
+  hit(){
+    if(this.splash > 0){
+      for(const e of state.enemies){
+        if(e.dead || e.reachedEnd) continue;
+        if(dist(e.x,e.y,this.tx,this.ty) <= this.splash){
+          damageEnemy(e, this.dmg * (e===this.target?1:0.6));
+          if(this.slow>0) e.applySlow(1-this.slow, 1.5);
+        }
+      }
+    } else if(this.target && !this.target.dead && !this.target.reachedEnd){
+      damageEnemy(this.target, this.dmg);
+      if(this.slow>0) this.target.applySlow(1-this.slow, 1.5);
+    }
+    spawnHitParticle(this.tx, this.ty);
+  }
+}
+
+function damageEnemy(e, dmg){
+  const killed = e.takeDamage(dmg);
+  if(killed){
+    state.gold += e.goldValue;
+    state.earnedGoldTotal += e.goldValue;
+    spawnGoldParticle(e.x, e.y);
+    updateHUD();
+  }
+}
+
+//////////////////////// PARTICLES ////////////////////////
+function spawnHitParticle(x,y){
+  for(let i=0;i<4;i++){
+    state.particles.push({ x,y, vx:rand(-40,40), vy:rand(-40,40), life:0.25, maxLife:0.25, color:'#fff', size:2 });
+  }
+}
+function spawnGoldParticle(x,y){
+  state.particles.push({ x,y, vx:rand(-10,10), vy:-30, life:0.6, maxLife:0.6, color:'#ffd866', size:3, gold:true });
+}
+function spawnMuzzleParticle(x,y){
+  state.particles.push({ x,y, vx:0, vy:0, life:0.08, maxLife:0.08, color:'#fff3d6', size:3 });
+}
+function spawnDeathBurst(x,y){
+  for(let i=0;i<8;i++){
+    state.particles.push({ x,y, vx:rand(-60,60), vy:rand(-60,60), life:0.4, maxLife:0.4, color: choice(['#ff6b6b','#ffae42','#fff']), size:2 });
+  }
+}
+
+//////////////////////// CANVAS / RENDER ////////////////////////
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+
+function resizeCanvas(){
+  const hud = document.getElementById('hud');
+  const bottom = document.getElementById('bottomBar');
+  const availH = window.innerHeight - hud.offsetHeight - bottom.offsetHeight;
+  const availW = window.innerWidth;
+  TILE = Math.floor(Math.min(availW/COLS, availH/ROWS));
+  TILE = Math.max(16, TILE);
+  canvas.width = TILE*COLS;
+  canvas.height = TILE*ROWS;
+  canvas.style.width = (TILE*COLS)+'px';
+  canvas.style.height = (TILE*ROWS)+'px';
+  WAYPOINTS = pathToWaypoints();
+  state.towers.forEach(t=>{ const c = tileCenter(t.col,t.row); t.x=c.x; t.y=c.y; });
+}
+
+function drawGrid(){
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const isPath = PATH_SET.has(tileKey(c,r));
+      const tex = isPath ? Assets.tiles.path : Assets.tiles.grass;
+      ctx.drawImage(tex, c*TILE, r*TILE, TILE, TILE);
+      if(!isPath){
+        // subtle buildable overlay highlight if selecting tower
+        if(state.selectedTowerType && isBuildable(c,r)){
+          ctx.fillStyle = 'rgba(255,216,102,0.12)';
+          ctx.fillRect(c*TILE, r*TILE, TILE, TILE);
+        }
+      }
+    }
+  }
+  // spawn + gate markers
+  const spawnTile = PATH_TILES[0];
+  const gateTile = PATH_TILES[PATH_TILES.length-1];
+  ctx.drawImage(Assets.spawn, spawnTile[0]*TILE, spawnTile[1]*TILE, TILE, TILE);
+  ctx.drawImage(Assets.gate, gateTile[0]*TILE, gateTile[1]*TILE, TILE, TILE);
+}
+
+function drawTowers(){
+  for(const t of state.towers){
+    const img = Assets.towers[t.type][t.level];
+    const scale = TILE/32;
+    ctx.save();
+    ctx.translate(t.x, t.y);
+    ctx.drawImage(img, -16*scale, -16*scale, 32*scale, 32*scale);
+    ctx.restore();
+    // range indicator if selected
+    if(state.selectedTower === t){
+      ctx.beginPath();
+      ctx.strokeStyle = 'rgba(255,216,102,0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.arc(t.x, t.y, t.stats().range, 0, Math.PI*2);
+      ctx.stroke();
+    }
+  }
+}
+
+function drawEnemies(){
+  for(const e of state.enemies){
+    if(e.dead || e.reachedEnd) continue;
+    const sprite = Assets.enemies[e.type];
+    const bob = Math.floor(state.animTick*6) % 2 === 0 ? sprite.f1 : sprite.f2;
+    const scale = (e.boss ? 1.4 : 1.0) * (TILE/32);
+    ctx.save();
+    ctx.translate(e.x, e.y);
+    if(e.flashTimer > 0){
+      ctx.globalCompositeOperation = 'lighter';
+    }
+    ctx.drawImage(bob, -16*scale, -18*scale, 32*scale, 32*scale);
+    ctx.restore();
+    // hp bar
+    const w = 18;
+    const hpRatio = clamp(e.hp/e.maxHp,0,1);
+    ctx.fillStyle = '#1a1228';
+    ctx.fillRect(e.x-w/2, e.y-22*(scale), w, 4);
+    ctx.fillStyle = hpRatio > 0.5 ? '#6fe07a' : hpRatio > 0.25 ? '#ffd866' : '#ff6b6b';
+    ctx.fillRect(e.x-w/2, e.y-22*(scale), w*hpRatio, 4);
+  }
+}
+
+function drawProjectiles(){
+  for(const p of state.projectiles){
+    const img = Assets.projectiles[p.type];
+    ctx.save();
+    ctx.translate(p.x,p.y);
+    const ang = Math.atan2(p.ty-p.y, p.tx-p.x);
+    ctx.rotate(ang + Math.PI/2);
+    ctx.drawImage(img, -4,-4,8,8);
+    ctx.restore();
+  }
+}
+
+function drawParticles(dt){
+  for(const pt of state.particles){
+    const a = clamp(pt.life/pt.maxLife,0,1);
+    ctx.globalAlpha = a;
+    ctx.fillStyle = pt.color;
+    if(pt.gold){
+      ctx.drawImage(Assets.coin, pt.x-5, pt.y-5, 10,10);
+    } else {
+      ctx.fillRect(pt.x-pt.size/2, pt.y-pt.size/2, pt.size, pt.size);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+
+function render(dt){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  drawGrid();
+  drawTowers();
+  drawProjectiles();
+  drawEnemies();
+  drawParticles(dt);
+}
+
+//////////////////////// GAME LOOP ////////////////////////
+let lastTime = 0;
+function gameLoop(ts){
+  if(!lastTime) lastTime = ts;
+  let dt = (ts - lastTime)/1000;
+  lastTime = ts;
+  dt = Math.min(dt, 0.05);
+  if(!assetsBuilt){
+    
+/* =========================================================
+   EXPANDED DESIGN DATA (safe, non-breaking integration)
+   Future content can be hooked into wave generation,
+   procedural sprite generation and tower unlock systems.
+   ========================================================= */
+const EXPANDED_DESIGN = {
+  tags: ["Holy","Nature","Fire","Ice","Arcane","Undead","Demon","Dragon","Summon","Mechanical"],
+  futureTowers: [
+    "Cleric Shrine","Druid Grove","Necromancer Tower","Alchemist",
+    "Bard Tower","Ballista","Paladin Watchtower","Warlock Circle",
+    "Beastmaster Camp","Rune Tower","Portal Tower","Goblin Engineer",
+    "Mimic Chest","Tavern","Wizard Academy","Dragon Egg"
+  ],
+  enemyStages: {
+    frontier:["Rat","Goblin","Kobold","Bandit"],
+    wilderness:["Wolf","Orc","Ogre","Shaman"],
+    undead:["Skeleton","Zombie","Ghoul","Wraith"],
+    darklords:["Vampire","Death Knight","Necromancer"],
+    infernal:["Imp","Hellhound","Succubus","Pit Fiend"],
+    dragons:["Wyvern","Young Dragon","Adult Dragon","Ancient Dragon"],
+    cosmic:["Crystal Dragon","Void Dragon","Cosmic Dragon","Time Dragon","Reality Eater","Elder Beholder","Star Spawn","Living Dungeon"]
+  },
+  bosses:[
+    "Goblin King","Ogre Chieftain","Lich Lord","Demon Prince",
+    "Ancient Dragon","Titan","World Serpent","The Moon"
+  ],
+  eras:[
+    {wave:1,name:'Frontier'},
+    {wave:20,name:'Undead'},
+    {wave:50,name:'Infernal'},
+    {wave:100,name:'Dragon Age'},
+    {wave:200,name:'Cosmic Age'}
+  ],
+  eliteModifiers:[
+    "Giant","Swift","Armoured","Regenerating","Flaming",
+    "Frozen","Vampiric","Explosive","Invisible",
+    "Teleporting","Splitter"
+  ]
+};
+
+
+requestAnimationFrame(gameLoop);
+    return;
+  }
+  if(!state.paused && !state.gameOver){
+    const simDt = dt * state.gameSpeed;
+    state.animTick += dt;
+    updateSpawning(simDt);
+    for(const t of state.towers) t.update(simDt);
+    for(const e of state.enemies) {
+      e.update(simDt);
+      if(e.reachedEnd && !e.counted){
+        e.counted = true;
+        state.lives -= (e.boss?5:1);
+        updateHUD();
+        if(state.lives <= 0){ triggerGameOver(false); }
+      }
+    }
+    for(const p of state.projectiles) p.update(simDt);
+    state.projectiles = state.projectiles.filter(p=>!p.dead);
+    const before = state.enemies.length;
+    for(const e of state.enemies){
+      if(e.dead) spawnDeathBurst(e.x,e.y);
+    }
+    state.enemies = state.enemies.filter(e=>!e.dead && !e.reachedEnd);
+    state.particles.forEach(p=>{ p.x += p.vx*simDt; p.y += p.vy*simDt; p.life -= simDt; });
+    state.particles = state.particles.filter(p=>p.life>0);
+
+    if(state.waveActive && state.enemiesToSpawn.length===0 && state.enemies.length===0){
+      onWaveComplete();
+    }
+  }
+  render(dt);
+  
+/* =========================================================
+   EXPANDED DESIGN DATA (safe, non-breaking integration)
+   Future content can be hooked into wave generation,
+   procedural sprite generation and tower unlock systems.
+   ========================================================= */
+const EXPANDED_DESIGN = {
+  tags: ["Holy","Nature","Fire","Ice","Arcane","Undead","Demon","Dragon","Summon","Mechanical"],
+  futureTowers: [
+    "Cleric Shrine","Druid Grove","Necromancer Tower","Alchemist",
+    "Bard Tower","Ballista","Paladin Watchtower","Warlock Circle",
+    "Beastmaster Camp","Rune Tower","Portal Tower","Goblin Engineer",
+    "Mimic Chest","Tavern","Wizard Academy","Dragon Egg"
+  ],
+  enemyStages: {
+    frontier:["Rat","Goblin","Kobold","Bandit"],
+    wilderness:["Wolf","Orc","Ogre","Shaman"],
+    undead:["Skeleton","Zombie","Ghoul","Wraith"],
+    darklords:["Vampire","Death Knight","Necromancer"],
+    infernal:["Imp","Hellhound","Succubus","Pit Fiend"],
+    dragons:["Wyvern","Young Dragon","Adult Dragon","Ancient Dragon"],
+    cosmic:["Crystal Dragon","Void Dragon","Cosmic Dragon","Time Dragon","Reality Eater","Elder Beholder","Star Spawn","Living Dungeon"]
+  },
+  bosses:[
+    "Goblin King","Ogre Chieftain","Lich Lord","Demon Prince",
+    "Ancient Dragon","Titan","World Serpent","The Moon"
+  ],
+  eras:[
+    {wave:1,name:'Frontier'},
+    {wave:20,name:'Undead'},
+    {wave:50,name:'Infernal'},
+    {wave:100,name:'Dragon Age'},
+    {wave:200,name:'Cosmic Age'}
+  ],
+  eliteModifiers:[
+    "Giant","Swift","Armoured","Regenerating","Flaming",
+    "Frozen","Vampiric","Explosive","Invisible",
+    "Teleporting","Splitter"
+  ]
+};
+
+
+requestAnimationFrame(gameLoop);
+}
+
+function updateSpawning(dt){
+  if(state.enemiesToSpawn.length === 0) return;
+  state.spawnTimer -= dt;
+  if(state.spawnTimer <= 0){
+    const next = state.enemiesToSpawn.shift();
+    state.enemies.push(new Enemy(next, state.wave));
+    state.spawnTimer = next.type==='golem' ? 0.1 : rand(0.5, 0.9);
+  }
+}
+
+//////////////////////// WAVE FLOW ////////////////////////
+function startWave(){
+  if(state.waveActive || state.gameOver) return;
+  state.wave++;
+  state.enemiesToSpawn = generateWave(state.wave);
+  state.spawnTimer = 0;
+  state.waveActive = true;
+  showWaveBanner('WAVE ' + state.wave);
+  if(state.wave===20) showWaveBanner('THE UNDEAD AWAKEN');
+  if(state.wave===50) showWaveBanner('INFERNAL PORTALS OPEN');
+  if(state.wave===100) showWaveBanner('DRAGON AGE BEGINS');
+  if(state.wave===200) showWaveBanner('REALITY FRACTURES');
+  updateHUD();
+  document.getElementById('startWaveBtn').disabled = true;
+  document.getElementById('startWaveBtn').style.opacity = 0.5;
+}
+
+function onWaveComplete(){
+  state.waveActive = false;
+  document.getElementById('startWaveBtn').disabled = false;
+  document.getElementById('startWaveBtn').style.opacity = 1;
+  // bonus gold for clearing wave
+  const bonus = 15 + state.wave*4;
+  state.gold += bonus;
+  state.earnedGoldTotal += bonus;
+  updateHUD();
+  showWaveBanner('WAVE CLEARED! +'+bonus+' gold');
+  if(state.wave > 0 && state.wave % 15 === 0){
+    state.gold += 100 + state.wave * 5;
+    showWaveBanner('WANDERING MERCHANT! BONUS GOLD');
+  }
+  // Endless mode enabled
+}
+
+function showWaveBanner(text){
+  const el = document.getElementById('waveBanner');
+  el.textContent = text;
+  el.style.opacity = 1;
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.style.opacity = 0; }, 1600);
+}
+
+function triggerGameOver(victory){
+  state.gameOver = true;
+  document.getElementById('gameOverTitle').textContent = victory ? 'VICTORY! THE DUNGEON HOLDS!' : 'YOUR GATE HAS FALLEN';
+  document.getElementById('gameOverTitle').style.color = victory ? '#6fe07a' : '#ff6b6b';
+  document.getElementById('finalWave').textContent = 'Reached Wave: ' + state.wave;
+  document.getElementById('finalGold').textContent = 'Gold earned: ' + state.earnedGoldTotal;
+  document.getElementById('gameOverScreen').classList.remove('hidden');
+}
+
+//////////////////////// HUD ////////////////////////
+function updateHUD(){
+  document.getElementById('goldStat').textContent = state.gold;
+  document.getElementById('livesStat').textContent = state.lives;
+  document.getElementById('waveStat').textContent = state.wave;
+  document.getElementById('waveTotal').textContent = state.totalWaves;
+}
+
+//////////////////////// TOWER SHOP UI ////////////////////////
+function buildTowerShop(){
+  const shop = document.getElementById('towerShop');
+  shop.innerHTML = '';
+  TOWER_TYPES.forEach(type=>{
+    const def = TowerDefs[type];
+    const card = document.createElement('div');
+    card.className = 'towerCard';
+    card.dataset.type = type;
+    const cv = document.createElement('canvas');
+    cv.width = 32; cv.height = 32;
+    card.appendChild(cv);
+    const nameEl = document.createElement('div');
+    nameEl.textContent = def.name;
+    card.appendChild(nameEl);
+    const costEl = document.createElement('div');
+    costEl.className = 'cost';
+    costEl.textContent = '💰'+def.cost;
+    card.appendChild(costEl);
+    card.addEventListener('click', ()=> selectTowerType(type));
+    shop.appendChild(card);
+    // draw preview once assets ready
+    requestAnimationFrame(()=>{
+      const cctx = cv.getContext('2d');
+      cctx.imageSmoothingEnabled = false;
+      cctx.drawImage(Assets.towers[type][1], 0,0,32,32);
+    });
+  });
+  refreshShopAfford();
+}
+
+function refreshShopAfford(){
+  document.querySelectorAll('.towerCard').forEach(card=>{
+    const type = card.dataset.type;
+    const def = TowerDefs[type];
+    card.classList.toggle('disabled', state.gold < def.cost);
+    card.classList.toggle('selected', state.selectedTowerType === type);
+  });
+}
+
+function selectTowerType(type){
+  if(TowerDefs[type].cost > state.gold) { flashShortGold(); return; }
+  state.selectedTowerType = (state.selectedTowerType === type) ? null : type;
+  state.selectedTower = null;
+  hideInfoPanel();
+  refreshShopAfford();
+}
+
+function flashShortGold(){
+  const el = document.getElementById('goldStat');
+  el.style.color = '#ff6b6b';
+  setTimeout(()=>{ el.style.color = '#ffd866'; }, 300);
+}
+
+//////////////////////// INFO PANEL (tower select) ////////////////////////
+function showInfoPanel(tower){
+  state.selectedTower = tower;
+  state.selectedTowerType = null;
+  refreshShopAfford();
+  const panel = document.getElementById('infoPanel');
+  panel.classList.add('show');
+  const st = tower.stats();
+  document.getElementById('infoName').textContent = TowerDefs[tower.type].name;
+  document.getElementById('infoLvl').textContent = 'Lv.' + tower.level + (tower.level>=4?' (MAX)':'');
+  document.getElementById('infoDmg').textContent = Math.round(st.dmg);
+  document.getElementById('infoRange').textContent = Math.round(st.range);
+  document.getElementById('infoSpeed').textContent = (1/st.rate).toFixed(1)+'/s';
+  const upBtn = document.getElementById('upgradeBtn');
+  if(tower.level >= 4){
+    upBtn.textContent = 'MAX LEVEL';
+    upBtn.disabled = true;
+  } else {
+    upBtn.textContent = 'Upgrade (💰' + tower.upgradeCost() + ')';
+    upBtn.disabled = state.gold < tower.upgradeCost();
+  }
+  document.getElementById('sellBtn').textContent = 'Sell (💰+' + tower.sellValue() + ')';
+}
+function hideInfoPanel(){
+  document.getElementById('infoPanel').classList.remove('show');
+  state.selectedTower = null;
+}
+
+//////////////////////// INPUT ////////////////////////
+function getTileFromEvent(evt){
+  const rect = canvas.getBoundingClientRect();
+  const cx = (evt.clientX !== undefined ? evt.clientX : evt.touches[0].clientX) - rect.left;
+  const cy = (evt.clientY !== undefined ? evt.clientY : evt.touches[0].clientY) - rect.top;
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  const col = Math.floor((cx*scaleX) / TILE);
+  const row = Math.floor((cy*scaleY) / TILE);
+  return { col, row };
+}
+
+canvas.addEventListener('click', (evt)=>{
+  if(state.gameOver || state.paused) return;
+  const {col,row} = getTileFromEvent(evt);
+  if(col<0||row<0||col>=COLS||row>=ROWS) return;
+
+  // check tower click first
+  const existing = state.towers.find(t=>t.col===col && t.row===row);
+  if(existing){
+    showInfoPanel(existing);
+    return;
+  }
+
+  if(state.selectedTowerType){
+    if(isBuildable(col,row)){
+      const def = TowerDefs[state.selectedTowerType];
+      if(state.gold >= def.cost){
+        state.gold -= def.cost;
+        const tower = new Tower(state.selectedTowerType, col, row);
+        state.towers.push(tower);
+        state.occupied[tileKey(col,row)] = tower;
+        state.selectedTowerType = null;
+        updateHUD();
+        refreshShopAfford();
+      }
+    }
+  } else {
+    hideInfoPanel();
+  }
+});
+
+document.getElementById('upgradeBtn').addEventListener('click', ()=>{
+  const t = state.selectedTower;
+  if(!t || t.level>=4) return;
+  const cost = t.upgradeCost();
+  if(state.gold >= cost){
+    state.gold -= cost;
+    t.totalSpent += cost;
+    t.level++;
+    updateHUD();
+    showInfoPanel(t);
+  }
+});
+
+document.getElementById('sellBtn').addEventListener('click', ()=>{
+  const t = state.selectedTower;
+  if(!t) return;
+  state.gold += t.sellValue();
+  state.towers = state.towers.filter(x=>x!==t);
+  delete state.occupied[tileKey(t.col,t.row)];
+  hideInfoPanel();
+  updateHUD();
+  refreshShopAfford();
+});
+
+document.getElementById('closeInfoBtn').addEventListener('click', hideInfoPanel);
+
+document.getElementById('startWaveBtn').addEventListener('click', startWave);
+
+document.getElementById('speedBtn').addEventListener('click', (e)=>{
+  state.gameSpeed = state.gameSpeed === 1 ? 2 : (state.gameSpeed===2 ? 3 : 1);
+  e.target.textContent = 'SPEED x' + state.gameSpeed;
+});
+
+document.getElementById('pauseBtn').addEventListener('click', ()=>{
+  state.paused = true;
+  document.getElementById('pauseScreen').classList.remove('hidden');
+});
+document.getElementById('resumeBtn').addEventListener('click', ()=>{
+  state.paused = false;
+  document.getElementById('pauseScreen').classList.add('hidden');
+});
+document.getElementById('quitBtn').addEventListener('click', ()=>{
+  document.getElementById('pauseScreen').classList.add('hidden');
+  goToMenu();
+});
+
+document.getElementById('retryBtn').addEventListener('click', ()=>{
+  document.getElementById('gameOverScreen').classList.add('hidden');
+  resetGameState();
+  document.getElementById('gameScreen').classList.remove('hidden');
+});
+document.getElementById('menuBtn2').addEventListener('click', ()=>{
+  document.getElementById('gameOverScreen').classList.add('hidden');
+  goToMenu();
+});
+
+function goToMenu(){
+  document.getElementById('gameScreen').classList.add('hidden');
+  document.getElementById('menuScreen').classList.remove('hidden');
+}
+
+function resetGameState(){
+  state.gold = 150;
+  state.lives = 20;
+  state.wave = 0;
+  state.towers = [];
+  state.enemies = [];
+  state.projectiles = [];
+  state.particles = [];
+  state.selectedTowerType = null;
+  state.selectedTower = null;
+  state.waveActive = false;
+  state.enemiesToSpawn = [];
+  state.occupied = {};
+  state.earnedGoldTotal = 0;
+  state.gameOver = false;
+  state.paused = false;
+  state.gameSpeed = 1;
+  document.getElementById('speedBtn').textContent = 'SPEED x1';
+  document.getElementById('startWaveBtn').disabled = false;
+  document.getElementById('startWaveBtn').style.opacity = 1;
+  hideInfoPanel();
+  updateHUD();
+  refreshShopAfford();
+}
+
+//////////////////////// MENU / LOADING FLOW ////////////////////////
+document.getElementById('playBtn').addEventListener('click', startLoadingThenGame);
+document.getElementById('howBtn').addEventListener('click', ()=>{
+  document.getElementById('menuScreen').classList.add('hidden');
+  document.getElementById('howScreen').classList.remove('hidden');
+});
+document.getElementById('backBtn').addEventListener('click', ()=>{
+  document.getElementById('howScreen').classList.add('hidden');
+  document.getElementById('menuScreen').classList.remove('hidden');
+});
+
+let assetsBuilt = false;
+
+function startLoadingThenGame(){
+  document.getElementById('menuScreen').classList.add('hidden');
+  document.getElementById('loadingScreen').classList.remove('hidden');
+  const bar = document.getElementById('loadingBarInner');
+  const txt = document.getElementById('loadingText');
+
+  const begin = () => {
+    buildAllAssets((progress, label)=>{
+      bar.style.width = Math.round(progress*100)+'%';
+      txt.textContent = label;
+    }).then(()=>{
+      assetsBuilt = true;
+      buildTowerShop();
+      resizeCanvas();
+      resetGameState();
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+    });
+  };
+
+  if(assetsBuilt){
+    // quick re-show loading briefly for flavor then go
+    bar.style.width = '100%';
+    txt.textContent = 'ready!';
+    setTimeout(()=>{
+      buildTowerShop();
+      resizeCanvas();
+      resetGameState();
+      document.getElementById('loadingScreen').classList.add('hidden');
+      document.getElementById('gameScreen').classList.remove('hidden');
+    }, 250);
+  } else {
+    begin();
+  }
+}
+
+window.addEventListener('resize', ()=>{ if(assetsBuilt) resizeCanvas(); });
+window.addEventListener('orientationchange', ()=>{ if(assetsBuilt) setTimeout(resizeCanvas,200); });
+
+// prevent iOS rubber-band scrolling / pinch zoom
+document.addEventListener('touchmove', (e)=>{ e.preventDefault(); }, {passive:false});
+document.addEventListener('gesturestart', (e)=>{ e.preventDefault(); });
+
+
+/* =========================================================
+   EXPANDED DESIGN DATA (safe, non-breaking integration)
+   Future content can be hooked into wave generation,
+   procedural sprite generation and tower unlock systems.
+   ========================================================= */
+const EXPANDED_DESIGN = {
+  tags: ["Holy","Nature","Fire","Ice","Arcane","Undead","Demon","Dragon","Summon","Mechanical"],
+  futureTowers: [
+    "Cleric Shrine","Druid Grove","Necromancer Tower","Alchemist",
+    "Bard Tower","Ballista","Paladin Watchtower","Warlock Circle",
+    "Beastmaster Camp","Rune Tower","Portal Tower","Goblin Engineer",
+    "Mimic Chest","Tavern","Wizard Academy","Dragon Egg"
+  ],
+  enemyStages: {
+    frontier:["Rat","Goblin","Kobold","Bandit"],
+    wilderness:["Wolf","Orc","Ogre","Shaman"],
+    undead:["Skeleton","Zombie","Ghoul","Wraith"],
+    darklords:["Vampire","Death Knight","Necromancer"],
+    infernal:["Imp","Hellhound","Succubus","Pit Fiend"],
+    dragons:["Wyvern","Young Dragon","Adult Dragon","Ancient Dragon"],
+    cosmic:["Crystal Dragon","Void Dragon","Cosmic Dragon","Time Dragon","Reality Eater","Elder Beholder","Star Spawn","Living Dungeon"]
+  },
+  bosses:[
+    "Goblin King","Ogre Chieftain","Lich Lord","Demon Prince",
+    "Ancient Dragon","Titan","World Serpent","The Moon"
+  ],
+  eras:[
+    {wave:1,name:'Frontier'},
+    {wave:20,name:'Undead'},
+    {wave:50,name:'Infernal'},
+    {wave:100,name:'Dragon Age'},
+    {wave:200,name:'Cosmic Age'}
+  ],
+  eliteModifiers:[
+    "Giant","Swift","Armoured","Regenerating","Flaming",
+    "Frozen","Vampiric","Explosive","Invisible",
+    "Teleporting","Splitter"
+  ]
+};
+
+
+requestAnimationFrame(gameLoop);
+
+</script>
+</body>
+</html>
