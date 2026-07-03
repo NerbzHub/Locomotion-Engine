@@ -1,0 +1,98 @@
+Locomotion-Builder/
+│
+├── builder.py                 # Entry point
+├── requirements.txt
+├── README.md
+│
+├── builder/
+│   ├── app.py                 # Application controller
+│   ├── ui.py                  # Terminal UI
+│   ├── menu.py                # Main menu
+│   ├── workspace.py           # Workspace management
+│   ├── settings.py            # Settings
+│   ├── jobs.py                # Job registry
+│   ├── logger.py              # Logging
+│   ├── version.py             # Version information
+│   └── constants.py
+│
+├── data/
+│   ├── workspace.json
+│   ├── settings.json
+│   └── history.json
+│
+├── logs/
+│
+├── prompts/
+│
+├── output/
+│
+└── projects/
+
+================ROADMAP================
+
+The roadmap I see
+
+v0.1.0 – Foundation
+
+Application shell
+UI
+Workspace creation
+Persistent settings
+Logging
+Project structure
+
+v0.2.0 – Persistence
+
+Workspace loading
+Resume previous session
+History
+Recent projects
+
+v0.3.0 – Project Discovery
+
+Locate Book 00–03
+Validate project structure
+Detect missing documents
+
+v0.4.0 – Book Parser
+
+Parse Book 03
+Discover sprints
+Show construction order
+
+v0.5.0 – Construction Manager
+
+Resume Construction
+Track progress
+Lock completed sprints
+Save checkpoints
+
+v0.6.0 – Prompt Generator
+
+Build implementation prompts
+Export Markdown
+Track prompt state
+
+From there, we can add validation, code import, and eventually optional AI integration.
+
+================FLESHED OUT V0.1.0 FOUNDATION================
+We're officially starting Locomotion Builder as a real project.
+
+Release 1
+
+Locomotion Builder v0.1.0 – Foundation
+
+This will be a polished, runnable project that includes:
+
+Professional Rich-based terminal UI.
+Modular architecture.
+Workspace management framework.
+Persistent settings.
+Session logging.
+Construction history system.
+Automatic workspace persistence.
+Directory creation.
+Version management.
+Builder identity (branding, banner, status footer).
+
+No parsing, prompts, or code generation yet—that comes in later versions.

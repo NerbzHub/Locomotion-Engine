@@ -1,0 +1,50 @@
+                 Locomotion Builder
+
+                      │
+          Load Existing Project
+                      │
+                      ▼
+             Read Builder State
+                      │
+                      ▼
+           Determine Current Sprint
+                      │
+                      ▼
+           Verify Existing Files
+                      │
+                      ▼
+      Can Builder Complete Automatically?
+
+            YES               NO
+
+             │                 │
+
+             ▼                 ▼
+
+     Do Work          Generate ChatGPT Prompt
+
+             │                 │
+
+             ▼                 ▼
+
+       Validate        Wait For User Paste
+
+             │                 │
+
+             └─────────┬───────┘
+
+                       ▼
+
+              Validate Output
+
+                       ▼
+
+              Mark Sprint Complete
+
+                       ▼
+
+                Save State
+
+                       ▼
+
+                  Next Sprint
