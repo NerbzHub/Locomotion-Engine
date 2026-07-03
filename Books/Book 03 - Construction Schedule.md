@@ -1,5 +1,17 @@
 # Book 03 — Construction Schedule
 
+Editorial Status
+
+This document is the current working edition of the Locomotion Engine Construction Schedule.
+
+Its engineering content is considered authoritative. However, portions of the document reflect the project's evolution over time and therefore contain legacy sprint identifiers and minor editorial inconsistencies.
+
+These inconsistencies do not affect construction order, engineering intent, dependencies, or implementation guidance.
+
+Editorial normalisation—including sprint identifier standardisation, cross-reference verification, and publication formatting—is intentionally deferred until completion of the Locomotion Publisher.
+
+Engineering development shall proceed using this document as the authoritative construction schedule.
+
 ## Part I — Project Foundations
 
 # Chapter 1 — Repository & Project Initialization
@@ -18,11 +30,11 @@ At the conclusion of this chapter, the project must contain a valid repository, 
 
 ---
 
-# Sprint B03-P1-S001
+# Sprint B03-P1-C001
 
 ## Sprint ID
 
-**B03-P1-S001**
+**B03-P1-C001**
 
 ---
 
@@ -218,7 +230,7 @@ Changing the repository structure after this sprint should be considered an arch
 
 ## Next Sprint
 
-**B03-P1-S002 — Runtime Bootstrap**
+**B03-P1-C002 — Runtime Bootstrap**
 
 # Book 03 — Construction Schedule
 
@@ -240,11 +252,11 @@ The only objective is to establish the deterministic lifecycle that every future
 
 ---
 
-# Sprint B03-P1-S002
+# Sprint B03-P1-C002
 
 ## Sprint ID
 
-**B03-P1-S002**
+**B03-P1-C002**
 
 ---
 
@@ -387,7 +399,7 @@ The sprint is complete when:
 
 **Depends On**
 
-* B03-P1-S001 — Repository Initialization
+* B03-P1-C001 — Repository Initialization
 
 **Enables**
 
@@ -413,13 +425,13 @@ Maintaining a minimal bootstrap significantly reduces hidden dependencies and si
 
 ## Next Sprint
 
-**B03-P1-S003 — Diagnostics**
+**B03-P1-C003 — Diagnostics**
 
 # Book 03 — Construction Schedule
 
 ## Part I — Project Foundations
 
-# Chapter 3 — Diagnostics
+### Chapter 3 — Diagnostics
 
 ---
 
@@ -435,11 +447,11 @@ No debugging interface, performance profiler, editor, or developer console is im
 
 ---
 
-# Sprint B03-P1-S003
+# Sprint B03-P1-C003
 
 ## Sprint ID
 
-**B03-P1-S003**
+**B03-P1-C003**
 
 ---
 
@@ -579,8 +591,8 @@ The sprint is complete when:
 
 **Depends On**
 
-* B03-P1-S001 — Repository Initialization
-* B03-P1-S002 — Runtime Bootstrap
+* B03-P1-C001 — Repository Initialization
+* B03-P1-C002 — Runtime Bootstrap
 
 **Enables**
 
@@ -615,7 +627,7 @@ Keeping diagnostics lightweight at this stage ensures that future subsystems can
 
 ## Next Sprint
 
-**B03-P1-S004 — Foundation Review**
+**B03-P1-C004 — Foundation Review**
 
 # Book 03 — Construction Schedule
 
@@ -637,11 +649,11 @@ Successful completion of this review authorizes progression to Part II.
 
 ---
 
-# Sprint B03-P1-S004
+# Sprint B03-P1-C004
 
 ## Sprint ID
 
-**B03-P1-S004**
+**B03-P1-C004**
 
 ---
 
@@ -779,9 +791,9 @@ The sprint is complete when:
 
 **Depends On**
 
-* B03-P1-S001 — Repository Initialization
-* B03-P1-S002 — Runtime Bootstrap
-* B03-P1-S003 — Diagnostics Foundation
+* B03-P1-C001 — Repository Initialization
+* B03-P1-C002 — Runtime Bootstrap
+* B03-P1-C003 — Diagnostics Foundation
 
 **Enables**
 
@@ -803,7 +815,7 @@ This review also establishes the pattern that will be repeated at the conclusion
 
 ## Next Sprint
 
-**B03-P2-S001 — Core Runtime Configuration**
+**B03-P2-C001 — Core Runtime Configuration**
 
 Chapter 5 — Utility Library
 Sprint C-005-001
