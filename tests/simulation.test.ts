@@ -32,13 +32,24 @@ describe("Dungeon Defense simulation", () => {
     expect(placementStatus(state, { column: 1, row: 1 }, "archer")).toBe("occupied");
   });
 
+  it("uses authored map content for buildability and spawned enemy paths", () => {
+    const state = createGame(55, "crossroads");
+
+    expect(state.mapId).toBe("crossroads");
+    expect(isBuildable({ column: 0, row: 5 }, "gate")).toBe(true);
+    expect(isBuildable({ column: 0, row: 5 }, "crossroads")).toBe(false);
+    startWave(state);
+    updateGame(state, 1 / 60);
+    expect(state.enemies[0].mapId).toBe("crossroads");
+  });
+
   it("targets the in-range enemy nearest to the exit", () => {
     const state = createGame();
     const first = state.world.create("enemy").id;
     const second = state.world.create("enemy").id;
     const enemies = [
-      { id: first, kind: "slime" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, distance: 24, reward: 1 },
-      { id: second, kind: "slime" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, distance: 160, reward: 1 }
+      { id: first, kind: "slime" as const, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, distance: 24, reward: 1 },
+      { id: second, kind: "slime" as const, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, distance: 160, reward: 1 }
     ];
 
     expect(selectNearestToExitTarget(enemies, { x: 64, y: 224 }, 200)?.id).toBe(second);
@@ -91,6 +102,7 @@ describe("Dungeon Defense simulation", () => {
     const beetle = {
       id: state.world.create("enemy").id,
       kind: "beetle" as const,
+      mapId: "gate" as const,
       health: 30,
       maximumHealth: 30,
       speed: 30,
@@ -110,6 +122,7 @@ describe("Dungeon Defense simulation", () => {
     const wisp = {
       id: state.world.create("enemy").id,
       kind: "wisp" as const,
+      mapId: "gate" as const,
       health: 20,
       maximumHealth: 20,
       speed: 60,

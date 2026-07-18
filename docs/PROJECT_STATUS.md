@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S06 and verified
+**Status:** Gate 1 extended through LE-S07 and verified
 
 **Updated:** 2026-07-18
 
@@ -32,6 +32,8 @@
   a deterministic periodic speed burst with clear combat-board cues.
 - Explicit intermissions with next-wave composition/reward briefings and clear
   wave-completion reward summaries.
+- Two selectable, validated authored maps with independent paths, build spaces,
+  palettes, and deterministic enemy path ownership.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -65,8 +67,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S07 from `docs/NEXT_TEN_SPRINTS.md`: decouple the board path into
-validated map content and add a second deterministic map.
+Begin LE-S08 from `docs/NEXT_TEN_SPRINTS.md`: add a toggleable developer
+diagnostics overlay for reproducible simulation evidence.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

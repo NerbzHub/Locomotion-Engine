@@ -1,4 +1,4 @@
-import type { EnemyDefinition, EnemyTraitDefinition, GameContent, TowerDefinition, TowerUpgradeDefinition } from "./content";
+import type { EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerUpgradeDefinition } from "./content";
 
 export interface ContentValidationIssue {
   readonly path: string;
@@ -23,9 +23,11 @@ export function validateGameContent(content: GameContent): ContentValidationRepo
   const issues: ContentValidationIssue[] = [];
   const towers = Object.entries(content.towers);
   const enemies = Object.entries(content.enemies);
+  const maps = Object.entries(content.maps);
 
   validateCollection("towers", towers, issues, validateTower);
   validateCollection("enemies", enemies, issues, validateEnemy);
+  validateCollection("maps", maps, issues, validateMap);
 
   if (content.waves.length === 0) {
     addIssue(issues, "waves", "must contain at least one wave");
@@ -125,6 +127,18 @@ function validateEnemyTrait(trait: EnemyTraitDefinition, path: string, issues: C
   if (trait.speedMultiplier <= 1) {
     addIssue(issues, `${path}.speedMultiplier`, "must be greater than one");
   }
+}
+
+function validateMap(definition: MapDefinition, path: string, issues: ContentValidationIssue[]): void {
+  validateDisplayName(definition.displayName, `${path}.displayName`, issues);
+  validatePositiveNumber(definition.columns, `${path}.columns`, issues);
+  validatePositiveNumber(definition.rows, `${path}.rows`, issues);
+  validatePositiveNumber(definition.tileSize, `${path}.tileSize`, issues);
+  if (definition.pathNodes.length < 2) addIssue(issues, `${path}.pathNodes`, "must contain at least two path nodes");
+  if (definition.pathCells.length === 0) addIssue(issues, `${path}.pathCells`, "must contain at least one occupied path cell");
+  validateColor(definition.grassColor, `${path}.grassColor`, issues);
+  validateColor(definition.pathColor, `${path}.pathColor`, issues);
+  validateColor(definition.pathEdgeColor, `${path}.pathEdgeColor`, issues);
 }
 
 function validateDisplayName(value: string, path: string, issues: ContentValidationIssue[]): void {

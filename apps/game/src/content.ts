@@ -44,6 +44,51 @@ export interface EnemySpeedBurstTrait {
   readonly speedMultiplier: number;
 }
 
+export interface MapDefinition {
+  readonly displayName: string;
+  readonly columns: number;
+  readonly rows: number;
+  readonly tileSize: number;
+  readonly pathNodes: readonly MapPoint[];
+  readonly pathCells: readonly string[];
+  readonly grassColor: string;
+  readonly pathColor: string;
+  readonly pathEdgeColor: string;
+}
+
+export interface MapPoint {
+  readonly x: number;
+  readonly y: number;
+}
+
+/** Maps are authored data; both initial maps intentionally share board dimensions. */
+export const MAP_DEFINITIONS = {
+  gate: {
+    displayName: "Dungeon Gate",
+    columns: 12,
+    rows: 8,
+    tileSize: 64,
+    pathNodes: [{ x: -32, y: 224 }, { x: 224, y: 224 }, { x: 224, y: 96 }, { x: 480, y: 96 }, { x: 480, y: 416 }, { x: 800, y: 416 }],
+    pathCells: ["0:3", "1:3", "2:3", "3:3", "3:1", "3:2", "4:1", "5:1", "6:1", "7:1", "7:2", "7:3", "7:4", "7:5", "7:6", "8:6", "9:6", "10:6", "11:6"],
+    grassColor: "#6caa5f",
+    pathColor: "#c69b64",
+    pathEdgeColor: "#e8c488"
+  },
+  crossroads: {
+    displayName: "Crossroads",
+    columns: 12,
+    rows: 8,
+    tileSize: 64,
+    pathNodes: [{ x: -32, y: 352 }, { x: 160, y: 352 }, { x: 160, y: 160 }, { x: 416, y: 160 }, { x: 416, y: 288 }, { x: 800, y: 288 }],
+    pathCells: ["0:5", "1:5", "2:5", "2:2", "2:3", "2:4", "3:2", "4:2", "5:2", "6:2", "6:3", "6:4", "7:4", "8:4", "9:4", "10:4", "11:4"],
+    grassColor: "#608fa8",
+    pathColor: "#8f7456",
+    pathEdgeColor: "#e5c38a"
+  }
+} as const satisfies Record<string, MapDefinition>;
+
+export type MapId = keyof typeof MAP_DEFINITIONS;
+
 /** Enemy balance and presentation are authored game content, not engine concerns. */
 export const ENEMY_DEFINITIONS = {
   slime: {
@@ -131,6 +176,7 @@ export type TowerKind = keyof typeof TOWER_DEFINITIONS;
 export interface GameContent {
   readonly towers: Readonly<Record<string, TowerDefinition>>;
   readonly enemies: Readonly<Record<string, EnemyDefinition>>;
+  readonly maps: Readonly<Record<string, MapDefinition>>;
   readonly waves: readonly {
     readonly enemyKinds: readonly string[];
     readonly clearBonus: number;
@@ -140,5 +186,6 @@ export interface GameContent {
 export const GAME_CONTENT = {
   towers: TOWER_DEFINITIONS,
   enemies: ENEMY_DEFINITIONS,
+  maps: MAP_DEFINITIONS,
   waves: WAVE_DEFINITIONS
 } satisfies GameContent;

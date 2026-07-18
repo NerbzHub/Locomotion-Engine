@@ -1,6 +1,6 @@
 import type { Cell, GameState, PlacementStatus, Point } from "./simulation";
 import { BOARD, enemyPosition, towerPosition } from "./simulation";
-import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
+import { ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
 import type { TowerKind } from "./content";
 
 export interface PlacementPreview {
@@ -11,7 +11,7 @@ export interface PlacementPreview {
 
 export function renderGame(context: CanvasRenderingContext2D, state: GameState, preview?: PlacementPreview): void {
   context.clearRect(0, 0, BOARD.columns * BOARD.tileSize, BOARD.rows * BOARD.tileSize);
-  drawBoard(context);
+  drawBoard(context, state);
   if (preview) drawPlacementPreview(context, preview);
   drawTowers(context, state);
   drawEnemies(context, state);
@@ -34,8 +34,9 @@ function drawPlacementPreview(context: CanvasRenderingContext2D, preview: Placem
   context.restore();
 }
 
-function drawBoard(context: CanvasRenderingContext2D): void {
-  context.fillStyle = "#6caa5f";
+function drawBoard(context: CanvasRenderingContext2D, state: GameState): void {
+  const map = MAP_DEFINITIONS[state.mapId];
+  context.fillStyle = map.grassColor;
   context.fillRect(0, 0, BOARD.columns * BOARD.tileSize, BOARD.rows * BOARD.tileSize);
   context.strokeStyle = "rgba(37, 83, 55, 0.18)";
   context.lineWidth = 1;
@@ -52,18 +53,14 @@ function drawBoard(context: CanvasRenderingContext2D): void {
     context.stroke();
   }
 
-  context.strokeStyle = "#c69b64";
+  context.strokeStyle = map.pathColor;
   context.lineWidth = BOARD.tileSize * 0.54;
   context.lineJoin = "round";
   context.beginPath();
-  context.moveTo(-32, 224);
-  context.lineTo(224, 224);
-  context.lineTo(224, 96);
-  context.lineTo(480, 96);
-  context.lineTo(480, 416);
-  context.lineTo(800, 416);
+  context.moveTo(map.pathNodes[0].x, map.pathNodes[0].y);
+  for (const node of map.pathNodes.slice(1)) context.lineTo(node.x, node.y);
   context.stroke();
-  context.strokeStyle = "#e8c488";
+  context.strokeStyle = map.pathEdgeColor;
   context.lineWidth = 3;
   context.stroke();
 }

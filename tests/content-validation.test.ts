@@ -31,6 +31,7 @@ describe("game content validation", () => {
           trait: { kind: "speed-burst", intervalSeconds: 1, durationSeconds: 1, speedMultiplier: 1 }
         }
       },
+      maps: GAME_CONTENT.maps,
       waves: [
         { enemyKinds: [], clearBonus: -1 },
         { enemyKinds: ["missing-enemy"], clearBonus: 0 }

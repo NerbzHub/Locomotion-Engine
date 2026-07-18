@@ -2,8 +2,8 @@ import "./style.css";
 import { Diagnostics, Engine, PointerInput } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
 import { renderGame } from "./render";
-import { GAME_CONTENT, TOWER_DEFINITIONS } from "./content";
-import type { TowerKind } from "./content";
+import { GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
+import type { MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
 import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, startWave, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell } from "./simulation";
@@ -13,6 +13,8 @@ const startWaveButton = requiredElement<HTMLButtonElement>("start-wave");
 const restartButton = requiredElement<HTMLButtonElement>("restart-game");
 const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
+const gateButton = requiredElement<HTMLButtonElement>("select-gate");
+const crossroadsButton = requiredElement<HTMLButtonElement>("select-crossroads");
 const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
@@ -37,7 +39,8 @@ try {
 }
 
 const initialSeed = 4_242;
-let state = createGame(initialSeed);
+let selectedMap: MapId = "gate";
+let state = createGame(initialSeed, selectedMap);
 let selectedTower: TowerKind = "archer";
 let hoveredCell: Cell | undefined;
 let inspectedTowerId: EntityId | undefined;
@@ -62,13 +65,15 @@ startWaveButton.addEventListener("click", () => {
 });
 
 restartButton.addEventListener("click", () => {
-  state = createGame(initialSeed);
+  state = createGame(initialSeed, selectedMap);
   inspectedTowerId = undefined;
   updateHud();
 });
 
 archerButton.addEventListener("click", () => selectTower("archer"));
 mageButton.addEventListener("click", () => selectTower("mage"));
+gateButton.addEventListener("click", () => selectMap("gate"));
+crossroadsButton.addEventListener("click", () => selectMap("crossroads"));
 upgradeTowerButton.addEventListener("click", () => {
   if (inspectedTowerId) upgradeTower(state, inspectedTowerId);
   updateHud();
@@ -102,6 +107,19 @@ function selectTower(kind: TowerKind): void {
   updateHud();
 }
 
+function selectMap(mapId: MapId): void {
+  if (state.waveActive) return;
+  selectedMap = mapId;
+  state = createGame(initialSeed, selectedMap);
+  inspectedTowerId = undefined;
+  gateButton.setAttribute("aria-pressed", String(mapId === "gate"));
+  crossroadsButton.setAttribute("aria-pressed", String(mapId === "crossroads"));
+  gateButton.classList.toggle("selected", mapId === "gate");
+  crossroadsButton.classList.toggle("selected", mapId === "crossroads");
+  state.message = `${MAP_DEFINITIONS[mapId].displayName} selected. Prepare your defense.`;
+  updateHud();
+}
+
 function placementPreview() {
   if (!hoveredCell) return undefined;
   return { cell: hoveredCell, kind: selectedTower, status: placementStatus(state, hoveredCell, selectedTower) };
@@ -114,6 +132,8 @@ function updateHud(): void {
   message.textContent = state.message;
   waveBriefing.textContent = nextWaveBriefing(state);
   startWaveButton.disabled = state.waveActive || state.gameOver || state.gameWon;
+  gateButton.disabled = state.waveActive;
+  crossroadsButton.disabled = state.waveActive;
   startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;
   updatePlacementMessage();
   updateTowerInspector();

@@ -1,9 +1,9 @@
 import { SeededRandom, World } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
-import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
-import type { EnemyKind, TowerKind } from "./content";
+import { ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
+import type { EnemyKind, MapId, TowerKind } from "./content";
 
-export const BOARD = { columns: 12, rows: 8, tileSize: 64 } as const;
+export const BOARD = MAP_DEFINITIONS.gate;
 export const TOTAL_WAVES = WAVE_DEFINITIONS.length;
 
 export interface Point {
@@ -19,6 +19,7 @@ export interface Cell {
 export interface Enemy {
   readonly id: EntityId;
   readonly kind: EnemyKind;
+  readonly mapId: MapId;
   health: number;
   readonly maximumHealth: number;
   readonly speed: number;
@@ -84,6 +85,7 @@ export interface GameState {
   gold: number;
   lives: number;
   wave: number;
+  mapId: MapId;
   phase: GamePhase;
   waveActive: boolean;
   gameOver: boolean;
@@ -97,25 +99,14 @@ export interface GameState {
   message: string;
 }
 
-const PATH_NODES: readonly Point[] = [
-  { x: -32, y: 224 },
-  { x: 224, y: 224 },
-  { x: 224, y: 96 },
-  { x: 480, y: 96 },
-  { x: 480, y: 416 },
-  { x: 800, y: 416 }
-];
-
-const PATH_CELLS = new Set(["0:3", "1:3", "2:3", "3:3", "3:1", "3:2", "4:1", "5:1", "6:1", "7:1", "7:2", "7:3", "7:4", "7:5", "7:6", "8:6", "9:6", "10:6", "11:6"]);
-const PATH_LENGTH = pathLength();
-
-export function createGame(seed = 4_242): GameState {
+export function createGame(seed = 4_242, mapId: MapId = "gate"): GameState {
   return {
     world: new World(),
     random: new SeededRandom(seed),
     gold: 50,
     lives: 10,
     wave: 0,
+    mapId,
     phase: "intermission",
     waveActive: false,
     gameOver: false,
@@ -130,8 +121,9 @@ export function createGame(seed = 4_242): GameState {
   };
 }
 
-export function isBuildable(cell: Cell): boolean {
-  return cell.column >= 0 && cell.column < BOARD.columns && cell.row >= 0 && cell.row < BOARD.rows && !PATH_CELLS.has(cellKey(cell));
+export function isBuildable(cell: Cell, mapId: MapId = "gate"): boolean {
+  const map = MAP_DEFINITIONS[mapId];
+  return cell.column >= 0 && cell.column < map.columns && cell.row >= 0 && cell.row < map.rows && !(map.pathCells as readonly string[]).includes(cellKey(cell));
 }
 
 export function towerAtCell(state: GameState, cell: Cell): Tower | undefined {
@@ -140,7 +132,7 @@ export function towerAtCell(state: GameState, cell: Cell): Tower | undefined {
 
 export function placementStatus(state: GameState, cell: Cell, kind: TowerKind): PlacementStatus {
   if (state.gameOver || state.gameWon) return "ended";
-  if (!isBuildable(cell)) return "path";
+  if (!isBuildable(cell, state.mapId)) return "path";
   if (towerAtCell(state, cell)) return "occupied";
   if (state.gold < TOWER_DEFINITIONS[kind].cost) return "unaffordable";
   return "valid";
@@ -288,7 +280,7 @@ export function updateGame(state: GameState, deltaSeconds: number): void {
 }
 
 export function enemyPosition(enemy: Enemy): Point {
-  return pointOnPath(enemy.distance);
+  return pointOnPath(enemy.distance, enemy.mapId);
 }
 
 export function enemySpeed(enemy: Enemy): number {
@@ -312,6 +304,7 @@ export function gameSnapshot(state: GameState): object {
     gold: state.gold,
     lives: state.lives,
     wave: state.wave,
+    mapId: state.mapId,
     phase: state.phase,
     waveActive: state.waveActive,
     gameOver: state.gameOver,
@@ -343,6 +336,7 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
   state.enemies.push({
     id: state.world.create("enemy").id,
     kind: spawn.kind,
+    mapId: state.mapId,
     health: spawn.health,
     maximumHealth: spawn.health,
     speed: spawn.speed,
@@ -360,12 +354,12 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
     updateEnemyTrait(enemy, deltaSeconds);
     enemy.distance += enemySpeed(enemy) * deltaSeconds;
   }
-  const escaped = state.enemies.filter((enemy) => enemy.distance >= PATH_LENGTH);
+  const escaped = state.enemies.filter((enemy) => enemy.distance >= pathLength(enemy.mapId));
   for (const enemy of escaped) {
     state.lives -= 1;
     state.world.destroy(enemy.id);
   }
-  removeFromArray(state.enemies, (enemy) => enemy.distance >= PATH_LENGTH);
+  removeFromArray(state.enemies, (enemy) => enemy.distance >= pathLength(enemy.mapId));
   if (escaped.length > 0) {
     if (state.lives <= 0) {
       state.gameOver = true;
@@ -487,11 +481,12 @@ function updateEffects(state: GameState, deltaSeconds: number): void {
   removeFromArray(state.effects, (effect) => expired.has(effect.id));
 }
 
-function pointOnPath(distanceAlongPath: number): Point {
+function pointOnPath(distanceAlongPath: number, mapId: MapId): Point {
+  const nodes = MAP_DEFINITIONS[mapId].pathNodes;
   let remainingDistance = distanceAlongPath;
-  for (let index = 0; index < PATH_NODES.length - 1; index += 1) {
-    const start = PATH_NODES[index];
-    const end = PATH_NODES[index + 1];
+  for (let index = 0; index < nodes.length - 1; index += 1) {
+    const start = nodes[index];
+    const end = nodes[index + 1];
     const segmentLength = Math.hypot(end.x - start.x, end.y - start.y);
     if (remainingDistance <= segmentLength) {
       const progress = remainingDistance / segmentLength;
@@ -499,11 +494,12 @@ function pointOnPath(distanceAlongPath: number): Point {
     }
     remainingDistance -= segmentLength;
   }
-  return PATH_NODES[PATH_NODES.length - 1];
+  return nodes[nodes.length - 1];
 }
 
-function pathLength(): number {
-  return PATH_NODES.slice(1).reduce((total, node, index) => total + Math.hypot(node.x - PATH_NODES[index].x, node.y - PATH_NODES[index].y), 0);
+function pathLength(mapId: MapId): number {
+  const nodes = MAP_DEFINITIONS[mapId].pathNodes;
+  return nodes.slice(1).reduce((total, node, index) => total + Math.hypot(node.x - nodes[index].x, node.y - nodes[index].y), 0);
 }
 
 function cellKey(cell: Cell): string {

@@ -28,6 +28,9 @@ button.secondary:hover { background: #526f6a; }
 .game-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .game-actions { display: flex; gap: 0.5rem; }
 .tower-palette { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.5rem; margin-bottom: 1rem; }
+.map-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: -0.4rem 0 1rem; }
+.map-choice { padding: 0.45rem 0.7rem; color: #c9dbcf; background: #31454b; font-size: 0.85rem; }
+.map-choice.selected { color: #182112; background: #91c4b4; box-shadow: inset 0 0 0 2px #d8f3e8; }
 .palette-label { align-self: center; color: #91c4b4; font-size: 0.8rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .tower-choice { display: grid; gap: 0.15rem; min-width: 10rem; padding: 0.55rem 0.75rem; text-align: left; color: #c9dbcf; background: #31454b; }
 .tower-choice span { color: #91c4b4; font-size: 0.75rem; font-weight: 600; }
