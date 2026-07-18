@@ -15,6 +15,7 @@
         </div>
         <div class="game-actions">
           <button id="start-wave" type="button">Start wave</button>
+          <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
           <button id="restart-game" class="secondary" type="button">Restart</button>
         </div>
       </header>
@@ -46,6 +47,11 @@
         <div><span class="palette-label">Selected tower</span><strong id="tower-name"></strong></div>
         <span id="tower-stats"></span>
         <button id="upgrade-tower" type="button">Upgrade</button>
+      </section>
+
+      <section id="developer-overlay" class="developer-overlay" hidden aria-label="Developer diagnostics">
+        <strong>Developer diagnostics</strong>
+        <pre id="developer-overlay-text"></pre>
       </section>
 
       <section class="hud" aria-live="polite">

@@ -79,6 +79,12 @@ export interface PendingSpawn {
   readonly reward: number;
 }
 
+export interface GameEvent {
+  readonly step: number;
+  readonly kind: "placement" | "upgrade" | "wave-start" | "spawn" | "defeat" | "escape" | "wave-clear";
+  readonly message: string;
+}
+
 export interface GameState {
   readonly world: World;
   readonly random: SeededRandom;
@@ -91,11 +97,13 @@ export interface GameState {
   gameOver: boolean;
   gameWon: boolean;
   spawnDelaySeconds: number;
+  step: number;
   readonly pendingSpawns: PendingSpawn[];
   readonly enemies: Enemy[];
   readonly towers: Tower[];
   readonly projectiles: Projectile[];
   readonly effects: CombatEffect[];
+  readonly events: GameEvent[];
   message: string;
 }
 
@@ -112,11 +120,13 @@ export function createGame(seed = 4_242, mapId: MapId = "gate"): GameState {
     gameOver: false,
     gameWon: false,
     spawnDelaySeconds: 0,
+    step: 0,
     pendingSpawns: [],
     enemies: [],
     towers: [],
     projectiles: [],
     effects: [],
+    events: [],
     message: "Prepare your defense for wave 1."
   };
 }
@@ -160,6 +170,7 @@ export function placeTower(state: GameState, cell: Cell, kind: TowerKind = "arch
 
   state.gold -= definition.cost;
   state.towers.push({ id: state.world.create("tower").id, kind, cell, level: 0, cooldownSeconds: 0 });
+  recordEvent(state, "placement", `${definition.displayName} placed at ${cell.column},${cell.row}`);
   state.message = `${definition.displayName} tower placed. Start the wave when you are ready.`;
   return true;
 }
@@ -195,6 +206,7 @@ export function upgradeTower(state: GameState, towerId: EntityId): boolean {
   }
   state.gold -= upgrade.cost;
   tower.level += 1;
+  recordEvent(state, "upgrade", `${TOWER_DEFINITIONS[tower.kind].displayName} reached level ${tower.level + 1}`);
   state.message = `${TOWER_DEFINITIONS[tower.kind].displayName} upgraded to level ${tower.level + 1}.`;
   return true;
 }
@@ -237,6 +249,7 @@ export function startWave(state: GameState): boolean {
     });
   }
   state.message = `Wave ${state.wave} underway: ${waveEnemyNames(definition)}.`;
+  recordEvent(state, "wave-start", `Wave ${state.wave} started`);
   return true;
 }
 
@@ -254,6 +267,8 @@ export function updateGame(state: GameState, deltaSeconds: number): void {
     return;
   }
 
+  state.step += 1;
+
   updateSpawning(state, deltaSeconds);
   updateEnemies(state, deltaSeconds);
   if (state.gameOver) {
@@ -269,6 +284,7 @@ export function updateGame(state: GameState, deltaSeconds: number): void {
     state.phase = "intermission";
     const definition = WAVE_DEFINITIONS[state.wave - 1];
     state.gold += definition.clearBonus;
+    recordEvent(state, "wave-clear", `Wave ${state.wave} cleared for ${definition.clearBonus} gold`);
     if (state.wave === TOTAL_WAVES) {
       state.gameWon = true;
       state.phase = "victory";
@@ -306,6 +322,7 @@ export function gameSnapshot(state: GameState): object {
     wave: state.wave,
     mapId: state.mapId,
     phase: state.phase,
+    step: state.step,
     waveActive: state.waveActive,
     gameOver: state.gameOver,
     gameWon: state.gameWon,
@@ -315,6 +332,7 @@ export function gameSnapshot(state: GameState): object {
     towers: state.towers.map((tower) => ({ ...tower, cell: { ...tower.cell } })),
     projectiles: state.projectiles.map((projectile) => ({ ...projectile })),
     effects: state.effects.map((effect) => ({ ...effect })),
+    events: state.events.map((event) => ({ ...event })),
     message: state.message
   };
 }
@@ -346,6 +364,7 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
     distance: 0,
     reward: spawn.reward
   });
+  recordEvent(state, "spawn", `${enemyDefinition.displayName} spawned`);
   state.spawnDelaySeconds = 0.7;
 }
 
@@ -358,6 +377,7 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
   for (const enemy of escaped) {
     state.lives -= 1;
     state.world.destroy(enemy.id);
+    recordEvent(state, "escape", `${ENEMY_DEFINITIONS[enemy.kind].displayName} escaped`);
   }
   removeFromArray(state.enemies, (enemy) => enemy.distance >= pathLength(enemy.mapId));
   if (escaped.length > 0) {
@@ -461,6 +481,7 @@ function removeDefeatedEnemies(state: GameState): void {
   const defeated = state.enemies.filter((enemy) => enemy.health <= 0);
   for (const enemy of defeated) {
     state.gold += enemy.reward;
+    recordEvent(state, "defeat", `${ENEMY_DEFINITIONS[enemy.kind].displayName} defeated`);
     addEffect(state, "defeat", ENEMY_DEFINITIONS[enemy.kind].color, enemyPosition(enemy), 0.34);
     state.world.destroy(enemy.id);
   }
@@ -526,4 +547,9 @@ function removeFromArray<T>(items: T[], predicate: (item: T) => boolean): void {
       items.splice(index, 1);
     }
   }
+}
+
+function recordEvent(state: GameState, kind: GameEvent["kind"], message: string): void {
+  state.events.push({ step: state.step, kind, message });
+  if (state.events.length > 8) state.events.shift();
 }

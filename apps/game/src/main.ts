@@ -11,6 +11,7 @@ import type { Cell } from "./simulation";
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
 const startWaveButton = requiredElement<HTMLButtonElement>("start-wave");
 const restartButton = requiredElement<HTMLButtonElement>("restart-game");
+const diagnosticsButton = requiredElement<HTMLButtonElement>("toggle-diagnostics");
 const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
 const gateButton = requiredElement<HTMLButtonElement>("select-gate");
@@ -21,6 +22,8 @@ const wave = requiredElement<HTMLElement>("wave");
 const message = requiredElement<HTMLElement>("message");
 const waveBriefing = requiredElement<HTMLElement>("wave-briefing");
 const placementMessage = requiredElement<HTMLElement>("placement-message");
+const developerOverlay = requiredElement<HTMLElement>("developer-overlay");
+const developerOverlayText = requiredElement<HTMLElement>("developer-overlay-text");
 const towerInspector = requiredElement<HTMLElement>("tower-inspector");
 const towerName = requiredElement<HTMLElement>("tower-name");
 const towerStatsElement = requiredElement<HTMLElement>("tower-stats");
@@ -44,6 +47,7 @@ let state = createGame(initialSeed, selectedMap);
 let selectedTower: TowerKind = "archer";
 let hoveredCell: Cell | undefined;
 let inspectedTowerId: EntityId | undefined;
+let diagnosticsVisible = false;
 const pointer = new PointerInput(canvas);
 
 pointer.onPointerDown((point) => {
@@ -67,6 +71,12 @@ startWaveButton.addEventListener("click", () => {
 restartButton.addEventListener("click", () => {
   state = createGame(initialSeed, selectedMap);
   inspectedTowerId = undefined;
+  updateHud();
+});
+
+diagnosticsButton.addEventListener("click", () => {
+  diagnosticsVisible = !diagnosticsVisible;
+  diagnosticsButton.setAttribute("aria-pressed", String(diagnosticsVisible));
   updateHud();
 });
 
@@ -137,6 +147,18 @@ function updateHud(): void {
   startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;
   updatePlacementMessage();
   updateTowerInspector();
+  updateDeveloperOverlay();
+}
+
+function updateDeveloperOverlay(): void {
+  developerOverlay.hidden = !diagnosticsVisible;
+  if (!diagnosticsVisible) return;
+  const events = state.events.length === 0 ? "(no events yet)" : state.events.map((event) => `${event.step} ${event.kind}: ${event.message}`).join("\n");
+  developerOverlayText.textContent = [
+    `seed: ${initialSeed}  step: ${state.step}  map: ${state.mapId}`,
+    `phase: ${state.phase}  enemies: ${state.enemies.length}  towers: ${state.towers.length}  projectiles: ${state.projectiles.length}`,
+    `events:\n${events}`
+  ].join("\n");
 }
 
 function updatePlacementMessage(): void {

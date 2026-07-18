@@ -97,6 +97,17 @@ describe("Dungeon Defense simulation", () => {
     expect(state.message).toContain("+12 gold");
   });
 
+  it("records a bounded deterministic event history for developer diagnostics", () => {
+    const state = createGame(55);
+
+    placeTower(state, { column: 1, row: 1 });
+    startWave(state);
+    updateGame(state, 1 / 60);
+
+    expect(state.events.map((event) => event.kind)).toEqual(["placement", "wave-start", "spawn"]);
+    expect(state.events[2].step).toBe(1);
+  });
+
   it("applies authored Beetle armour to incoming damage", () => {
     const state = createGame();
     const beetle = {

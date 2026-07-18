@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S07 and verified
+**Status:** Gate 1 extended through LE-S08 and verified
 
 **Updated:** 2026-07-18
 
@@ -34,6 +34,8 @@
   wave-completion reward summaries.
 - Two selectable, validated authored maps with independent paths, build spaces,
   palettes, and deterministic enemy path ownership.
+- A disabled-by-default developer overlay for seed, step, map, entity counts,
+  phase, and a bounded deterministic event history.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -67,8 +69,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S08 from `docs/NEXT_TEN_SPRINTS.md`: add a toggleable developer
-diagnostics overlay for reproducible simulation evidence.
+Begin LE-S09 from `docs/NEXT_TEN_SPRINTS.md`: add versioned, intermission-only
+local save and resume with validation safeguards.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.
