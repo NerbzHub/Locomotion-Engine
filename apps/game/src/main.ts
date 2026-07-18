@@ -1,7 +1,9 @@
 import "./style.css";
 import { Diagnostics, Engine, PointerInput } from "../../../packages/engine/src";
 import { renderGame } from "./render";
+import { GAME_CONTENT } from "./content";
 import type { TowerKind } from "./content";
+import { assertValidGameContent } from "./content-validation";
 import { BOARD, createGame, placeTower, startWave, TOTAL_WAVES, updateGame } from "./simulation";
 
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
@@ -20,10 +22,17 @@ if (!context) {
 }
 
 context.imageSmoothingEnabled = false;
+const diagnostics = new Diagnostics();
+try {
+  const report = assertValidGameContent(GAME_CONTENT);
+  diagnostics.info("Game content validated", report);
+} catch (error) {
+  diagnostics.error("Game content validation failed", error);
+  throw error;
+}
 const initialSeed = 4_242;
 let state = createGame(initialSeed);
 let selectedTower: TowerKind = "archer";
-const diagnostics = new Diagnostics();
 const pointer = new PointerInput(canvas);
 
 pointer.onPointerDown((point) => {

@@ -20,6 +20,8 @@
   content can configure runtime instances without leaking game rules into the engine.
 - Game-owned enemy definitions for Slimes, Beetles, and Wisps, plus authored
   wave composition that introduces them progressively.
+- Startup content validation with contextual diagnostics for authored tower,
+  enemy, and wave definitions.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -53,8 +55,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S01 from `docs/NEXT_TEN_SPRINTS.md`: validate all authored game
-definitions before the simulation starts.
+Begin LE-S02 from `docs/NEXT_TEN_SPRINTS.md`: add placement feedback and range
+preview without changing simulation state during hovering.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

@@ -90,3 +90,19 @@ export const TOWER_DEFINITIONS = {
 } as const satisfies Record<string, TowerDefinition>;
 
 export type TowerKind = keyof typeof TOWER_DEFINITIONS;
+
+/** The complete authored content set consumed by the first game. */
+export interface GameContent {
+  readonly towers: Readonly<Record<string, TowerDefinition>>;
+  readonly enemies: Readonly<Record<string, EnemyDefinition>>;
+  readonly waves: readonly {
+    readonly enemyKinds: readonly string[];
+    readonly clearBonus: number;
+  }[];
+}
+
+export const GAME_CONTENT = {
+  towers: TOWER_DEFINITIONS,
+  enemies: ENEMY_DEFINITIONS,
+  waves: WAVE_DEFINITIONS
+} satisfies GameContent;
