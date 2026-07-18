@@ -1,11 +1,11 @@
-# Next Twenty-Five Sprints
+# Next Fifty Sprints
 
 **Status:** Proposed implementation plan
 
 **Starting point:** LE-S01 through LE-S05 are complete: Dungeon Defense has a
 deterministic three-wave loop, selectable and upgradeable Archer/Mage towers,
-and distinct data-defined Slime, Beetle, and Wisp behaviour. The 25 upcoming
-sprints below run from LE-S06 through LE-S30. Their purpose is to turn that
+and distinct data-defined Slime, Beetle, and Wisp behaviour. The 50 upcoming
+sprints below run from LE-S06 through LE-S55. Their purpose is to turn that
 proof into a clear, replayable, and maintainable small game without prematurely
 building a generic engine.
 
@@ -56,6 +56,31 @@ legacy identifiers in Book 03.
 | LE-S28 | Release packaging | Builds, versioning, credits, and licence are release-ready. |
 | LE-S29 | Playtest release candidate | External feedback is collected against a stable candidate. |
 | LE-S30 | Gate 1 release | The polished vertical slice is shipped with reproducible evidence. |
+| LE-S31 | Post-release stabilisation | Release feedback is triaged and high-confidence defects are resolved. |
+| LE-S32 | Usability study | Observed player behaviour directs the next feature choices. |
+| LE-S33 | Content authoring workflow | New maps and encounters are quicker and safer to author. |
+| LE-S34 | Challenge mutators | Optional run modifiers create replay variety. |
+| LE-S35 | Endless defense | A bounded post-campaign mode tests long-run strategy. |
+| LE-S36 | Challenge milestones | Optional goals reward mastery without mandatory grind. |
+| LE-S37 | Splitter enemy family | New enemies alter combat space when defeated. |
+| LE-S38 | Area-control tower | A fourth tower counters crowds with a distinct trade-off. |
+| LE-S39 | Map hazards | Authored terrain rules make maps tactically different. |
+| LE-S40 | Map pack one | A curated set of additional maps expands the campaign. |
+| LE-S41 | Campaign chapter two | The game gains a second authored campaign arc. |
+| LE-S42 | Custom challenge setup | Players can create reproducible local challenge rules. |
+| LE-S43 | Replay gallery | Local replay browsing makes past and shared runs easier to revisit. |
+| LE-S44 | Localisation foundation | Player-facing copy is ready for translation without changing game rules. |
+| LE-S45 | Accessibility second pass | External accessibility feedback improves the complete feature set. |
+| LE-S46 | Mobile completion | Touch play reaches release quality on supported devices. |
+| LE-S47 | Content pack import | Validated authored content packs can extend the game safely. |
+| LE-S48 | Proven engine extraction | Only validated reusable primitives move into the engine package. |
+| LE-S49 | Quality automation | CI gates protect deterministic, visual, and packaging quality. |
+| LE-S50 | Privacy and resilience | Local data, imports, and failures have clear, safe boundaries. |
+| LE-S51 | Community playtest kit | Testers can report reproducible feedback with minimal friction. |
+| LE-S52 | Live-balance workflow | Content adjustments are traceable, comparable, and reversible. |
+| LE-S53 | Save migration hardening | Long-lived profiles and replays migrate safely across releases. |
+| LE-S54 | Gate 2 release candidate | The expanded game is frozen for focused validation. |
+| LE-S55 | Gate 2 release | The post-release expansion ships with maintainable foundations. |
 
 ## LE-S01 — Content validation
 
@@ -473,9 +498,316 @@ and known limitations are all documented and independently repeatable.
 
 **Depends on:** LE-S29.
 
+## LE-S31 — Post-release stabilisation
+
+**Goal:** Resolve confirmed release defects without diluting the product
+direction.
+
+**Deliverables:** a severity-based issue triage policy, a fixed maintenance
+window, regression tests for accepted fixes, and a patch release note format.
+
+**Done when:** high-severity reports have an owner, reproduction evidence, and
+either a verified fix or documented decision.
+
+**Depends on:** LE-S30.
+
+## LE-S32 — Usability study
+
+**Goal:** Choose post-release work from observed player behaviour.
+
+**Deliverables:** consentful playtest scripts, observation notes for first-run,
+build, upgrade, and loss moments, a findings summary, and prioritised changes.
+
+**Done when:** the next feature tranche is justified by repeated player evidence
+rather than assumed needs.
+
+**Depends on:** LE-S31.
+
+## LE-S33 — Content authoring workflow
+
+**Goal:** Make maps, encounters, and campaign nodes safer to create.
+
+**Deliverables:** authoring templates, content validation commands, example
+content, concise contributor guidance, and failure messages aimed at authors.
+
+**Done when:** a new authored map and wave set can be added, validated, and
+previewed without touching simulation control flow.
+
+**Depends on:** LE-S07, LE-S18, and LE-S32.
+
+## LE-S34 — Challenge mutators
+
+**Goal:** Add opt-in replay variety with rules that stay legible.
+
+**Deliverables:** a small data-defined mutator set, pre-run selection,
+compatibility rules, in-run badges, and deterministic interaction tests.
+
+**Done when:** a selected mutator is visible, replayable, and does not silently
+alter a standard campaign run.
+
+**Depends on:** LE-S12, LE-S24, and LE-S33.
+
+## LE-S35 — Endless defense
+
+**Goal:** Provide a bounded post-campaign test of long-run strategy.
+
+**Deliverables:** an authored endless pacing curve, a clear survival score,
+periodic checkpoints, safe stop/restart behaviour, and stress tests.
+
+**Done when:** a player can end an endless run with a reproducible summary and
+the mode remains within the performance budget.
+
+**Depends on:** LE-S20, LE-S26, and LE-S34.
+
+## LE-S36 — Challenge milestones
+
+**Goal:** Reward mastery through optional, understandable goals.
+
+**Deliverables:** data-defined milestone conditions, non-essential rewards,
+progress display, reset behaviour, and deterministic condition tests.
+
+**Done when:** milestones encourage varied play without blocking campaign
+completion or creating mandatory grind.
+
+**Depends on:** LE-S19, LE-S34, and LE-S35.
+
+## LE-S37 — Splitter enemy family
+
+**Goal:** Add a new enemy family that changes the combat board when defeated.
+
+**Deliverables:** an authored Splitter that creates smaller units on defeat,
+clear visuals, spawn limits, balance scenarios, and lifecycle tests.
+
+**Done when:** the split event is readable and cannot create uncontrolled
+entities or break deterministic replay.
+
+**Depends on:** LE-S16, LE-S25, and LE-S33.
+
+## LE-S38 — Area-control tower
+
+**Goal:** Add a fourth tower with a deliberate crowd-control trade-off.
+
+**Deliverables:** a data-defined Bombard tower, an area-impact rule, upgrades,
+target feedback, and tests for radius/overlap behaviour.
+
+**Done when:** Bombard is strong against grouped Splitters but has a clearly
+understood weakness against isolated priority threats.
+
+**Depends on:** LE-S15, LE-S37, and LE-S33.
+
+## LE-S39 — Map hazards
+
+**Goal:** Give maps tactical identity through authored terrain interactions.
+
+**Deliverables:** one beneficial and one hazardous path zone, visual language,
+map validation, deterministic movement/combat integration, and tests.
+
+**Done when:** a map can use a hazard without adding map-specific conditional
+logic to the shared simulation flow.
+
+**Depends on:** LE-S07, LE-S33, and LE-S37.
+
+## LE-S40 — Map pack one
+
+**Goal:** Expand the game with a small curated set of tactically different maps.
+
+**Deliverables:** three validated maps using different path geometry/hazards,
+campaign placement, playtest balance notes, and map regression snapshots.
+
+**Done when:** each map changes useful placement decisions while meeting the
+same accessibility and performance standards.
+
+**Depends on:** LE-S39.
+
+## LE-S41 — Campaign chapter two
+
+**Goal:** Turn the new map pack and enemies into a coherent second arc.
+
+**Deliverables:** authored chapter progression, encounter goals, a new boss or
+boss variation, chapter briefing/completion copy, and flow tests.
+
+**Done when:** chapter two introduces its mechanics progressively and ends with
+a reproducible, satisfying capstone encounter.
+
+**Depends on:** LE-S17, LE-S37 through LE-S40.
+
+## LE-S42 — Custom challenge setup
+
+**Goal:** Let players create local, reproducible variations without unsafe
+arbitrary scripting.
+
+**Deliverables:** a constrained challenge configuration UI, validation,
+shareable configuration codes, reset defaults, and compatibility tests.
+
+**Done when:** a challenge can be created, described, replayed, and rejected
+cleanly when its rules are invalid or unavailable.
+
+**Depends on:** LE-S24, LE-S34, and LE-S41.
+
+## LE-S43 — Replay gallery
+
+**Goal:** Make saved and imported runs easier to revisit locally.
+
+**Deliverables:** searchable local replay metadata, run summaries, replay
+launch/delete controls, storage limits, and migration-safe index tests.
+
+**Done when:** a player can find a prior replay by map, outcome, or date without
+the gallery becoming a source of unbounded local storage.
+
+**Depends on:** LE-S24, LE-S35, and LE-S42.
+
+## LE-S44 — Localisation foundation
+
+**Goal:** Prepare player-facing text for translation while retaining clear
+authoring ownership.
+
+**Deliverables:** message keys, a default locale catalogue, interpolation and
+plural rules, missing-key diagnostics, and locale-independent logic tests.
+
+**Done when:** changing the active locale changes presentation copy only and
+does not change a deterministic simulation snapshot.
+
+**Depends on:** LE-S23 and LE-S41.
+
+## LE-S45 — Accessibility second pass
+
+**Goal:** Improve the complete game using external accessibility feedback.
+
+**Deliverables:** assisted playtesting, remappable controls where warranted,
+screen-reader review, motion/audio alternatives, and tracked remediation work.
+
+**Done when:** the supported play loop remains operable with the agreed input,
+contrast, motion, and audio accommodations across all maps.
+
+**Depends on:** LE-S21, LE-S27, LE-S41, and LE-S44.
+
+## LE-S46 — Mobile completion
+
+**Goal:** Bring the touch experience to the same standard as desktop play.
+
+**Deliverables:** tested touch gestures, safe-area handling, portrait/landscape
+layouts, device performance checks, and clear support boundaries.
+
+**Done when:** campaign, upgrades, challenges, and replays work on the agreed
+mobile device matrix without hidden desktop-only dependencies.
+
+**Depends on:** LE-S27, LE-S35, LE-S42, and LE-S45.
+
+## LE-S47 — Content pack import
+
+**Goal:** Permit safe extension through authored data packs, not executable
+mod code.
+
+**Deliverables:** a versioned pack manifest, strict content validation,
+namespacing, import/export UX, quotas, and invalid-pack test cases.
+
+**Done when:** a valid pack can add isolated content and an unsafe or
+incompatible pack fails before it reaches gameplay.
+
+**Depends on:** LE-S33 and LE-S44.
+
+## LE-S48 — Proven engine extraction
+
+**Goal:** Graduate only repeatedly demonstrated shared primitives into the
+engine package.
+
+**Deliverables:** a capability audit, extraction proposal, narrow package API,
+migration tests, and a no-regression benchmark.
+
+**Done when:** the game becomes simpler to maintain and no game-specific rules
+or balance data move into `packages/engine/`.
+
+**Depends on:** LE-S25, LE-S33, LE-S39, and LE-S47.
+
+## LE-S49 — Quality automation
+
+**Goal:** Make the release bar executable rather than manual.
+
+**Deliverables:** CI checks for type safety, tests, deterministic replay,
+content validation, production build, and a small browser smoke path;
+documented failure triage.
+
+**Done when:** protected changes cannot merge with a failed quality gate and
+each failure points to an actionable artifact.
+
+**Depends on:** LE-S28, LE-S43, and LE-S48.
+
+## LE-S50 — Privacy and resilience
+
+**Goal:** Make local data and failure behaviour explicit, safe, and recoverable.
+
+**Deliverables:** data inventory, storage/export/delete guidance, corrupted-data
+recovery, import size limits, failure UX, and resilience tests.
+
+**Done when:** the game remains usable after a malformed save/import and never
+silently transmits player data.
+
+**Depends on:** LE-S43 and LE-S47.
+
+## LE-S51 — Community playtest kit
+
+**Goal:** Help testers create useful, reproducible feedback with minimal effort.
+
+**Deliverables:** a diagnostic bundle containing version, map, seed, replay,
+and optional notes; a privacy review; clear sharing instructions; tests.
+
+**Done when:** a tester can report a balance or defect issue that a developer
+can reproduce without asking for screenshots alone.
+
+**Depends on:** LE-S43, LE-S49, and LE-S50.
+
+## LE-S52 — Live-balance workflow
+
+**Goal:** Make balance adjustments traceable, comparable, and reversible.
+
+**Deliverables:** versioned balance manifests, scenario comparison reports,
+change rationale templates, and backwards-compatible replay handling.
+
+**Done when:** a balance change can be evaluated against reference scenarios
+and rolled back without corrupting saves or historical replays.
+
+**Depends on:** LE-S11, LE-S24, LE-S49, and LE-S51.
+
+## LE-S53 — Save migration hardening
+
+**Goal:** Support long-lived profiles and replays across multiple releases.
+
+**Deliverables:** explicit migration chains, fixture archives for old formats,
+backup/restore behaviour, clear retirement policy, and compatibility tests.
+
+**Done when:** every supported historic save/replay either loads equivalently or
+fails with a specific, recoverable explanation.
+
+**Depends on:** LE-S19, LE-S24, LE-S47, and LE-S52.
+
+## LE-S54 — Gate 2 release candidate
+
+**Goal:** Freeze the expanded game for evidence-driven final validation.
+
+**Deliverables:** a feature freeze, final balance candidate, complete automated
+evidence, accessibility/mobile sign-off, and a focused external playtest plan.
+
+**Done when:** only accepted release-blocking fixes may change the candidate.
+
+**Depends on:** LE-S45 through LE-S53.
+
+## LE-S55 — Gate 2 release
+
+**Goal:** Ship the expanded game with maintainable content and quality
+foundations.
+
+**Deliverables:** a tagged release, final notes and credits, verified artefacts,
+known-limitations record, and a retrospective on the Gate 2 architecture.
+
+**Done when:** the published source, content, verification commands, and
+release artifact are independently reproducible.
+
+**Depends on:** LE-S54.
+
 ## Replanning checkpoints
 
-Review the plan after LE-S10, LE-S15, LE-S20, LE-S25, and LE-S30. At each
-checkpoint, decide which capabilities have proven reusable enough to graduate
-into `packages/engine/`. Until then, favour a compact working game over generic
-systems such as ECS breadth, physics, inventory, or mod support.
+Review the plan after LE-S10, LE-S15, LE-S20, LE-S25, LE-S30, LE-S40, LE-S48,
+and LE-S55. At each checkpoint, decide which capabilities have proven reusable
+enough to graduate into `packages/engine/`. Until then, favour a compact
+working game over generic systems such as ECS breadth, physics, inventory, or
+mod support.
