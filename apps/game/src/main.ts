@@ -5,12 +5,15 @@ import { renderGame } from "./render";
 import { GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
 import type { MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
+import { loadFromLocalStorage, saveToLocalStorage } from "./save";
 import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, startWave, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell } from "./simulation";
 
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
 const startWaveButton = requiredElement<HTMLButtonElement>("start-wave");
 const restartButton = requiredElement<HTMLButtonElement>("restart-game");
+const saveButton = requiredElement<HTMLButtonElement>("save-game");
+const loadButton = requiredElement<HTMLButtonElement>("load-game");
 const diagnosticsButton = requiredElement<HTMLButtonElement>("toggle-diagnostics");
 const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
@@ -71,6 +74,28 @@ startWaveButton.addEventListener("click", () => {
 restartButton.addEventListener("click", () => {
   state = createGame(initialSeed, selectedMap);
   inspectedTowerId = undefined;
+  updateHud();
+});
+
+saveButton.addEventListener("click", () => {
+  const result = saveToLocalStorage(window.localStorage, state);
+  state.message = result.ok ? "Intermission saved locally." : result.message;
+  updateHud();
+});
+
+loadButton.addEventListener("click", () => {
+  const result = loadFromLocalStorage(window.localStorage);
+  if (result.ok) {
+    state = result.state;
+    selectedMap = state.mapId;
+    inspectedTowerId = undefined;
+    gateButton.setAttribute("aria-pressed", String(selectedMap === "gate"));
+    crossroadsButton.setAttribute("aria-pressed", String(selectedMap === "crossroads"));
+    gateButton.classList.toggle("selected", selectedMap === "gate");
+    crossroadsButton.classList.toggle("selected", selectedMap === "crossroads");
+  } else {
+    state.message = result.message;
+  }
   updateHud();
 });
 
@@ -142,6 +167,7 @@ function updateHud(): void {
   message.textContent = state.message;
   waveBriefing.textContent = nextWaveBriefing(state);
   startWaveButton.disabled = state.waveActive || state.gameOver || state.gameWon;
+  saveButton.disabled = state.phase !== "intermission";
   gateButton.disabled = state.waveActive;
   crossroadsButton.disabled = state.waveActive;
   startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;

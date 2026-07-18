@@ -21,4 +21,9 @@ export class SeededRandom {
   public state(): number {
     return this.value;
   }
+
+  /** Restores a previously captured state for deterministic save/replay use. */
+  public restoreState(state: number): void {
+    this.value = state >>> 0;
+  }
 }

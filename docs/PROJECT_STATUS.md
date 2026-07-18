@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S08 and verified
+**Status:** Gate 1 extended through LE-S09 and verified
 
 **Updated:** 2026-07-18
 
@@ -36,6 +36,8 @@
   palettes, and deterministic enemy path ownership.
 - A disabled-by-default developer overlay for seed, step, map, entity counts,
   phase, and a bounded deterministic event history.
+- Versioned local save/load at intermission only, with map/seed/RNG/tower state
+  restoration and malformed-save safeguards.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -69,8 +71,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S09 from `docs/NEXT_TEN_SPRINTS.md`: add versioned, intermission-only
-local save and resume with validation safeguards.
+Begin LE-S10 from `docs/NEXT_TEN_SPRINTS.md`: complete keyboard accessibility,
+focus behaviour, and reduced-motion support.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

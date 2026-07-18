@@ -88,6 +88,7 @@ export interface GameEvent {
 export interface GameState {
   readonly world: World;
   readonly random: SeededRandom;
+  readonly seed: number;
   gold: number;
   lives: number;
   wave: number;
@@ -111,6 +112,7 @@ export function createGame(seed = 4_242, mapId: MapId = "gate"): GameState {
   return {
     world: new World(),
     random: new SeededRandom(seed),
+    seed,
     gold: 50,
     lives: 10,
     wave: 0,
@@ -318,6 +320,7 @@ export function towerPosition(tower: Tower): Point {
 export function gameSnapshot(state: GameState): object {
   return {
     gold: state.gold,
+    seed: state.seed,
     lives: state.lives,
     wave: state.wave,
     mapId: state.mapId,
