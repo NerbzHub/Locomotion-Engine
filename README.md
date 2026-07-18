@@ -42,7 +42,7 @@ rationale, boundaries, and acceptance criteria.
 
 ## Running the first slice
 
-Install Node.js 20.19 or later, then run:
+Install Node.js 22 or later, then run:
 
 ```sh
 corepack enable
