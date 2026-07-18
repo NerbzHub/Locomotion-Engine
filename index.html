@@ -17,6 +17,7 @@
           <button id="start-wave" type="button">Start wave</button>
           <button id="save-game" class="secondary" type="button">Save</button>
           <button id="load-game" class="secondary" type="button">Load</button>
+          <button id="toggle-motion" class="secondary" type="button" aria-pressed="false">Motion: full</button>
           <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
           <button id="restart-game" class="secondary" type="button">Restart</button>
         </div>
@@ -43,7 +44,7 @@
         <strong id="wave-briefing"></strong>
       </section>
 
-      <canvas id="game-canvas" width="768" height="512" aria-label="Dungeon Defense game board"></canvas>
+      <canvas id="game-canvas" width="768" height="512" tabindex="0" aria-label="Dungeon Defense game board. Use arrow keys to move the board cursor, then Enter to build or inspect."></canvas>
 
       <section id="tower-inspector" class="tower-inspector" hidden aria-live="polite">
         <div><span class="palette-label">Selected tower</span><strong id="tower-name"></strong></div>
@@ -64,7 +65,7 @@
         <span id="placement-message" class="placement-message"></span>
       </section>
 
-      <p class="hint">Beetles absorb some damage; Wisps periodically burst forward. Hover to preview range, and click a tower to inspect or upgrade it.</p>
+      <p class="hint">Beetles absorb some damage; Wisps periodically burst forward. Hover or use arrow keys to preview range; press Enter on the board to build or inspect.</p>
     </main>
     <script type="module" src="/apps/game/src/main.ts"></script>
   </body>

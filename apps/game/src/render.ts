@@ -9,14 +9,14 @@ export interface PlacementPreview {
   readonly status: PlacementStatus;
 }
 
-export function renderGame(context: CanvasRenderingContext2D, state: GameState, preview?: PlacementPreview): void {
+export function renderGame(context: CanvasRenderingContext2D, state: GameState, preview?: PlacementPreview, reducedMotion = false): void {
   context.clearRect(0, 0, BOARD.columns * BOARD.tileSize, BOARD.rows * BOARD.tileSize);
   drawBoard(context, state);
   if (preview) drawPlacementPreview(context, preview);
   drawTowers(context, state);
   drawEnemies(context, state);
   drawProjectiles(context, state);
-  drawEffects(context, state);
+  if (!reducedMotion) drawEffects(context, state);
 }
 
 function drawPlacementPreview(context: CanvasRenderingContext2D, preview: PlacementPreview): void {

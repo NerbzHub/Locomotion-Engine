@@ -14,6 +14,7 @@ const startWaveButton = requiredElement<HTMLButtonElement>("start-wave");
 const restartButton = requiredElement<HTMLButtonElement>("restart-game");
 const saveButton = requiredElement<HTMLButtonElement>("save-game");
 const loadButton = requiredElement<HTMLButtonElement>("load-game");
+const motionButton = requiredElement<HTMLButtonElement>("toggle-motion");
 const diagnosticsButton = requiredElement<HTMLButtonElement>("toggle-diagnostics");
 const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
@@ -49,8 +50,11 @@ let selectedMap: MapId = "gate";
 let state = createGame(initialSeed, selectedMap);
 let selectedTower: TowerKind = "archer";
 let hoveredCell: Cell | undefined;
+let keyboardCursor: Cell = { column: 1, row: 1 };
+let keyboardCursorActive = false;
 let inspectedTowerId: EntityId | undefined;
 let diagnosticsVisible = false;
+let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const pointer = new PointerInput(canvas);
 
 pointer.onPointerDown((point) => {
@@ -63,7 +67,30 @@ pointer.onPointerDown((point) => {
 
 pointer.onPointerMove((point) => {
   hoveredCell = cellAt(point.x, point.y);
+  keyboardCursorActive = false;
   updatePlacementMessage();
+});
+
+canvas.addEventListener("keydown", (event) => {
+  const direction: Record<string, Cell> = {
+    ArrowLeft: { column: -1, row: 0 }, ArrowRight: { column: 1, row: 0 }, ArrowUp: { column: 0, row: -1 }, ArrowDown: { column: 0, row: 1 }
+  };
+  if (event.key in direction) {
+    const delta = direction[event.key];
+    keyboardCursor = { column: clamp(keyboardCursor.column + delta.column, 0, BOARD.columns - 1), row: clamp(keyboardCursor.row + delta.row, 0, BOARD.rows - 1) };
+    keyboardCursorActive = true;
+    event.preventDefault();
+    updateHud();
+    return;
+  }
+  if (event.key === "Enter" || event.key === " ") {
+    const tower = towerAtCell(state, keyboardCursor);
+    if (tower) inspectedTowerId = tower.id;
+    else placeTower(state, keyboardCursor, selectedTower);
+    keyboardCursorActive = true;
+    event.preventDefault();
+    updateHud();
+  }
 });
 
 startWaveButton.addEventListener("click", () => {
@@ -99,6 +126,12 @@ loadButton.addEventListener("click", () => {
   updateHud();
 });
 
+motionButton.addEventListener("click", () => {
+  reducedMotion = !reducedMotion;
+  motionButton.setAttribute("aria-pressed", String(reducedMotion));
+  motionButton.textContent = reducedMotion ? "Motion: reduced" : "Motion: full";
+});
+
 diagnosticsButton.addEventListener("click", () => {
   diagnosticsVisible = !diagnosticsVisible;
   diagnosticsButton.setAttribute("aria-pressed", String(diagnosticsVisible));
@@ -119,7 +152,7 @@ const engine = new Engine({
   diagnostics,
   update: (deltaSeconds) => updateGame(state, deltaSeconds),
   render: () => {
-    renderGame(context, state, placementPreview());
+    renderGame(context, state, placementPreview(), reducedMotion);
     updateHud();
   }
 });
@@ -156,8 +189,9 @@ function selectMap(mapId: MapId): void {
 }
 
 function placementPreview() {
-  if (!hoveredCell) return undefined;
-  return { cell: hoveredCell, kind: selectedTower, status: placementStatus(state, hoveredCell, selectedTower) };
+  const cell = keyboardCursorActive ? keyboardCursor : hoveredCell;
+  if (!cell) return undefined;
+  return { cell, kind: selectedTower, status: placementStatus(state, cell, selectedTower) };
 }
 
 function updateHud(): void {
@@ -188,11 +222,12 @@ function updateDeveloperOverlay(): void {
 }
 
 function updatePlacementMessage(): void {
-  if (!hoveredCell) {
+  const cell = keyboardCursorActive ? keyboardCursor : hoveredCell;
+  if (!cell) {
     placementMessage.textContent = "";
     return;
   }
-  const status = placementStatus(state, hoveredCell, selectedTower);
+  const status = placementStatus(state, cell, selectedTower);
   const definition = TOWER_DEFINITIONS[selectedTower];
   const descriptions: Record<typeof status, string> = {
     valid: `${definition.displayName} ready: ${definition.cost} gold.`,
@@ -223,6 +258,10 @@ function updateTowerInspector(): void {
 
 function cellAt(x: number, y: number): Cell {
   return { column: Math.floor(x / BOARD.tileSize), row: Math.floor(y / BOARD.tileSize) };
+}
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.max(minimum, Math.min(maximum, value));
 }
 
 function requiredElement<ElementType extends HTMLElement>(id: string): ElementType {
