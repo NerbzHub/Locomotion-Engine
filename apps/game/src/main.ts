@@ -6,7 +6,7 @@ import { GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
 import type { MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
 import { loadFromLocalStorage, saveToLocalStorage } from "./save";
-import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, startWave, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
+import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell } from "./simulation";
 
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
@@ -217,7 +217,8 @@ function updateDeveloperOverlay(): void {
   developerOverlayText.textContent = [
     `seed: ${initialSeed}  step: ${state.step}  map: ${state.mapId}`,
     `phase: ${state.phase}  enemies: ${state.enemies.length}  towers: ${state.towers.length}  projectiles: ${state.projectiles.length}`,
-    `events:\n${events}`
+    `events:\n${events}`,
+    `telemetry:\n${telemetryReport(state)}`
   ].join("\n");
 }
 

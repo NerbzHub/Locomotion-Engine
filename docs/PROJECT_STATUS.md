@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S10 and verified
+**Status:** Gate 1 extended through LE-S11 and verified
 
 **Updated:** 2026-07-18
 
@@ -40,6 +40,8 @@
   restoration and malformed-save safeguards.
 - Keyboard board cursor/placement controls, visible focus styles, and a
   user-selectable reduced-motion mode for combat effects.
+- Deterministic completed-wave telemetry with resource, lives, tower, kill,
+  escape, duration, seed, and map evidence in the developer overlay.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -73,8 +75,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S11 from `docs/NEXT_TEN_SPRINTS.md`: collect structured balance
-telemetry from deterministic play sessions.
+Begin LE-S12 from `docs/NEXT_TEN_SPRINTS.md`: add transparent authored
+difficulty modes for casual, standard, and veteran runs.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

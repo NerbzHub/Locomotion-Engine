@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
-import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, startWave, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
+import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, startWave, telemetryReport, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
   it("rejects towers on the enemy path", () => {
@@ -106,6 +106,17 @@ describe("Dungeon Defense simulation", () => {
 
     expect(state.events.map((event) => event.kind)).toEqual(["placement", "wave-start", "spawn"]);
     expect(state.events[2].step).toBe(1);
+  });
+
+  it("records a deterministic summary when a wave is cleared", () => {
+    const state = createGame(55);
+    startWave(state);
+    state.pendingSpawns.splice(0);
+    updateGame(state, 1 / 60);
+
+    expect(state.waveReports).toHaveLength(1);
+    expect(state.waveReports[0]).toMatchObject({ wave: 1, goldAtStart: 50, goldAtEnd: 62, livesAtStart: 10, livesAtEnd: 10 });
+    expect(telemetryReport(state)).toContain('"seed": 55');
   });
 
   it("applies authored Beetle armour to incoming damage", () => {

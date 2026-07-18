@@ -85,6 +85,19 @@ export interface GameEvent {
   readonly message: string;
 }
 
+export interface WaveTelemetry {
+  readonly wave: number;
+  readonly startStep: number;
+  endStep: number;
+  readonly goldAtStart: number;
+  goldAtEnd: number;
+  readonly livesAtStart: number;
+  livesAtEnd: number;
+  readonly towersAtStart: number;
+  kills: number;
+  escapes: number;
+}
+
 export interface GameState {
   readonly world: World;
   readonly random: SeededRandom;
@@ -105,6 +118,8 @@ export interface GameState {
   readonly projectiles: Projectile[];
   readonly effects: CombatEffect[];
   readonly events: GameEvent[];
+  readonly waveReports: WaveTelemetry[];
+  currentWaveTelemetry?: WaveTelemetry;
   message: string;
 }
 
@@ -129,6 +144,7 @@ export function createGame(seed = 4_242, mapId: MapId = "gate"): GameState {
     projectiles: [],
     effects: [],
     events: [],
+    waveReports: [],
     message: "Prepare your defense for wave 1."
   };
 }
@@ -251,6 +267,7 @@ export function startWave(state: GameState): boolean {
     });
   }
   state.message = `Wave ${state.wave} underway: ${waveEnemyNames(definition)}.`;
+  state.currentWaveTelemetry = { wave: state.wave, startStep: state.step, endStep: state.step, goldAtStart: state.gold, goldAtEnd: state.gold, livesAtStart: state.lives, livesAtEnd: state.lives, towersAtStart: state.towers.length, kills: 0, escapes: 0 };
   recordEvent(state, "wave-start", `Wave ${state.wave} started`);
   return true;
 }
@@ -262,6 +279,10 @@ export function nextWaveBriefing(state: GameState): string {
   const definition = WAVE_DEFINITIONS[state.wave];
   if (!definition) return "No further waves are available.";
   return `Next: wave ${state.wave + 1} · ${waveEnemyCounts(definition)} · ${definition.clearBonus} gold clear reward.`;
+}
+
+export function telemetryReport(state: GameState): string {
+  return JSON.stringify({ seed: state.seed, mapId: state.mapId, completedWaves: state.waveReports }, null, 2);
 }
 
 export function updateGame(state: GameState, deltaSeconds: number): void {
@@ -286,6 +307,7 @@ export function updateGame(state: GameState, deltaSeconds: number): void {
     state.phase = "intermission";
     const definition = WAVE_DEFINITIONS[state.wave - 1];
     state.gold += definition.clearBonus;
+    finishWaveTelemetry(state);
     recordEvent(state, "wave-clear", `Wave ${state.wave} cleared for ${definition.clearBonus} gold`);
     if (state.wave === TOTAL_WAVES) {
       state.gameWon = true;
@@ -336,6 +358,7 @@ export function gameSnapshot(state: GameState): object {
     projectiles: state.projectiles.map((projectile) => ({ ...projectile })),
     effects: state.effects.map((effect) => ({ ...effect })),
     events: state.events.map((event) => ({ ...event })),
+    waveReports: state.waveReports.map((report) => ({ ...report })),
     message: state.message
   };
 }
@@ -380,6 +403,7 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
   for (const enemy of escaped) {
     state.lives -= 1;
     state.world.destroy(enemy.id);
+    if (state.currentWaveTelemetry) state.currentWaveTelemetry.escapes += 1;
     recordEvent(state, "escape", `${ENEMY_DEFINITIONS[enemy.kind].displayName} escaped`);
   }
   removeFromArray(state.enemies, (enemy) => enemy.distance >= pathLength(enemy.mapId));
@@ -484,6 +508,7 @@ function removeDefeatedEnemies(state: GameState): void {
   const defeated = state.enemies.filter((enemy) => enemy.health <= 0);
   for (const enemy of defeated) {
     state.gold += enemy.reward;
+    if (state.currentWaveTelemetry) state.currentWaveTelemetry.kills += 1;
     recordEvent(state, "defeat", `${ENEMY_DEFINITIONS[enemy.kind].displayName} defeated`);
     addEffect(state, "defeat", ENEMY_DEFINITIONS[enemy.kind].color, enemyPosition(enemy), 0.34);
     state.world.destroy(enemy.id);
@@ -555,4 +580,14 @@ function removeFromArray<T>(items: T[], predicate: (item: T) => boolean): void {
 function recordEvent(state: GameState, kind: GameEvent["kind"], message: string): void {
   state.events.push({ step: state.step, kind, message });
   if (state.events.length > 8) state.events.shift();
+}
+
+function finishWaveTelemetry(state: GameState): void {
+  const telemetry = state.currentWaveTelemetry;
+  if (!telemetry) return;
+  telemetry.endStep = state.step;
+  telemetry.goldAtEnd = state.gold;
+  telemetry.livesAtEnd = state.lives;
+  state.waveReports.push(telemetry);
+  state.currentWaveTelemetry = undefined;
 }
