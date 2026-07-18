@@ -69,6 +69,7 @@ export interface CombatEffect {
 }
 
 export type PlacementStatus = "valid" | "path" | "occupied" | "unaffordable" | "ended";
+export type GamePhase = "intermission" | "wave" | "victory" | "defeat";
 
 export interface PendingSpawn {
   readonly kind: EnemyKind;
@@ -83,6 +84,7 @@ export interface GameState {
   gold: number;
   lives: number;
   wave: number;
+  phase: GamePhase;
   waveActive: boolean;
   gameOver: boolean;
   gameWon: boolean;
@@ -114,6 +116,7 @@ export function createGame(seed = 4_242): GameState {
     gold: 50,
     lives: 10,
     wave: 0,
+    phase: "intermission",
     waveActive: false,
     gameOver: false,
     gameWon: false,
@@ -123,7 +126,7 @@ export function createGame(seed = 4_242): GameState {
     towers: [],
     projectiles: [],
     effects: [],
-    message: "Click a grass tile to place an archer tower (25 gold)."
+    message: "Prepare your defense for wave 1."
   };
 }
 
@@ -215,17 +218,20 @@ export function startWave(state: GameState): boolean {
   }
   if (state.lives <= 0) {
     state.gameOver = true;
+    state.phase = "defeat";
     state.message = "The dungeon has fallen. Restart to begin again.";
     return false;
   }
   if (state.wave >= TOTAL_WAVES) {
     state.gameWon = true;
+    state.phase = "victory";
     state.message = "The dungeon is safe. Restart to defend it again.";
     return false;
   }
 
   state.wave += 1;
   state.waveActive = true;
+  state.phase = "wave";
   state.spawnDelaySeconds = 0;
   const definition = WAVE_DEFINITIONS[state.wave - 1];
   for (const kind of definition.enemyKinds) {
@@ -238,8 +244,17 @@ export function startWave(state: GameState): boolean {
       reward: enemyDefinition.reward
     });
   }
-  state.message = `Wave ${state.wave} is approaching: ${waveEnemyNames(definition)}.`;
+  state.message = `Wave ${state.wave} underway: ${waveEnemyNames(definition)}.`;
   return true;
+}
+
+/** A UI-facing summary of the next authored encounter; it does not mutate simulation state. */
+export function nextWaveBriefing(state: GameState): string {
+  if (state.gameWon) return "All waves cleared — the dungeon is safe.";
+  if (state.gameOver) return "The dungeon has fallen. Restart to try again.";
+  const definition = WAVE_DEFINITIONS[state.wave];
+  if (!definition) return "No further waves are available.";
+  return `Next: wave ${state.wave + 1} · ${waveEnemyCounts(definition)} · ${definition.clearBonus} gold clear reward.`;
 }
 
 export function updateGame(state: GameState, deltaSeconds: number): void {
@@ -259,14 +274,16 @@ export function updateGame(state: GameState, deltaSeconds: number): void {
 
   if (state.waveActive && state.pendingSpawns.length === 0 && state.enemies.length === 0) {
     state.waveActive = false;
+    state.phase = "intermission";
     const definition = WAVE_DEFINITIONS[state.wave - 1];
     state.gold += definition.clearBonus;
     if (state.wave === TOTAL_WAVES) {
       state.gameWon = true;
+      state.phase = "victory";
       state.message = "The dungeon is safe! All three waves have been defeated.";
       return;
     }
-    state.message = `Wave ${state.wave} cleared. Prepare for wave ${state.wave + 1}.`;
+    state.message = `Wave ${state.wave} cleared: +${definition.clearBonus} gold. Prepare for wave ${state.wave + 1}.`;
   }
 }
 
@@ -295,6 +312,7 @@ export function gameSnapshot(state: GameState): object {
     gold: state.gold,
     lives: state.lives,
     wave: state.wave,
+    phase: state.phase,
     waveActive: state.waveActive,
     gameOver: state.gameOver,
     gameWon: state.gameWon,
@@ -351,6 +369,7 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
   if (escaped.length > 0) {
     if (state.lives <= 0) {
       state.gameOver = true;
+      state.phase = "defeat";
       state.message = "The dungeon has fallen. Restart to begin again.";
     } else {
       state.message = `${escaped.length} enem${escaped.length === 1 ? "y" : "ies"} reached the dungeon.`;
@@ -493,6 +512,12 @@ function cellKey(cell: Cell): string {
 
 function waveEnemyNames(definition: { readonly enemyKinds: readonly EnemyKind[] }): string {
   return [...new Set(definition.enemyKinds)].map((kind) => ENEMY_DEFINITIONS[kind].displayName.toLowerCase()).join(" and ");
+}
+
+function waveEnemyCounts(definition: { readonly enemyKinds: readonly EnemyKind[] }): string {
+  const counts = new Map<EnemyKind, number>();
+  for (const kind of definition.enemyKinds) counts.set(kind, (counts.get(kind) ?? 0) + 1);
+  return [...counts].map(([kind, count]) => `${count} ${ENEMY_DEFINITIONS[kind].displayName}${count === 1 ? "" : "s"}`).join(", ");
 }
 
 function distance(first: Point, second: Point): number {

@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S05 and verified
+**Status:** Gate 1 extended through LE-S06 and verified
 
 **Updated:** 2026-07-18
 
@@ -30,6 +30,8 @@
   inspection and per-instance runtime statistics.
 - Data-defined enemy traits: Beetle armour reduces every hit, while Wisps use
   a deterministic periodic speed burst with clear combat-board cues.
+- Explicit intermissions with next-wave composition/reward briefings and clear
+  wave-completion reward summaries.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -63,8 +65,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S06 from `docs/NEXT_TEN_SPRINTS.md`: add readable wave briefings and
-an explicit intermission flow.
+Begin LE-S07 from `docs/NEXT_TEN_SPRINTS.md`: decouple the board path into
+validated map content and add a second deterministic map.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

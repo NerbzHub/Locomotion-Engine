@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
-import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, placementStatus, placeTower, selectNearestToExitTarget, startWave, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
+import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, startWave, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
   it("rejects towers on the enemy path", () => {
@@ -66,6 +66,24 @@ describe("Dungeon Defense simulation", () => {
     expect(state.pendingSpawns.map((spawn) => spawn.kind)).toEqual(WAVE_DEFINITIONS[1].enemyKinds);
     expect(state.pendingSpawns.some((spawn) => spawn.kind === "beetle")).toBe(true);
     expect(ENEMY_DEFINITIONS.beetle.baseHealth).toBeGreaterThan(ENEMY_DEFINITIONS.slime.baseHealth);
+  });
+
+  it("moves between explicit intermission and wave phases with a readable briefing", () => {
+    const state = createGame(55);
+
+    expect(state.phase).toBe("intermission");
+    expect(nextWaveBriefing(state)).toContain("7 Slimes");
+    expect(nextWaveBriefing(state)).toContain("12 gold");
+    expect(startWave(state)).toBe(true);
+    expect(state.phase).toBe("wave");
+
+    state.pendingSpawns.splice(0);
+    state.enemies.splice(0);
+    updateGame(state, 1 / 60);
+
+    expect(state.phase).toBe("intermission");
+    expect(state.gold).toBe(50 + WAVE_DEFINITIONS[0].clearBonus);
+    expect(state.message).toContain("+12 gold");
   });
 
   it("applies authored Beetle armour to incoming damage", () => {

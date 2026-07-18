@@ -5,7 +5,7 @@ import { renderGame } from "./render";
 import { GAME_CONTENT, TOWER_DEFINITIONS } from "./content";
 import type { TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
-import { BOARD, createGame, nextTowerUpgrade, placementStatus, placeTower, startWave, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
+import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, startWave, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell } from "./simulation";
 
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
@@ -17,6 +17,7 @@ const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
 const message = requiredElement<HTMLElement>("message");
+const waveBriefing = requiredElement<HTMLElement>("wave-briefing");
 const placementMessage = requiredElement<HTMLElement>("placement-message");
 const towerInspector = requiredElement<HTMLElement>("tower-inspector");
 const towerName = requiredElement<HTMLElement>("tower-name");
@@ -111,7 +112,9 @@ function updateHud(): void {
   lives.textContent = String(state.lives);
   wave.textContent = `${state.wave}/${TOTAL_WAVES}`;
   message.textContent = state.message;
+  waveBriefing.textContent = nextWaveBriefing(state);
   startWaveButton.disabled = state.waveActive || state.gameOver || state.gameWon;
+  startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;
   updatePlacementMessage();
   updateTowerInspector();
 }
