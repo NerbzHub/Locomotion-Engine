@@ -12,6 +12,7 @@ engine implementation.
 - [Project collaboration rules](LOCOMOTION.md)
 - [Recommended implementation strategy](docs/IMPLEMENTATION_STRATEGY.md)
 - [Project status and delivery gates](docs/PROJECT_STATUS.md)
+- [Next ten planned sprints](docs/NEXT_TEN_SPRINTS.md)
 - [Canonical architecture books](Books/)
 
 ## Repository layout

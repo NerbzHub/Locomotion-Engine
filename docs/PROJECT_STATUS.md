@@ -35,7 +35,7 @@
 | Vision and architecture | `Books/Book 00` through `Books/Book 02` |
 | Engineering practice | `LOCOMOTION.md` and `Books/Engineering Standards.md` |
 | Historical construction detail | `Books/Book 03 - Construction Schedule.md` |
-| Implementation sequence | `docs/IMPLEMENTATION_STRATEGY.md` |
+| Implementation sequence | `docs/IMPLEMENTATION_STRATEGY.md` and `docs/NEXT_TEN_SPRINTS.md` |
 | Existing game behaviour reference | `Final Products/v1 20 Rounds/` |
 
 ## Verification evidence
@@ -43,7 +43,7 @@
 The first slice was verified on 2026-07-18 with the bundled Node.js 24 runtime:
 
 ```sh
-pnpm run check  # TypeScript plus 3 deterministic tests
+pnpm run check  # TypeScript plus deterministic simulation tests
 pnpm run build  # Vite production build
 ```
 
@@ -53,8 +53,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin Gate 2: keep game-specific combat in `apps/game/` while refining the
-small, proven engine API in `packages/engine/`.
+Begin LE-S01 from `docs/NEXT_TEN_SPRINTS.md`: validate all authored game
+definitions before the simulation starts.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.
