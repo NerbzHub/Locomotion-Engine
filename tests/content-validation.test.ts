@@ -24,7 +24,12 @@ describe("game content validation", () => {
         }
       },
       enemies: {
-        invalidEnemy: { ...GAME_CONTENT.enemies.slime, speedRange: [80, 10], radius: 0 }
+        invalidEnemy: {
+          ...GAME_CONTENT.enemies.slime,
+          speedRange: [80, 10],
+          radius: 0,
+          trait: { kind: "speed-burst", intervalSeconds: 1, durationSeconds: 1, speedMultiplier: 1 }
+        }
       },
       waves: [
         { enemyKinds: [], clearBonus: -1 },
@@ -39,6 +44,8 @@ describe("game content validation", () => {
       expect.objectContaining({ path: "towers.invalidTower.projectileColor" }),
       expect.objectContaining({ path: "towers.invalidTower.upgrades[0].cooldownMultiplier" }),
       expect.objectContaining({ path: "enemies.invalidEnemy.speedRange" }),
+      expect.objectContaining({ path: "enemies.invalidEnemy.trait.durationSeconds" }),
+      expect.objectContaining({ path: "enemies.invalidEnemy.trait.speedMultiplier" }),
       expect.objectContaining({ path: "waves[0].enemyKinds" }),
       expect.objectContaining({ path: "waves[1].enemyKinds[0]" })
     ]));

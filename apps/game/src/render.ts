@@ -109,6 +109,20 @@ function drawEnemies(context: CanvasRenderingContext2D, state: GameState): void 
     context.beginPath();
     context.arc(position.x, position.y, definition.radius, 0, Math.PI * 2);
     context.fill();
+    if (definition.trait?.kind === "armor") {
+      context.strokeStyle = "#fff0ba";
+      context.lineWidth = 3;
+      context.beginPath();
+      context.arc(position.x, position.y, definition.radius - 5, Math.PI * 0.15, Math.PI * 0.85);
+      context.stroke();
+    }
+    if (definition.trait?.kind === "speed-burst" && enemy.burstRemainingSeconds > 0) {
+      context.strokeStyle = "#e8dfff";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(position.x, position.y, definition.radius + 6, 0, Math.PI * 2);
+      context.stroke();
+    }
     context.fillStyle = definition.eyeColor;
     context.fillRect(position.x - definition.radius / 2, position.y - 3, 4, 4);
     context.fillRect(position.x + definition.radius / 2 - 4, position.y - 3, 4, 4);
@@ -134,11 +148,11 @@ function drawProjectiles(context: CanvasRenderingContext2D, state: GameState): v
 function drawEffects(context: CanvasRenderingContext2D, state: GameState): void {
   for (const effect of state.effects) {
     const progress = 1 - effect.remainingSeconds / effect.maximumSeconds;
-    const radius = effect.kind === "impact" ? 5 + progress * 11 : 9 + progress * 20;
+    const radius = effect.kind === "impact" ? 5 + progress * 11 : effect.kind === "armor" ? 4 + progress * 8 : 9 + progress * 20;
     context.save();
     context.globalAlpha = Math.max(0, 1 - progress);
     context.strokeStyle = effect.color;
-    context.lineWidth = effect.kind === "impact" ? 2 : 3;
+    context.lineWidth = effect.kind === "defeat" ? 3 : 2;
     context.beginPath();
     context.arc(effect.x, effect.y, radius, 0, Math.PI * 2);
     context.stroke();

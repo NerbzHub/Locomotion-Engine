@@ -26,6 +26,22 @@ export interface EnemyDefinition {
   readonly color: string;
   readonly eyeColor: string;
   readonly radius: number;
+  readonly trait?: EnemyTraitDefinition;
+}
+
+/** Enemy traits stay authored data so combat behaviour remains specific and testable. */
+export type EnemyTraitDefinition = EnemyArmorTrait | EnemySpeedBurstTrait;
+
+export interface EnemyArmorTrait {
+  readonly kind: "armor";
+  readonly flatDamageReduction: number;
+}
+
+export interface EnemySpeedBurstTrait {
+  readonly kind: "speed-burst";
+  readonly intervalSeconds: number;
+  readonly durationSeconds: number;
+  readonly speedMultiplier: number;
 }
 
 /** Enemy balance and presentation are authored game content, not engine concerns. */
@@ -38,7 +54,8 @@ export const ENEMY_DEFINITIONS = {
     reward: 6,
     color: "#bf5e5e",
     eyeColor: "#33263a",
-    radius: 14
+    radius: 14,
+    trait: undefined
   },
   beetle: {
     displayName: "Beetle",
@@ -48,7 +65,8 @@ export const ENEMY_DEFINITIONS = {
     reward: 12,
     color: "#916d3f",
     eyeColor: "#fff0ba",
-    radius: 17
+    radius: 17,
+    trait: { kind: "armor", flatDamageReduction: 3 }
   },
   wisp: {
     displayName: "Wisp",
@@ -58,7 +76,8 @@ export const ENEMY_DEFINITIONS = {
     reward: 8,
     color: "#9b7be2",
     eyeColor: "#e8dfff",
-    radius: 10
+    radius: 10,
+    trait: { kind: "speed-burst", intervalSeconds: 2.2, durationSeconds: 0.5, speedMultiplier: 1.8 }
   }
 } as const satisfies Record<string, EnemyDefinition>;
 

@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S04 and verified
+**Status:** Gate 1 extended through LE-S05 and verified
 
 **Updated:** 2026-07-18
 
@@ -28,6 +28,8 @@
   trails, impact flashes, and defeat effects owned by the game simulation.
 - Data-defined two-tier upgrades for Archer and Mage towers, including tower
   inspection and per-instance runtime statistics.
+- Data-defined enemy traits: Beetle armour reduces every hit, while Wisps use
+  a deterministic periodic speed burst with clear combat-board cues.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -61,8 +63,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S05 from `docs/NEXT_TEN_SPRINTS.md`: add explicit, testable enemy
-traits to make Beetles and Wisps tactically distinct.
+Begin LE-S06 from `docs/NEXT_TEN_SPRINTS.md`: add readable wave briefings and
+an explicit intermission flow.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

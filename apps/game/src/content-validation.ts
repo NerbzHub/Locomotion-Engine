@@ -1,4 +1,4 @@
-import type { EnemyDefinition, GameContent, TowerDefinition, TowerUpgradeDefinition } from "./content";
+import type { EnemyDefinition, EnemyTraitDefinition, GameContent, TowerDefinition, TowerUpgradeDefinition } from "./content";
 
 export interface ContentValidationIssue {
   readonly path: string;
@@ -108,6 +108,23 @@ function validateEnemy(definition: EnemyDefinition, path: string, issues: Conten
   validateColor(definition.color, `${path}.color`, issues);
   validateColor(definition.eyeColor, `${path}.eyeColor`, issues);
   validatePositiveNumber(definition.radius, `${path}.radius`, issues);
+  if (definition.trait) validateEnemyTrait(definition.trait, `${path}.trait`, issues);
+}
+
+function validateEnemyTrait(trait: EnemyTraitDefinition, path: string, issues: ContentValidationIssue[]): void {
+  if (trait.kind === "armor") {
+    validateNonNegativeNumber(trait.flatDamageReduction, `${path}.flatDamageReduction`, issues);
+    return;
+  }
+  validatePositiveNumber(trait.intervalSeconds, `${path}.intervalSeconds`, issues);
+  validatePositiveNumber(trait.durationSeconds, `${path}.durationSeconds`, issues);
+  if (trait.durationSeconds >= trait.intervalSeconds) {
+    addIssue(issues, `${path}.durationSeconds`, "must be shorter than the burst interval");
+  }
+  validatePositiveNumber(trait.speedMultiplier, `${path}.speedMultiplier`, issues);
+  if (trait.speedMultiplier <= 1) {
+    addIssue(issues, `${path}.speedMultiplier`, "must be greater than one");
+  }
 }
 
 function validateDisplayName(value: string, path: string, issues: ContentValidationIssue[]): void {

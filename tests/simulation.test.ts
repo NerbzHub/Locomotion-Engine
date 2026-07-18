@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
-import { createGame, gameSnapshot, isBuildable, placementStatus, placeTower, selectNearestToExitTarget, startWave, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
+import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, placementStatus, placeTower, selectNearestToExitTarget, startWave, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
   it("rejects towers on the enemy path", () => {
@@ -37,8 +37,8 @@ describe("Dungeon Defense simulation", () => {
     const first = state.world.create("enemy").id;
     const second = state.world.create("enemy").id;
     const enemies = [
-      { id: first, kind: "slime" as const, health: 10, maximumHealth: 10, speed: 1, distance: 24, reward: 1 },
-      { id: second, kind: "slime" as const, health: 10, maximumHealth: 10, speed: 1, distance: 160, reward: 1 }
+      { id: first, kind: "slime" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, distance: 24, reward: 1 },
+      { id: second, kind: "slime" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, distance: 160, reward: 1 }
     ];
 
     expect(selectNearestToExitTarget(enemies, { x: 64, y: 224 }, 200)?.id).toBe(second);
@@ -66,6 +66,45 @@ describe("Dungeon Defense simulation", () => {
     expect(state.pendingSpawns.map((spawn) => spawn.kind)).toEqual(WAVE_DEFINITIONS[1].enemyKinds);
     expect(state.pendingSpawns.some((spawn) => spawn.kind === "beetle")).toBe(true);
     expect(ENEMY_DEFINITIONS.beetle.baseHealth).toBeGreaterThan(ENEMY_DEFINITIONS.slime.baseHealth);
+  });
+
+  it("applies authored Beetle armour to incoming damage", () => {
+    const state = createGame();
+    const beetle = {
+      id: state.world.create("enemy").id,
+      kind: "beetle" as const,
+      health: 30,
+      maximumHealth: 30,
+      speed: 30,
+      armorDamageReduction: ENEMY_DEFINITIONS.beetle.trait.flatDamageReduction,
+      burstCooldownSeconds: 0,
+      burstRemainingSeconds: 0,
+      distance: 0,
+      reward: 12
+    };
+
+    expect(applyDamage(beetle, 8)).toBe(5);
+    expect(beetle.health).toBe(25);
+  });
+
+  it("uses the authored Wisp multiplier only while its burst is active", () => {
+    const state = createGame();
+    const wisp = {
+      id: state.world.create("enemy").id,
+      kind: "wisp" as const,
+      health: 20,
+      maximumHealth: 20,
+      speed: 60,
+      armorDamageReduction: 0,
+      burstCooldownSeconds: 2,
+      burstRemainingSeconds: 0,
+      distance: 0,
+      reward: 8
+    };
+
+    expect(enemySpeed(wisp)).toBe(60);
+    wisp.burstRemainingSeconds = ENEMY_DEFINITIONS.wisp.trait.durationSeconds;
+    expect(enemySpeed(wisp)).toBe(60 * ENEMY_DEFINITIONS.wisp.trait.speedMultiplier);
   });
 
   it("produces the same state for the same seed and inputs", () => {

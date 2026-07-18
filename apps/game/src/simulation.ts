@@ -22,6 +22,9 @@ export interface Enemy {
   health: number;
   readonly maximumHealth: number;
   readonly speed: number;
+  readonly armorDamageReduction: number;
+  burstCooldownSeconds: number;
+  burstRemainingSeconds: number;
   distance: number;
   readonly reward: number;
 }
@@ -57,7 +60,7 @@ export interface Projectile {
 
 export interface CombatEffect {
   readonly id: EntityId;
-  readonly kind: "impact" | "defeat";
+  readonly kind: "impact" | "armor" | "defeat";
   readonly color: string;
   readonly x: number;
   readonly y: number;
@@ -271,6 +274,18 @@ export function enemyPosition(enemy: Enemy): Point {
   return pointOnPath(enemy.distance);
 }
 
+export function enemySpeed(enemy: Enemy): number {
+  const trait = ENEMY_DEFINITIONS[enemy.kind].trait;
+  return trait?.kind === "speed-burst" && enemy.burstRemainingSeconds > 0 ? enemy.speed * trait.speedMultiplier : enemy.speed;
+}
+
+/** Applies flat armour and returns the amount that actually reached the enemy. */
+export function applyDamage(enemy: Enemy, incomingDamage: number): number {
+  const damage = Math.max(0, incomingDamage - enemy.armorDamageReduction);
+  enemy.health -= damage;
+  return damage;
+}
+
 export function towerPosition(tower: Tower): Point {
   return { x: tower.cell.column * BOARD.tileSize + BOARD.tileSize / 2, y: tower.cell.row * BOARD.tileSize + BOARD.tileSize / 2 };
 }
@@ -306,12 +321,16 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
   if (!spawn) {
     return;
   }
+  const enemyDefinition = ENEMY_DEFINITIONS[spawn.kind];
   state.enemies.push({
     id: state.world.create("enemy").id,
     kind: spawn.kind,
     health: spawn.health,
     maximumHealth: spawn.health,
     speed: spawn.speed,
+    armorDamageReduction: enemyDefinition.trait?.kind === "armor" ? enemyDefinition.trait.flatDamageReduction : 0,
+    burstCooldownSeconds: enemyDefinition.trait?.kind === "speed-burst" ? enemyDefinition.trait.intervalSeconds : 0,
+    burstRemainingSeconds: 0,
     distance: 0,
     reward: spawn.reward
   });
@@ -320,7 +339,8 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
 
 function updateEnemies(state: GameState, deltaSeconds: number): void {
   for (const enemy of state.enemies) {
-    enemy.distance += enemy.speed * deltaSeconds;
+    updateEnemyTrait(enemy, deltaSeconds);
+    enemy.distance += enemySpeed(enemy) * deltaSeconds;
   }
   const escaped = state.enemies.filter((enemy) => enemy.distance >= PATH_LENGTH);
   for (const enemy of escaped) {
@@ -335,6 +355,20 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
     } else {
       state.message = `${escaped.length} enem${escaped.length === 1 ? "y" : "ies"} reached the dungeon.`;
     }
+  }
+}
+
+function updateEnemyTrait(enemy: Enemy, deltaSeconds: number): void {
+  const trait = ENEMY_DEFINITIONS[enemy.kind].trait;
+  if (trait?.kind !== "speed-burst") return;
+  if (enemy.burstRemainingSeconds > 0) {
+    enemy.burstRemainingSeconds = Math.max(0, enemy.burstRemainingSeconds - deltaSeconds);
+    return;
+  }
+  enemy.burstCooldownSeconds -= deltaSeconds;
+  if (enemy.burstCooldownSeconds <= 0) {
+    enemy.burstRemainingSeconds = trait.durationSeconds;
+    enemy.burstCooldownSeconds += trait.intervalSeconds;
   }
 }
 
@@ -395,8 +429,9 @@ function updateProjectiles(state: GameState, deltaSeconds: number): void {
     const distanceToTarget = Math.hypot(deltaX, deltaY);
     const travel = projectile.speed * deltaSeconds;
     if (distanceToTarget <= travel) {
-      target.health -= projectile.damage;
+      const dealtDamage = applyDamage(target, projectile.damage);
       addEffect(state, "impact", projectile.color, targetPosition, 0.16);
+      if (dealtDamage < projectile.damage) addEffect(state, "armor", "#fff0ba", targetPosition, 0.22);
       expired.add(projectile.id);
       continue;
     }
