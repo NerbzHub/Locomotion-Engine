@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { WAVE_DEFINITIONS } from "../apps/game/src/content";
 import { createGame, gameSnapshot, isBuildable, placeTower, startWave, updateGame } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
@@ -31,5 +32,26 @@ describe("Dungeon Defense simulation", () => {
     }
 
     expect(gameSnapshot(first)).toEqual(gameSnapshot(second));
+  });
+
+  it("ends in victory after the final wave is cleared", () => {
+    const state = createGame();
+    state.wave = WAVE_DEFINITIONS.length;
+    state.waveActive = true;
+
+    updateGame(state, 1 / 60);
+
+    expect(state.gameWon).toBe(true);
+    expect(state.message).toContain("dungeon is safe");
+    expect(startWave(state)).toBe(false);
+  });
+
+  it("ends in defeat when no lives remain", () => {
+    const state = createGame();
+    state.lives = 0;
+
+    expect(startWave(state)).toBe(false);
+    expect(state.gameOver).toBe(true);
+    expect(state.message).toContain("dungeon has fallen");
   });
 });

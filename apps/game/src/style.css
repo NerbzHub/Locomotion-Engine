@@ -21,9 +21,12 @@ button {
 
 button:hover { background: #f2d37d; }
 button:disabled { cursor: not-allowed; opacity: 0.55; }
+button.secondary { color: #e8f0e9; background: #405b57; }
+button.secondary:hover { background: #526f6a; }
 
 .game-shell { width: min(100% - 2rem, 820px); margin: 2rem auto; }
 .game-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.game-actions { display: flex; gap: 0.5rem; }
 .eyebrow { margin: 0; color: #91c4b4; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 h1 { margin: 0.15rem 0 0; font-size: clamp(1.8rem, 5vw, 2.6rem); }
 

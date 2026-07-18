@@ -14,8 +14,8 @@
 - A TypeScript/Vite project with a browser Canvas entry point.
 - A fixed-step engine lifecycle, diagnostics, pointer input, seeded random
   service, and entity lifetime registry.
-- A playable first slice: place archer towers, start a seeded slime wave, and
-  observe projectiles, damage, gold, and lives.
+- A complete first slice: place archer towers, survive three seeded slime waves,
+  and observe projectiles, damage, gold, lives, victory, loss, and restart.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet

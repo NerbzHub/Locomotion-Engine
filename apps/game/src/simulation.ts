@@ -1,7 +1,9 @@
 import { SeededRandom, World } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
+import { WAVE_DEFINITIONS } from "./content";
 
 export const BOARD = { columns: 12, rows: 8, tileSize: 64 } as const;
+export const TOTAL_WAVES = WAVE_DEFINITIONS.length;
 
 export interface Point {
   readonly x: number;
@@ -48,6 +50,8 @@ export interface GameState {
   lives: number;
   wave: number;
   waveActive: boolean;
+  gameOver: boolean;
+  gameWon: boolean;
   spawnDelaySeconds: number;
   readonly pendingSpawns: PendingSpawn[];
   readonly enemies: Enemy[];
@@ -80,6 +84,8 @@ export function createGame(seed = 4_242): GameState {
     lives: 10,
     wave: 0,
     waveActive: false,
+    gameOver: false,
+    gameWon: false,
     spawnDelaySeconds: 0,
     pendingSpawns: [],
     enemies: [],
@@ -94,6 +100,10 @@ export function isBuildable(cell: Cell): boolean {
 }
 
 export function placeTower(state: GameState, cell: Cell): boolean {
+  if (state.gameOver || state.gameWon) {
+    state.message = "This game has ended. Restart to defend the dungeon again.";
+    return false;
+  }
   if (!isBuildable(cell)) {
     state.message = "Towers must be placed on grass, not the path.";
     return false;
@@ -114,42 +124,61 @@ export function placeTower(state: GameState, cell: Cell): boolean {
 }
 
 export function startWave(state: GameState): boolean {
+  if (state.gameWon) {
+    state.message = "The dungeon is already safe. Restart to play again.";
+    return false;
+  }
   if (state.waveActive) {
     state.message = "This wave is already underway.";
     return false;
   }
   if (state.lives <= 0) {
-    state.message = "The dungeon has fallen. Refresh to begin again.";
+    state.gameOver = true;
+    state.message = "The dungeon has fallen. Restart to begin again.";
+    return false;
+  }
+  if (state.wave >= TOTAL_WAVES) {
+    state.gameWon = true;
+    state.message = "The dungeon is safe. Restart to defend it again.";
     return false;
   }
 
   state.wave += 1;
   state.waveActive = true;
   state.spawnDelaySeconds = 0;
-  const count = 5 + state.wave * 2;
-  for (let index = 0; index < count; index += 1) {
-    const health = 20 + state.wave * 5 + Math.round(state.random.between(0, 6));
-    state.pendingSpawns.push({ health, speed: state.random.between(34, 46), reward: 5 + state.wave });
+  const definition = WAVE_DEFINITIONS[state.wave - 1];
+  for (let index = 0; index < definition.enemyCount; index += 1) {
+    const health = definition.baseHealth + Math.round(state.random.between(0, definition.healthVariation));
+    state.pendingSpawns.push({ health, speed: state.random.between(...definition.speedRange), reward: definition.reward });
   }
   state.message = `Wave ${state.wave} is approaching.`;
   return true;
 }
 
 export function updateGame(state: GameState, deltaSeconds: number): void {
-  if (state.lives <= 0) {
+  if (state.gameOver || state.gameWon) {
     return;
   }
 
   updateSpawning(state, deltaSeconds);
   updateEnemies(state, deltaSeconds);
+  if (state.gameOver) {
+    return;
+  }
   updateTowers(state, deltaSeconds);
   updateProjectiles(state, deltaSeconds);
   removeDefeatedEnemies(state);
 
   if (state.waveActive && state.pendingSpawns.length === 0 && state.enemies.length === 0) {
     state.waveActive = false;
-    state.gold += 10 + state.wave * 2;
-    state.message = `Wave ${state.wave} cleared. Prepare your defences.`;
+    const definition = WAVE_DEFINITIONS[state.wave - 1];
+    state.gold += definition.clearBonus;
+    if (state.wave === TOTAL_WAVES) {
+      state.gameWon = true;
+      state.message = "The dungeon is safe! All three waves have been defeated.";
+      return;
+    }
+    state.message = `Wave ${state.wave} cleared. Prepare for wave ${state.wave + 1}.`;
   }
 }
 
@@ -167,6 +196,8 @@ export function gameSnapshot(state: GameState): object {
     lives: state.lives,
     wave: state.wave,
     waveActive: state.waveActive,
+    gameOver: state.gameOver,
+    gameWon: state.gameWon,
     randomState: state.random.state(),
     pendingSpawns: state.pendingSpawns,
     enemies: state.enemies.map((enemy) => ({ ...enemy })),
@@ -211,7 +242,12 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
   }
   removeFromArray(state.enemies, (enemy) => enemy.distance >= PATH_LENGTH);
   if (escaped.length > 0) {
-    state.message = `${escaped.length} slime${escaped.length === 1 ? "" : "s"} reached the dungeon.`;
+    if (state.lives <= 0) {
+      state.gameOver = true;
+      state.message = "The dungeon has fallen. Restart to begin again.";
+    } else {
+      state.message = `${escaped.length} slime${escaped.length === 1 ? "" : "s"} reached the dungeon.`;
+    }
   }
 }
 

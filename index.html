@@ -13,7 +13,10 @@
           <p class="eyebrow">Locomotion Engine · Gate 1</p>
           <h1>Dungeon Defense</h1>
         </div>
-        <button id="start-wave" type="button">Start wave</button>
+        <div class="game-actions">
+          <button id="start-wave" type="button">Start wave</button>
+          <button id="restart-game" class="secondary" type="button">Restart</button>
+        </div>
       </header>
 
       <canvas id="game-canvas" width="768" height="512" aria-label="Dungeon Defense game board"></canvas>
@@ -21,7 +24,7 @@
       <section class="hud" aria-live="polite">
         <span>Gold <strong id="gold">50</strong></span>
         <span>Lives <strong id="lives">10</strong></span>
-        <span>Wave <strong id="wave">0</strong></span>
+        <span>Wave <strong id="wave">0/3</strong></span>
         <span id="message">Click a grass tile to place an archer tower (25 gold).</span>
       </section>
 
