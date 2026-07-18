@@ -1,7 +1,7 @@
 import { SeededRandom, World } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
-import { ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
-import type { EnemyKind, MapId, TowerKind } from "./content";
+import { DIFFICULTY_DEFINITIONS, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
+import type { DifficultyId, EnemyKind, MapId, TowerKind } from "./content";
 
 export const BOARD = MAP_DEFINITIONS.gate;
 export const TOTAL_WAVES = WAVE_DEFINITIONS.length;
@@ -106,6 +106,7 @@ export interface GameState {
   lives: number;
   wave: number;
   mapId: MapId;
+  difficultyId: DifficultyId;
   phase: GamePhase;
   waveActive: boolean;
   gameOver: boolean;
@@ -123,15 +124,17 @@ export interface GameState {
   message: string;
 }
 
-export function createGame(seed = 4_242, mapId: MapId = "gate"): GameState {
+export function createGame(seed = 4_242, mapId: MapId = "gate", difficultyId: DifficultyId = "standard"): GameState {
+  const difficulty = DIFFICULTY_DEFINITIONS[difficultyId];
   return {
     world: new World(),
     random: new SeededRandom(seed),
     seed,
-    gold: 50,
-    lives: 10,
+    gold: difficulty.startingGold,
+    lives: difficulty.startingLives,
     wave: 0,
     mapId,
+    difficultyId,
     phase: "intermission",
     waveActive: false,
     gameOver: false,
@@ -258,7 +261,7 @@ export function startWave(state: GameState): boolean {
   const definition = WAVE_DEFINITIONS[state.wave - 1];
   for (const kind of definition.enemyKinds) {
     const enemyDefinition = ENEMY_DEFINITIONS[kind];
-    const health = enemyDefinition.baseHealth + Math.round(state.random.between(0, enemyDefinition.healthVariation));
+    const health = Math.round((enemyDefinition.baseHealth + state.random.between(0, enemyDefinition.healthVariation)) * DIFFICULTY_DEFINITIONS[state.difficultyId].enemyHealthMultiplier);
     state.pendingSpawns.push({
       kind,
       health,
@@ -346,6 +349,7 @@ export function gameSnapshot(state: GameState): object {
     lives: state.lives,
     wave: state.wave,
     mapId: state.mapId,
+    difficultyId: state.difficultyId,
     phase: state.phase,
     step: state.step,
     waveActive: state.waveActive,

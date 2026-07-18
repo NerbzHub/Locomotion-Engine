@@ -2,8 +2,8 @@ import "./style.css";
 import { Diagnostics, Engine, PointerInput } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
 import { renderGame } from "./render";
-import { GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
-import type { MapId, TowerKind } from "./content";
+import { DIFFICULTY_DEFINITIONS, GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
+import type { DifficultyId, MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
 import { loadFromLocalStorage, saveToLocalStorage } from "./save";
 import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
@@ -20,6 +20,9 @@ const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
 const gateButton = requiredElement<HTMLButtonElement>("select-gate");
 const crossroadsButton = requiredElement<HTMLButtonElement>("select-crossroads");
+const casualButton = requiredElement<HTMLButtonElement>("select-casual");
+const standardButton = requiredElement<HTMLButtonElement>("select-standard");
+const veteranButton = requiredElement<HTMLButtonElement>("select-veteran");
 const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
@@ -47,7 +50,8 @@ try {
 
 const initialSeed = 4_242;
 let selectedMap: MapId = "gate";
-let state = createGame(initialSeed, selectedMap);
+let selectedDifficulty: DifficultyId = "standard";
+let state = createGame(initialSeed, selectedMap, selectedDifficulty);
 let selectedTower: TowerKind = "archer";
 let hoveredCell: Cell | undefined;
 let keyboardCursor: Cell = { column: 1, row: 1 };
@@ -99,7 +103,7 @@ startWaveButton.addEventListener("click", () => {
 });
 
 restartButton.addEventListener("click", () => {
-  state = createGame(initialSeed, selectedMap);
+  state = createGame(initialSeed, selectedMap, selectedDifficulty);
   inspectedTowerId = undefined;
   updateHud();
 });
@@ -115,6 +119,7 @@ loadButton.addEventListener("click", () => {
   if (result.ok) {
     state = result.state;
     selectedMap = state.mapId;
+    selectedDifficulty = state.difficultyId;
     inspectedTowerId = undefined;
     gateButton.setAttribute("aria-pressed", String(selectedMap === "gate"));
     crossroadsButton.setAttribute("aria-pressed", String(selectedMap === "crossroads"));
@@ -142,6 +147,9 @@ archerButton.addEventListener("click", () => selectTower("archer"));
 mageButton.addEventListener("click", () => selectTower("mage"));
 gateButton.addEventListener("click", () => selectMap("gate"));
 crossroadsButton.addEventListener("click", () => selectMap("crossroads"));
+casualButton.addEventListener("click", () => selectDifficulty("casual"));
+standardButton.addEventListener("click", () => selectDifficulty("standard"));
+veteranButton.addEventListener("click", () => selectDifficulty("veteran"));
 upgradeTowerButton.addEventListener("click", () => {
   if (inspectedTowerId) upgradeTower(state, inspectedTowerId);
   updateHud();
@@ -178,13 +186,25 @@ function selectTower(kind: TowerKind): void {
 function selectMap(mapId: MapId): void {
   if (state.waveActive) return;
   selectedMap = mapId;
-  state = createGame(initialSeed, selectedMap);
+  state = createGame(initialSeed, selectedMap, selectedDifficulty);
   inspectedTowerId = undefined;
   gateButton.setAttribute("aria-pressed", String(mapId === "gate"));
   crossroadsButton.setAttribute("aria-pressed", String(mapId === "crossroads"));
   gateButton.classList.toggle("selected", mapId === "gate");
   crossroadsButton.classList.toggle("selected", mapId === "crossroads");
   state.message = `${MAP_DEFINITIONS[mapId].displayName} selected. Prepare your defense.`;
+  updateHud();
+}
+
+function selectDifficulty(difficultyId: DifficultyId): void {
+  if (state.waveActive) return;
+  selectedDifficulty = difficultyId;
+  state = createGame(initialSeed, selectedMap, selectedDifficulty);
+  for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
+    button.setAttribute("aria-pressed", String(id === difficultyId));
+    button.classList.toggle("selected", id === difficultyId);
+  }
+  state.message = `${DIFFICULTY_DEFINITIONS[difficultyId].displayName} difficulty selected.`;
   updateHud();
 }
 
@@ -204,6 +224,9 @@ function updateHud(): void {
   saveButton.disabled = state.phase !== "intermission";
   gateButton.disabled = state.waveActive;
   crossroadsButton.disabled = state.waveActive;
+  casualButton.disabled = state.waveActive;
+  standardButton.disabled = state.waveActive;
+  veteranButton.disabled = state.waveActive;
   startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;
   updatePlacementMessage();
   updateTowerInspector();

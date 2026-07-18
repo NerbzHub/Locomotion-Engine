@@ -89,6 +89,21 @@ export const MAP_DEFINITIONS = {
 
 export type MapId = keyof typeof MAP_DEFINITIONS;
 
+export interface DifficultyDefinition {
+  readonly displayName: string;
+  readonly startingGold: number;
+  readonly startingLives: number;
+  readonly enemyHealthMultiplier: number;
+}
+
+export const DIFFICULTY_DEFINITIONS = {
+  casual: { displayName: "Casual", startingGold: 65, startingLives: 14, enemyHealthMultiplier: 0.85 },
+  standard: { displayName: "Standard", startingGold: 50, startingLives: 10, enemyHealthMultiplier: 1 },
+  veteran: { displayName: "Veteran", startingGold: 45, startingLives: 7, enemyHealthMultiplier: 1.2 }
+} as const satisfies Record<string, DifficultyDefinition>;
+
+export type DifficultyId = keyof typeof DIFFICULTY_DEFINITIONS;
+
 /** Enemy balance and presentation are authored game content, not engine concerns. */
 export const ENEMY_DEFINITIONS = {
   slime: {
@@ -177,6 +192,7 @@ export interface GameContent {
   readonly towers: Readonly<Record<string, TowerDefinition>>;
   readonly enemies: Readonly<Record<string, EnemyDefinition>>;
   readonly maps: Readonly<Record<string, MapDefinition>>;
+  readonly difficulties: Readonly<Record<string, DifficultyDefinition>>;
   readonly waves: readonly {
     readonly enemyKinds: readonly string[];
     readonly clearBonus: number;
@@ -187,5 +203,6 @@ export const GAME_CONTENT = {
   towers: TOWER_DEFINITIONS,
   enemies: ENEMY_DEFINITIONS,
   maps: MAP_DEFINITIONS,
+  difficulties: DIFFICULTY_DEFINITIONS,
   waves: WAVE_DEFINITIONS
 } satisfies GameContent;

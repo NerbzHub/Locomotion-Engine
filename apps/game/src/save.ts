@@ -1,5 +1,5 @@
-import { MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
-import type { MapId, TowerKind } from "./content";
+import { DIFFICULTY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
+import type { DifficultyId, MapId, TowerKind } from "./content";
 import { createGame } from "./simulation";
 import type { GameState } from "./simulation";
 
@@ -17,6 +17,7 @@ interface SavedGame {
   readonly seed: number;
   readonly randomState: number;
   readonly mapId: MapId;
+  readonly difficultyId: DifficultyId;
   readonly gold: number;
   readonly lives: number;
   readonly wave: number;
@@ -34,6 +35,7 @@ export function serialiseIntermission(state: GameState): string | undefined {
     seed: state.seed,
     randomState: state.random.state(),
     mapId: state.mapId,
+    difficultyId: state.difficultyId,
     gold: state.gold,
     lives: state.lives,
     wave: state.wave,
@@ -46,7 +48,7 @@ export function restoreIntermission(serialised: string): LoadResult {
   try {
     const value: unknown = JSON.parse(serialised);
     if (!isSavedGame(value)) return { ok: false, message: "This save is incompatible or malformed." };
-    const state = createGame(value.seed, value.mapId);
+    const state = createGame(value.seed, value.mapId, value.difficultyId);
     state.random.restoreState(value.randomState);
     state.gold = value.gold;
     state.lives = value.lives;
@@ -76,7 +78,7 @@ export function loadFromLocalStorage(storage: Storage): LoadResult {
 
 function isSavedGame(value: unknown): value is SavedGame {
   if (!isRecord(value) || value.version !== SAVE_VERSION || !isFiniteNumber(value.seed) || !isFiniteNumber(value.randomState) || !isFiniteNumber(value.gold) || !isFiniteNumber(value.lives) || !isFiniteNumber(value.wave) || !Array.isArray(value.towers)) return false;
-  if (typeof value.mapId !== "string" || !(value.mapId in MAP_DEFINITIONS) || value.gold < 0 || value.lives < 0 || value.wave < 0 || value.wave > WAVE_DEFINITIONS.length) return false;
+  if (typeof value.mapId !== "string" || !(value.mapId in MAP_DEFINITIONS) || typeof value.difficultyId !== "string" || !(value.difficultyId in DIFFICULTY_DEFINITIONS) || value.gold < 0 || value.lives < 0 || value.wave < 0 || value.wave > WAVE_DEFINITIONS.length) return false;
   return value.towers.every((tower) => isSavedTower(tower));
 }
 

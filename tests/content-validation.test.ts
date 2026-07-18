@@ -32,6 +32,7 @@ describe("game content validation", () => {
         }
       },
       maps: GAME_CONTENT.maps,
+      difficulties: GAME_CONTENT.difficulties,
       waves: [
         { enemyKinds: [], clearBonus: -1 },
         { enemyKinds: ["missing-enemy"], clearBonus: 0 }

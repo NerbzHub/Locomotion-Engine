@@ -43,6 +43,19 @@ describe("Dungeon Defense simulation", () => {
     expect(state.enemies[0].mapId).toBe("crossroads");
   });
 
+  it("applies authored difficulty resources and enemy health deterministically", () => {
+    const casual = createGame(55, "gate", "casual");
+    const veteran = createGame(55, "gate", "veteran");
+
+    expect(casual.gold).toBe(65);
+    expect(casual.lives).toBe(14);
+    expect(veteran.gold).toBe(45);
+    expect(veteran.lives).toBe(7);
+    startWave(casual);
+    startWave(veteran);
+    expect(veteran.pendingSpawns[0].health).toBeGreaterThan(casual.pendingSpawns[0].health);
+  });
+
   it("targets the in-range enemy nearest to the exit", () => {
     const state = createGame();
     const first = state.world.create("enemy").id;

@@ -1,4 +1,4 @@
-import type { EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerUpgradeDefinition } from "./content";
+import type { DifficultyDefinition, EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerUpgradeDefinition } from "./content";
 
 export interface ContentValidationIssue {
   readonly path: string;
@@ -24,10 +24,12 @@ export function validateGameContent(content: GameContent): ContentValidationRepo
   const towers = Object.entries(content.towers);
   const enemies = Object.entries(content.enemies);
   const maps = Object.entries(content.maps);
+  const difficulties = Object.entries(content.difficulties);
 
   validateCollection("towers", towers, issues, validateTower);
   validateCollection("enemies", enemies, issues, validateEnemy);
   validateCollection("maps", maps, issues, validateMap);
+  validateCollection("difficulties", difficulties, issues, validateDifficulty);
 
   if (content.waves.length === 0) {
     addIssue(issues, "waves", "must contain at least one wave");
@@ -139,6 +141,13 @@ function validateMap(definition: MapDefinition, path: string, issues: ContentVal
   validateColor(definition.grassColor, `${path}.grassColor`, issues);
   validateColor(definition.pathColor, `${path}.pathColor`, issues);
   validateColor(definition.pathEdgeColor, `${path}.pathEdgeColor`, issues);
+}
+
+function validateDifficulty(definition: DifficultyDefinition, path: string, issues: ContentValidationIssue[]): void {
+  validateDisplayName(definition.displayName, `${path}.displayName`, issues);
+  validateNonNegativeNumber(definition.startingGold, `${path}.startingGold`, issues);
+  validatePositiveNumber(definition.startingLives, `${path}.startingLives`, issues);
+  validatePositiveNumber(definition.enemyHealthMultiplier, `${path}.enemyHealthMultiplier`, issues);
 }
 
 function validateDisplayName(value: string, path: string, issues: ContentValidationIssue[]): void {
