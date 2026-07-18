@@ -1,0 +1,44 @@
+:root {
+  color: #ecf5eb;
+  background: #17212b;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body { margin: 0; min-width: 320px; }
+
+button {
+  border: 0;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  color: #182112;
+  background: #e9c46a;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+button:hover { background: #f2d37d; }
+button:disabled { cursor: not-allowed; opacity: 0.55; }
+
+.game-shell { width: min(100% - 2rem, 820px); margin: 2rem auto; }
+.game-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.eyebrow { margin: 0; color: #91c4b4; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+h1 { margin: 0.15rem 0 0; font-size: clamp(1.8rem, 5vw, 2.6rem); }
+
+#game-canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 4px solid #405b57;
+  border-radius: 0.75rem;
+  background: #6a9f58;
+  image-rendering: pixelated;
+  touch-action: none;
+}
+
+.hud { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin-top: 1rem; color: #c9dbcf; }
+.hud strong { color: #fff9dd; }
+#message { flex-basis: 100%; color: #91c4b4; }
+.hint { color: #95a9a6; font-size: 0.9rem; }
