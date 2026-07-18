@@ -31,14 +31,21 @@
 
       <canvas id="game-canvas" width="768" height="512" aria-label="Dungeon Defense game board"></canvas>
 
+      <section id="tower-inspector" class="tower-inspector" hidden aria-live="polite">
+        <div><span class="palette-label">Selected tower</span><strong id="tower-name"></strong></div>
+        <span id="tower-stats"></span>
+        <button id="upgrade-tower" type="button">Upgrade</button>
+      </section>
+
       <section class="hud" aria-live="polite">
         <span>Gold <strong id="gold">50</strong></span>
         <span>Lives <strong id="lives">10</strong></span>
         <span>Wave <strong id="wave">0/3</strong></span>
         <span id="message">Click a grass tile to place an archer tower (25 gold).</span>
+        <span id="placement-message" class="placement-message"></span>
       </section>
 
-      <p class="hint">Archers fire quickly; mages hit harder from farther away. The same seed produces the same wave.</p>
+      <p class="hint">Hover to preview placement range. Towers target the enemy closest to the exit; click a placed tower to inspect or upgrade it.</p>
     </main>
     <script type="module" src="/apps/game/src/main.ts"></script>
   </body>

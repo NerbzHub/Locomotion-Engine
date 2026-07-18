@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 complete and verified
+**Status:** Gate 1 extended through LE-S04 and verified
 
 **Updated:** 2026-07-18
 
@@ -22,6 +22,12 @@
   wave composition that introduces them progressively.
 - Startup content validation with contextual diagnostics for authored tower,
   enemy, and wave definitions.
+- Placement previews that distinguish buildable, blocked, occupied, and
+  unaffordable tiles without changing simulation state while hovering.
+- An explicit nearest-to-exit targeting policy with target rings, projectile
+  trails, impact flashes, and defeat effects owned by the game simulation.
+- Data-defined two-tier upgrades for Archer and Mage towers, including tower
+  inspection and per-instance runtime statistics.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -55,8 +61,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S02 from `docs/NEXT_TEN_SPRINTS.md`: add placement feedback and range
-preview without changing simulation state during hovering.
+Begin LE-S05 from `docs/NEXT_TEN_SPRINTS.md`: add explicit, testable enemy
+traits to make Beetles and Wisps tactically distinct.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

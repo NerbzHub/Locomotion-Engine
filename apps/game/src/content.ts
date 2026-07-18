@@ -6,6 +6,15 @@ export interface TowerDefinition {
   readonly projectileDamage: number;
   readonly projectileSpeed: number;
   readonly projectileColor: string;
+  readonly upgrades: readonly TowerUpgradeDefinition[];
+}
+
+/** Each tier modifies the base tower without mutating its authored definition. */
+export interface TowerUpgradeDefinition {
+  readonly cost: number;
+  readonly rangeBonus: number;
+  readonly damageBonus: number;
+  readonly cooldownMultiplier: number;
 }
 
 export interface EnemyDefinition {
@@ -76,7 +85,11 @@ export const TOWER_DEFINITIONS = {
     cooldownSeconds: 0.45,
     projectileDamage: 8,
     projectileSpeed: 420,
-    projectileColor: "#fff2a6"
+    projectileColor: "#fff2a6",
+    upgrades: [
+      { cost: 20, rangeBonus: 24, damageBonus: 4, cooldownMultiplier: 0.88 },
+      { cost: 34, rangeBonus: 38, damageBonus: 7, cooldownMultiplier: 0.82 }
+    ]
   },
   mage: {
     displayName: "Mage",
@@ -85,7 +98,11 @@ export const TOWER_DEFINITIONS = {
     cooldownSeconds: 0.9,
     projectileDamage: 18,
     projectileSpeed: 360,
-    projectileColor: "#9be7ff"
+    projectileColor: "#9be7ff",
+    upgrades: [
+      { cost: 28, rangeBonus: 28, damageBonus: 7, cooldownMultiplier: 0.9 },
+      { cost: 44, rangeBonus: 42, damageBonus: 12, cooldownMultiplier: 0.84 }
+    ]
   }
 } as const satisfies Record<string, TowerDefinition>;
 

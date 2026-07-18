@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
-import { createGame, gameSnapshot, isBuildable, placeTower, startWave, updateGame } from "../apps/game/src/simulation";
+import { createGame, gameSnapshot, isBuildable, placementStatus, placeTower, selectNearestToExitTarget, startWave, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
   it("rejects towers on the enemy path", () => {
@@ -19,6 +19,43 @@ describe("Dungeon Defense simulation", () => {
     expect(state.towers[0].kind).toBe("mage");
     expect(placeTower(state, { column: 5, row: 3 }, "archer")).toBe(false);
     expect(state.message).toContain("Not enough gold");
+  });
+
+  it("reports placement feedback without changing the game state", () => {
+    const state = createGame();
+    const before = gameSnapshot(state);
+
+    expect(placementStatus(state, { column: 0, row: 3 }, "archer")).toBe("path");
+    expect(placementStatus(state, { column: 1, row: 1 }, "archer")).toBe("valid");
+    expect(gameSnapshot(state)).toEqual(before);
+    placeTower(state, { column: 1, row: 1 });
+    expect(placementStatus(state, { column: 1, row: 1 }, "archer")).toBe("occupied");
+  });
+
+  it("targets the in-range enemy nearest to the exit", () => {
+    const state = createGame();
+    const first = state.world.create("enemy").id;
+    const second = state.world.create("enemy").id;
+    const enemies = [
+      { id: first, kind: "slime" as const, health: 10, maximumHealth: 10, speed: 1, distance: 24, reward: 1 },
+      { id: second, kind: "slime" as const, health: 10, maximumHealth: 10, speed: 1, distance: 160, reward: 1 }
+    ];
+
+    expect(selectNearestToExitTarget(enemies, { x: 64, y: 224 }, 200)?.id).toBe(second);
+  });
+
+  it("upgrades a tower using its next authored tier", () => {
+    const state = createGame();
+    placeTower(state, { column: 1, row: 1 }, "archer");
+    const tower = state.towers[0];
+    const before = towerStats(tower);
+    const goldBefore = state.gold;
+
+    expect(upgradeTower(state, tower.id)).toBe(true);
+    expect(tower.level).toBe(1);
+    expect(state.gold).toBe(goldBefore - TOWER_DEFINITIONS.archer.upgrades[0].cost);
+    expect(towerStats(tower).range).toBeGreaterThan(before.range);
+    expect(towerStats(tower).projectileDamage).toBeGreaterThan(before.projectileDamage);
   });
 
   it("instantiates the authored enemy composition for each wave", () => {

@@ -1,13 +1,37 @@
-import type { GameState, Point } from "./simulation";
+import type { Cell, GameState, PlacementStatus, Point } from "./simulation";
 import { BOARD, enemyPosition, towerPosition } from "./simulation";
-import { ENEMY_DEFINITIONS } from "./content";
+import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
+import type { TowerKind } from "./content";
 
-export function renderGame(context: CanvasRenderingContext2D, state: GameState): void {
+export interface PlacementPreview {
+  readonly cell: Cell;
+  readonly kind: TowerKind;
+  readonly status: PlacementStatus;
+}
+
+export function renderGame(context: CanvasRenderingContext2D, state: GameState, preview?: PlacementPreview): void {
   context.clearRect(0, 0, BOARD.columns * BOARD.tileSize, BOARD.rows * BOARD.tileSize);
   drawBoard(context);
+  if (preview) drawPlacementPreview(context, preview);
   drawTowers(context, state);
   drawEnemies(context, state);
   drawProjectiles(context, state);
+  drawEffects(context, state);
+}
+
+function drawPlacementPreview(context: CanvasRenderingContext2D, preview: PlacementPreview): void {
+  const center = { x: preview.cell.column * BOARD.tileSize + BOARD.tileSize / 2, y: preview.cell.row * BOARD.tileSize + BOARD.tileSize / 2 };
+  const isValid = preview.status === "valid";
+  const color = isValid ? "#d9f58b" : preview.status === "occupied" ? "#f4c95d" : "#f07d6f";
+  context.save();
+  context.fillStyle = `${color}55`;
+  context.fillRect(preview.cell.column * BOARD.tileSize + 2, preview.cell.row * BOARD.tileSize + 2, BOARD.tileSize - 4, BOARD.tileSize - 4);
+  context.strokeStyle = `${color}bb`;
+  context.lineWidth = 2;
+  context.beginPath();
+  context.arc(center.x, center.y, TOWER_DEFINITIONS[preview.kind].range, 0, Math.PI * 2);
+  context.stroke();
+  context.restore();
 }
 
 function drawBoard(context: CanvasRenderingContext2D): void {
@@ -74,6 +98,13 @@ function drawEnemies(context: CanvasRenderingContext2D, state: GameState): void 
   for (const enemy of state.enemies) {
     const position = enemyPosition(enemy);
     const definition = ENEMY_DEFINITIONS[enemy.kind];
+    if (state.towers.some((tower) => tower.lastTargetId === enemy.id)) {
+      context.strokeStyle = "#fff2a6";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(position.x, position.y, definition.radius + 5, 0, Math.PI * 2);
+      context.stroke();
+    }
     context.fillStyle = definition.color;
     context.beginPath();
     context.arc(position.x, position.y, definition.radius, 0, Math.PI * 2);
@@ -87,10 +118,31 @@ function drawEnemies(context: CanvasRenderingContext2D, state: GameState): void 
 
 function drawProjectiles(context: CanvasRenderingContext2D, state: GameState): void {
   for (const projectile of state.projectiles) {
+    context.strokeStyle = `${projectile.color}99`;
+    context.lineWidth = 2;
+    context.beginPath();
+    context.moveTo(projectile.previousX, projectile.previousY);
+    context.lineTo(projectile.x, projectile.y);
+    context.stroke();
     context.fillStyle = projectile.color;
     context.beginPath();
     context.arc(projectile.x, projectile.y, 3, 0, Math.PI * 2);
     context.fill();
+  }
+}
+
+function drawEffects(context: CanvasRenderingContext2D, state: GameState): void {
+  for (const effect of state.effects) {
+    const progress = 1 - effect.remainingSeconds / effect.maximumSeconds;
+    const radius = effect.kind === "impact" ? 5 + progress * 11 : 9 + progress * 20;
+    context.save();
+    context.globalAlpha = Math.max(0, 1 - progress);
+    context.strokeStyle = effect.color;
+    context.lineWidth = effect.kind === "impact" ? 2 : 3;
+    context.beginPath();
+    context.arc(effect.x, effect.y, radius, 0, Math.PI * 2);
+    context.stroke();
+    context.restore();
   }
 }
 

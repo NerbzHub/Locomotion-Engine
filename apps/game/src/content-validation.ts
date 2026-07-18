@@ -1,4 +1,4 @@
-import type { EnemyDefinition, GameContent, TowerDefinition } from "./content";
+import type { EnemyDefinition, GameContent, TowerDefinition, TowerUpgradeDefinition } from "./content";
 
 export interface ContentValidationIssue {
   readonly path: string;
@@ -80,6 +80,19 @@ function validateTower(definition: TowerDefinition, path: string, issues: Conten
   validatePositiveNumber(definition.projectileDamage, `${path}.projectileDamage`, issues);
   validatePositiveNumber(definition.projectileSpeed, `${path}.projectileSpeed`, issues);
   validateColor(definition.projectileColor, `${path}.projectileColor`, issues);
+  for (const [index, upgrade] of definition.upgrades.entries()) {
+    validateTowerUpgrade(upgrade, `${path}.upgrades[${index}]`, issues);
+  }
+}
+
+function validateTowerUpgrade(definition: TowerUpgradeDefinition, path: string, issues: ContentValidationIssue[]): void {
+  validatePositiveNumber(definition.cost, `${path}.cost`, issues);
+  validateNonNegativeNumber(definition.rangeBonus, `${path}.rangeBonus`, issues);
+  validatePositiveNumber(definition.damageBonus, `${path}.damageBonus`, issues);
+  validatePositiveNumber(definition.cooldownMultiplier, `${path}.cooldownMultiplier`, issues);
+  if (definition.cooldownMultiplier > 1) {
+    addIssue(issues, `${path}.cooldownMultiplier`, "must be one or less so an upgrade cannot slow the tower");
+  }
 }
 
 function validateEnemy(definition: EnemyDefinition, path: string, issues: ContentValidationIssue[]): void {
