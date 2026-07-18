@@ -19,6 +19,16 @@
         </div>
       </header>
 
+      <section class="tower-palette" aria-label="Tower selection">
+        <span class="palette-label">Build</span>
+        <button id="select-archer" class="tower-choice selected" type="button" aria-pressed="true">
+          <strong>Archer</strong><span>25 gold · fast shots</span>
+        </button>
+        <button id="select-mage" class="tower-choice" type="button" aria-pressed="false">
+          <strong>Mage</strong><span>35 gold · long range</span>
+        </button>
+      </section>
+
       <canvas id="game-canvas" width="768" height="512" aria-label="Dungeon Defense game board"></canvas>
 
       <section class="hud" aria-live="polite">
@@ -28,7 +38,7 @@
         <span id="message">Click a grass tile to place an archer tower (25 gold).</span>
       </section>
 
-      <p class="hint">Towers automatically fire at slimes. The same seed produces the same wave.</p>
+      <p class="hint">Archers fire quickly; mages hit harder from farther away. The same seed produces the same wave.</p>
     </main>
     <script type="module" src="/apps/game/src/main.ts"></script>
   </body>

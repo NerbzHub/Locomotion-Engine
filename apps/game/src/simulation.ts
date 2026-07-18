@@ -1,6 +1,7 @@
 import { SeededRandom, World } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
-import { WAVE_DEFINITIONS } from "./content";
+import { TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
+import type { TowerKind } from "./content";
 
 export const BOARD = { columns: 12, rows: 8, tileSize: 64 } as const;
 export const TOTAL_WAVES = WAVE_DEFINITIONS.length;
@@ -26,6 +27,7 @@ export interface Enemy {
 
 export interface Tower {
   readonly id: EntityId;
+  readonly kind: TowerKind;
   readonly cell: Cell;
   cooldownSeconds: number;
 }
@@ -33,6 +35,9 @@ export interface Tower {
 export interface Projectile {
   readonly id: EntityId;
   readonly targetId: EntityId;
+  readonly damage: number;
+  readonly speed: number;
+  readonly color: string;
   x: number;
   y: number;
 }
@@ -70,10 +75,6 @@ const PATH_NODES: readonly Point[] = [
 ];
 
 const PATH_CELLS = new Set(["0:3", "1:3", "2:3", "3:3", "3:1", "3:2", "4:1", "5:1", "6:1", "7:1", "7:2", "7:3", "7:4", "7:5", "7:6", "8:6", "9:6", "10:6", "11:6"]);
-const TOWER_COST = 25;
-const TOWER_RANGE = 145;
-const PROJECTILE_SPEED = 420;
-const PROJECTILE_DAMAGE = 8;
 const PATH_LENGTH = pathLength();
 
 export function createGame(seed = 4_242): GameState {
@@ -99,7 +100,8 @@ export function isBuildable(cell: Cell): boolean {
   return cell.column >= 0 && cell.column < BOARD.columns && cell.row >= 0 && cell.row < BOARD.rows && !PATH_CELLS.has(cellKey(cell));
 }
 
-export function placeTower(state: GameState, cell: Cell): boolean {
+export function placeTower(state: GameState, cell: Cell, kind: TowerKind = "archer"): boolean {
+  const definition = TOWER_DEFINITIONS[kind];
   if (state.gameOver || state.gameWon) {
     state.message = "This game has ended. Restart to defend the dungeon again.";
     return false;
@@ -108,8 +110,8 @@ export function placeTower(state: GameState, cell: Cell): boolean {
     state.message = "Towers must be placed on grass, not the path.";
     return false;
   }
-  if (state.gold < TOWER_COST) {
-    state.message = "Not enough gold for an archer tower.";
+  if (state.gold < definition.cost) {
+    state.message = `Not enough gold for a ${definition.displayName.toLowerCase()} tower.`;
     return false;
   }
   if (state.towers.some((tower) => tower.cell.column === cell.column && tower.cell.row === cell.row)) {
@@ -117,9 +119,9 @@ export function placeTower(state: GameState, cell: Cell): boolean {
     return false;
   }
 
-  state.gold -= TOWER_COST;
-  state.towers.push({ id: state.world.create("tower").id, cell, cooldownSeconds: 0 });
-  state.message = "Archer tower placed. Start the wave when you are ready.";
+  state.gold -= definition.cost;
+  state.towers.push({ id: state.world.create("tower").id, kind, cell, cooldownSeconds: 0 });
+  state.message = `${definition.displayName} tower placed. Start the wave when you are ready.`;
   return true;
 }
 
@@ -253,17 +255,26 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
 
 function updateTowers(state: GameState, deltaSeconds: number): void {
   for (const tower of state.towers) {
+    const definition = TOWER_DEFINITIONS[tower.kind];
     tower.cooldownSeconds -= deltaSeconds;
     if (tower.cooldownSeconds > 0) {
       continue;
     }
     const origin = towerPosition(tower);
-    const target = state.enemies.find((enemy) => distance(origin, enemyPosition(enemy)) <= TOWER_RANGE);
+    const target = state.enemies.find((enemy) => distance(origin, enemyPosition(enemy)) <= definition.range);
     if (!target) {
       continue;
     }
-    state.projectiles.push({ id: state.world.create("projectile").id, targetId: target.id, x: origin.x, y: origin.y });
-    tower.cooldownSeconds = 0.45;
+    state.projectiles.push({
+      id: state.world.create("projectile").id,
+      targetId: target.id,
+      damage: definition.projectileDamage,
+      speed: definition.projectileSpeed,
+      color: definition.projectileColor,
+      x: origin.x,
+      y: origin.y
+    });
+    tower.cooldownSeconds = definition.cooldownSeconds;
   }
 }
 
@@ -279,9 +290,9 @@ function updateProjectiles(state: GameState, deltaSeconds: number): void {
     const deltaX = targetPosition.x - projectile.x;
     const deltaY = targetPosition.y - projectile.y;
     const distanceToTarget = Math.hypot(deltaX, deltaY);
-    const travel = PROJECTILE_SPEED * deltaSeconds;
+    const travel = projectile.speed * deltaSeconds;
     if (distanceToTarget <= travel) {
-      target.health -= PROJECTILE_DAMAGE;
+      target.health -= projectile.damage;
       expired.add(projectile.id);
       continue;
     }

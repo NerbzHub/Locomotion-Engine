@@ -46,12 +46,26 @@ function drawBoard(context: CanvasRenderingContext2D): void {
 function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
   for (const tower of state.towers) {
     const position = towerPosition(tower);
-    context.fillStyle = "#594136";
+    if (tower.kind === "archer") {
+      context.fillStyle = "#594136";
+      context.fillRect(position.x - 15, position.y - 15, 30, 30);
+      context.fillStyle = "#d8d1b5";
+      context.fillRect(position.x - 7, position.y - 23, 14, 18);
+      context.fillStyle = "#2d3944";
+      context.fillRect(position.x - 3, position.y - 35, 6, 18);
+      continue;
+    }
+    context.fillStyle = "#303654";
     context.fillRect(position.x - 15, position.y - 15, 30, 30);
-    context.fillStyle = "#d8d1b5";
-    context.fillRect(position.x - 7, position.y - 23, 14, 18);
-    context.fillStyle = "#2d3944";
-    context.fillRect(position.x - 3, position.y - 35, 6, 18);
+    context.fillStyle = "#7de0eb";
+    context.beginPath();
+    context.moveTo(position.x, position.y - 33);
+    context.lineTo(position.x + 11, position.y - 8);
+    context.lineTo(position.x - 11, position.y - 8);
+    context.closePath();
+    context.fill();
+    context.fillStyle = "#c9f8ff";
+    context.fillRect(position.x - 4, position.y - 6, 8, 8);
   }
 }
 
@@ -70,8 +84,8 @@ function drawEnemies(context: CanvasRenderingContext2D, state: GameState): void 
 }
 
 function drawProjectiles(context: CanvasRenderingContext2D, state: GameState): void {
-  context.fillStyle = "#fff2a6";
   for (const projectile of state.projectiles) {
+    context.fillStyle = projectile.color;
     context.beginPath();
     context.arc(projectile.x, projectile.y, 3, 0, Math.PI * 2);
     context.fill();

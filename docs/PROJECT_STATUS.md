@@ -16,6 +16,8 @@
   service, and entity lifetime registry.
 - A complete first slice: place archer towers, survive three seeded slime waves,
   and observe projectiles, damage, gold, lives, victory, loss, and restart.
+- Game-owned tower definitions for an Archer and Mage, proving that authored
+  content can configure runtime instances without leaking game rules into the engine.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet

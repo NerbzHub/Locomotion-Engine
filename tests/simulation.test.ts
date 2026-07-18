@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { WAVE_DEFINITIONS } from "../apps/game/src/content";
+import { TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
 import { createGame, gameSnapshot, isBuildable, placeTower, startWave, updateGame } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
@@ -9,6 +9,16 @@ describe("Dungeon Defense simulation", () => {
     expect(isBuildable({ column: 0, row: 3 })).toBe(false);
     expect(placeTower(state, { column: 0, row: 3 })).toBe(false);
     expect(state.gold).toBe(50);
+  });
+
+  it("instantiates a tower from its selected definition", () => {
+    const state = createGame();
+
+    expect(placeTower(state, { column: 1, row: 1 }, "mage")).toBe(true);
+    expect(state.gold).toBe(50 - TOWER_DEFINITIONS.mage.cost);
+    expect(state.towers[0].kind).toBe("mage");
+    expect(placeTower(state, { column: 5, row: 3 }, "archer")).toBe(false);
+    expect(state.message).toContain("Not enough gold");
   });
 
   it("produces the same state for the same seed and inputs", () => {

@@ -1,11 +1,14 @@
 import "./style.css";
 import { Diagnostics, Engine, PointerInput } from "../../../packages/engine/src";
 import { renderGame } from "./render";
+import type { TowerKind } from "./content";
 import { BOARD, createGame, placeTower, startWave, TOTAL_WAVES, updateGame } from "./simulation";
 
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
 const startWaveButton = requiredElement<HTMLButtonElement>("start-wave");
 const restartButton = requiredElement<HTMLButtonElement>("restart-game");
+const archerButton = requiredElement<HTMLButtonElement>("select-archer");
+const mageButton = requiredElement<HTMLButtonElement>("select-mage");
 const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
@@ -19,6 +22,7 @@ if (!context) {
 context.imageSmoothingEnabled = false;
 const initialSeed = 4_242;
 let state = createGame(initialSeed);
+let selectedTower: TowerKind = "archer";
 const diagnostics = new Diagnostics();
 const pointer = new PointerInput(canvas);
 
@@ -26,7 +30,7 @@ pointer.onPointerDown((point) => {
   placeTower(state, {
     column: Math.floor(point.x / BOARD.tileSize),
     row: Math.floor(point.y / BOARD.tileSize)
-  });
+  }, selectedTower);
   updateHud();
 });
 
@@ -39,6 +43,9 @@ restartButton.addEventListener("click", () => {
   state = createGame(initialSeed);
   updateHud();
 });
+
+archerButton.addEventListener("click", () => selectTower("archer"));
+mageButton.addEventListener("click", () => selectTower("mage"));
 
 const engine = new Engine({
   fixedDeltaSeconds: 1 / 60,
@@ -57,6 +64,16 @@ window.addEventListener("beforeunload", () => {
 
 engine.start();
 updateHud();
+
+function selectTower(kind: TowerKind): void {
+  selectedTower = kind;
+  archerButton.setAttribute("aria-pressed", String(kind === "archer"));
+  mageButton.setAttribute("aria-pressed", String(kind === "mage"));
+  archerButton.classList.toggle("selected", kind === "archer");
+  mageButton.classList.toggle("selected", kind === "mage");
+  state.message = `${kind === "archer" ? "Archer" : "Mage"} selected. Click grass to place it.`;
+  updateHud();
+}
 
 function updateHud(): void {
   gold.textContent = String(state.gold);
