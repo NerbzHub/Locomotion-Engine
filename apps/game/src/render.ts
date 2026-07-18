@@ -1,5 +1,6 @@
 import type { GameState, Point } from "./simulation";
 import { BOARD, enemyPosition, towerPosition } from "./simulation";
+import { ENEMY_DEFINITIONS } from "./content";
 
 export function renderGame(context: CanvasRenderingContext2D, state: GameState): void {
   context.clearRect(0, 0, BOARD.columns * BOARD.tileSize, BOARD.rows * BOARD.tileSize);
@@ -72,14 +73,15 @@ function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
 function drawEnemies(context: CanvasRenderingContext2D, state: GameState): void {
   for (const enemy of state.enemies) {
     const position = enemyPosition(enemy);
-    context.fillStyle = "#bf5e5e";
+    const definition = ENEMY_DEFINITIONS[enemy.kind];
+    context.fillStyle = definition.color;
     context.beginPath();
-    context.arc(position.x, position.y, 14, 0, Math.PI * 2);
+    context.arc(position.x, position.y, definition.radius, 0, Math.PI * 2);
     context.fill();
-    context.fillStyle = "#33263a";
-    context.fillRect(position.x - 6, position.y - 3, 4, 4);
-    context.fillRect(position.x + 2, position.y - 3, 4, 4);
-    drawHealthBar(context, position, enemy.health / enemy.maximumHealth);
+    context.fillStyle = definition.eyeColor;
+    context.fillRect(position.x - definition.radius / 2, position.y - 3, 4, 4);
+    context.fillRect(position.x + definition.radius / 2 - 4, position.y - 3, 4, 4);
+    drawHealthBar(context, position, definition.radius, enemy.health / enemy.maximumHealth);
   }
 }
 
@@ -92,9 +94,10 @@ function drawProjectiles(context: CanvasRenderingContext2D, state: GameState): v
   }
 }
 
-function drawHealthBar(context: CanvasRenderingContext2D, position: Point, ratio: number): void {
+function drawHealthBar(context: CanvasRenderingContext2D, position: Point, radius: number, ratio: number): void {
+  const width = radius * 2 + 4;
   context.fillStyle = "#372f37";
-  context.fillRect(position.x - 16, position.y - 25, 32, 5);
+  context.fillRect(position.x - width / 2, position.y - radius - 11, width, 5);
   context.fillStyle = "#a7d46f";
-  context.fillRect(position.x - 16, position.y - 25, Math.max(0, ratio) * 32, 5);
+  context.fillRect(position.x - width / 2, position.y - radius - 11, Math.max(0, ratio) * width, 5);
 }

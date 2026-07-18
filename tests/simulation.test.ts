@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
+import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
 import { createGame, gameSnapshot, isBuildable, placeTower, startWave, updateGame } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
@@ -19,6 +19,16 @@ describe("Dungeon Defense simulation", () => {
     expect(state.towers[0].kind).toBe("mage");
     expect(placeTower(state, { column: 5, row: 3 }, "archer")).toBe(false);
     expect(state.message).toContain("Not enough gold");
+  });
+
+  it("instantiates the authored enemy composition for each wave", () => {
+    const state = createGame(55);
+    state.wave = 1;
+
+    expect(startWave(state)).toBe(true);
+    expect(state.pendingSpawns.map((spawn) => spawn.kind)).toEqual(WAVE_DEFINITIONS[1].enemyKinds);
+    expect(state.pendingSpawns.some((spawn) => spawn.kind === "beetle")).toBe(true);
+    expect(ENEMY_DEFINITIONS.beetle.baseHealth).toBeGreaterThan(ENEMY_DEFINITIONS.slime.baseHealth);
   });
 
   it("produces the same state for the same seed and inputs", () => {

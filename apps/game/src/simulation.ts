@@ -1,7 +1,7 @@
 import { SeededRandom, World } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
-import { TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
-import type { TowerKind } from "./content";
+import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
+import type { EnemyKind, TowerKind } from "./content";
 
 export const BOARD = { columns: 12, rows: 8, tileSize: 64 } as const;
 export const TOTAL_WAVES = WAVE_DEFINITIONS.length;
@@ -18,6 +18,7 @@ export interface Cell {
 
 export interface Enemy {
   readonly id: EntityId;
+  readonly kind: EnemyKind;
   health: number;
   readonly maximumHealth: number;
   readonly speed: number;
@@ -42,7 +43,8 @@ export interface Projectile {
   y: number;
 }
 
-interface PendingSpawn {
+export interface PendingSpawn {
+  readonly kind: EnemyKind;
   readonly health: number;
   readonly speed: number;
   readonly reward: number;
@@ -149,11 +151,17 @@ export function startWave(state: GameState): boolean {
   state.waveActive = true;
   state.spawnDelaySeconds = 0;
   const definition = WAVE_DEFINITIONS[state.wave - 1];
-  for (let index = 0; index < definition.enemyCount; index += 1) {
-    const health = definition.baseHealth + Math.round(state.random.between(0, definition.healthVariation));
-    state.pendingSpawns.push({ health, speed: state.random.between(...definition.speedRange), reward: definition.reward });
+  for (const kind of definition.enemyKinds) {
+    const enemyDefinition = ENEMY_DEFINITIONS[kind];
+    const health = enemyDefinition.baseHealth + Math.round(state.random.between(0, enemyDefinition.healthVariation));
+    state.pendingSpawns.push({
+      kind,
+      health,
+      speed: state.random.between(enemyDefinition.speedRange[0], enemyDefinition.speedRange[1]),
+      reward: enemyDefinition.reward
+    });
   }
-  state.message = `Wave ${state.wave} is approaching.`;
+  state.message = `Wave ${state.wave} is approaching: ${waveEnemyNames(definition)}.`;
   return true;
 }
 
@@ -224,6 +232,7 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
   }
   state.enemies.push({
     id: state.world.create("enemy").id,
+    kind: spawn.kind,
     health: spawn.health,
     maximumHealth: spawn.health,
     speed: spawn.speed,
@@ -248,7 +257,7 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
       state.gameOver = true;
       state.message = "The dungeon has fallen. Restart to begin again.";
     } else {
-      state.message = `${escaped.length} slime${escaped.length === 1 ? "" : "s"} reached the dungeon.`;
+      state.message = `${escaped.length} enem${escaped.length === 1 ? "y" : "ies"} reached the dungeon.`;
     }
   }
 }
@@ -335,6 +344,10 @@ function pathLength(): number {
 
 function cellKey(cell: Cell): string {
   return `${cell.column}:${cell.row}`;
+}
+
+function waveEnemyNames(definition: { readonly enemyKinds: readonly EnemyKind[] }): string {
+  return [...new Set(definition.enemyKinds)].map((kind) => ENEMY_DEFINITIONS[kind].displayName.toLowerCase()).join(" and ");
 }
 
 function distance(first: Point, second: Point): number {
