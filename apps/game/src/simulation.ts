@@ -1,6 +1,6 @@
 import { SeededRandom, World } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
-import { DIFFICULTY_DEFINITIONS, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
+import { DIFFICULTY_DEFINITIONS, ELITE_DEFINITION, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
 import type { DifficultyId, EnemyKind, MapId, TowerKind } from "./content";
 
 export const BOARD = MAP_DEFINITIONS.gate;
@@ -19,6 +19,7 @@ export interface Cell {
 export interface Enemy {
   readonly id: EntityId;
   readonly kind: EnemyKind;
+  readonly isElite: boolean;
   readonly mapId: MapId;
   health: number;
   readonly maximumHealth: number;
@@ -81,6 +82,7 @@ export type GamePhase = "intermission" | "wave" | "victory" | "defeat";
 
 export interface PendingSpawn {
   readonly kind: EnemyKind;
+  readonly isElite: boolean;
   readonly health: number;
   readonly speed: number;
   readonly reward: number;
@@ -291,14 +293,16 @@ export function startWave(state: GameState): boolean {
   state.phase = "wave";
   state.spawnDelaySeconds = 0;
   const definition = WAVE_DEFINITIONS[state.wave - 1];
-  for (const kind of definition.enemyKinds) {
+  for (const [index, kind] of definition.enemyKinds.entries()) {
     const enemyDefinition = ENEMY_DEFINITIONS[kind];
-    const health = Math.round((enemyDefinition.baseHealth + state.random.between(0, enemyDefinition.healthVariation)) * DIFFICULTY_DEFINITIONS[state.difficultyId].enemyHealthMultiplier);
+    const isElite = definition.eliteEnemyIndices?.includes(index) ?? false;
+    const health = Math.round((enemyDefinition.baseHealth + state.random.between(0, enemyDefinition.healthVariation)) * DIFFICULTY_DEFINITIONS[state.difficultyId].enemyHealthMultiplier * (isElite ? ELITE_DEFINITION.healthMultiplier : 1));
     state.pendingSpawns.push({
       kind,
+      isElite,
       health,
       speed: state.random.between(enemyDefinition.speedRange[0], enemyDefinition.speedRange[1]),
-      reward: enemyDefinition.reward
+      reward: Math.round(enemyDefinition.reward * (isElite ? ELITE_DEFINITION.rewardMultiplier : 1))
     });
   }
   state.message = `Wave ${state.wave} underway: ${waveEnemyNames(definition)}.`;
@@ -417,6 +421,7 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
   state.enemies.push({
     id: state.world.create("enemy").id,
     kind: spawn.kind,
+    isElite: spawn.isElite,
     mapId: state.mapId,
     health: spawn.health,
     maximumHealth: spawn.health,

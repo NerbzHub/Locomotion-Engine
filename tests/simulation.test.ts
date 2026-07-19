@@ -61,8 +61,8 @@ describe("Dungeon Defense simulation", () => {
     const first = state.world.create("enemy").id;
     const second = state.world.create("enemy").id;
     const enemies = [
-      { id: first, kind: "slime" as const, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 1, slowRemainingSeconds: 0, distance: 24, reward: 1 },
-      { id: second, kind: "slime" as const, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 1, slowRemainingSeconds: 0, distance: 160, reward: 1 }
+      { id: first, kind: "slime" as const, isElite: false, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 1, slowRemainingSeconds: 0, distance: 24, reward: 1 },
+      { id: second, kind: "slime" as const, isElite: false, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 1, slowRemainingSeconds: 0, distance: 160, reward: 1 }
     ];
 
     expect(selectNearestToExitTarget(enemies, { x: 64, y: 224 }, 200)?.id).toBe(second);
@@ -73,8 +73,8 @@ describe("Dungeon Defense simulation", () => {
     const first = state.world.create("enemy").id;
     const second = state.world.create("enemy").id;
     const enemies = [
-      { id: first, kind: "slime" as const, mapId: "gate" as const, health: 40, maximumHealth: 40, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 1, slowRemainingSeconds: 0, distance: 40, reward: 1 },
-      { id: second, kind: "slime" as const, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 1, slowRemainingSeconds: 0, distance: 120, reward: 1 }
+      { id: first, kind: "slime" as const, isElite: false, mapId: "gate" as const, health: 40, maximumHealth: 40, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 1, slowRemainingSeconds: 0, distance: 40, reward: 1 },
+      { id: second, kind: "slime" as const, isElite: false, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 1, slowRemainingSeconds: 0, distance: 120, reward: 1 }
     ];
 
     expect(selectTarget(enemies, { x: 0, y: 224 }, 300, "nearest-exit")?.id).toBe(second);
@@ -127,6 +127,17 @@ describe("Dungeon Defense simulation", () => {
     expect(ENEMY_DEFINITIONS.beetle.baseHealth).toBeGreaterThan(ENEMY_DEFINITIONS.slime.baseHealth);
   });
 
+  it("marks authored elite wave entries with stronger health and rewards", () => {
+    const state = createGame(55);
+    state.wave = 2;
+    startWave(state);
+    const elite = state.pendingSpawns.find((spawn) => spawn.isElite);
+
+    expect(elite).toBeDefined();
+    expect(elite?.kind).toBe("beetle");
+    expect(elite?.reward).toBe(ENEMY_DEFINITIONS.beetle.reward * 2);
+  });
+
   it("moves between explicit intermission and wave phases with a readable briefing", () => {
     const state = createGame(55);
 
@@ -172,6 +183,7 @@ describe("Dungeon Defense simulation", () => {
     const beetle = {
       id: state.world.create("enemy").id,
       kind: "beetle" as const,
+      isElite: false,
       mapId: "gate" as const,
       health: 30,
       maximumHealth: 30,
@@ -194,6 +206,7 @@ describe("Dungeon Defense simulation", () => {
     const wisp = {
       id: state.world.create("enemy").id,
       kind: "wisp" as const,
+      isElite: false,
       mapId: "gate" as const,
       health: 20,
       maximumHealth: 20,
@@ -214,7 +227,7 @@ describe("Dungeon Defense simulation", () => {
 
   it("expires a slow effect and restores the enemy's base movement multiplier", () => {
     const state = createGame();
-    state.enemies.push({ id: state.world.create("enemy").id, kind: "slime", mapId: "gate", health: 20, maximumHealth: 20, speed: 40, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 0.55, slowRemainingSeconds: 0.1, distance: 0, reward: 1 });
+    state.enemies.push({ id: state.world.create("enemy").id, kind: "slime", isElite: false, mapId: "gate", health: 20, maximumHealth: 20, speed: 40, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, slowMultiplier: 0.55, slowRemainingSeconds: 0.1, distance: 0, reward: 1 });
 
     updateGame(state, 0.2);
 

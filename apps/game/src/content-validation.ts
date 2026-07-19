@@ -1,4 +1,5 @@
-import type { DifficultyDefinition, EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerSlowEffect, TowerSpecialisationDefinition, TowerUpgradeDefinition } from "./content";
+import { ELITE_DEFINITION } from "./content";
+import type { DifficultyDefinition, EliteDefinition, EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerSlowEffect, TowerSpecialisationDefinition, TowerUpgradeDefinition } from "./content";
 
 export interface ContentValidationIssue {
   readonly path: string;
@@ -30,6 +31,7 @@ export function validateGameContent(content: GameContent): ContentValidationRepo
   validateCollection("enemies", enemies, issues, validateEnemy);
   validateCollection("maps", maps, issues, validateMap);
   validateCollection("difficulties", difficulties, issues, validateDifficulty);
+  validateElite(ELITE_DEFINITION, "elite", issues);
 
   if (content.waves.length === 0) {
     addIssue(issues, "waves", "must contain at least one wave");
@@ -44,10 +46,19 @@ export function validateGameContent(content: GameContent): ContentValidationRepo
         addIssue(issues, `${path}.enemyKinds[${enemyIndex}]`, `references unknown enemy kind "${kind}"`);
       }
     }
+    for (const eliteIndex of wave.eliteEnemyIndices ?? []) {
+      if (!Number.isInteger(eliteIndex) || eliteIndex < 0 || eliteIndex >= wave.enemyKinds.length) addIssue(issues, `${path}.eliteEnemyIndices`, "must reference an enemy in this wave");
+    }
     validateNonNegativeNumber(wave.clearBonus, `${path}.clearBonus`, issues);
   }
 
   return { issues, towerCount: towers.length, enemyCount: enemies.length, waveCount: content.waves.length };
+}
+
+function validateElite(definition: EliteDefinition, path: string, issues: ContentValidationIssue[]): void {
+  validatePositiveNumber(definition.healthMultiplier, `${path}.healthMultiplier`, issues);
+  validatePositiveNumber(definition.rewardMultiplier, `${path}.rewardMultiplier`, issues);
+  validateColor(definition.color, `${path}.color`, issues);
 }
 
 export function assertValidGameContent(content: GameContent): ContentValidationReport {

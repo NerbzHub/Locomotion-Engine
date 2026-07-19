@@ -1,6 +1,6 @@
 import type { Cell, GameState, PlacementStatus, Point } from "./simulation";
 import { BOARD, enemyPosition, towerPosition } from "./simulation";
-import { ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
+import { ELITE_DEFINITION, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
 import type { TowerKind } from "./content";
 
 export interface PlacementPreview {
@@ -118,6 +118,15 @@ function drawEnemies(context: CanvasRenderingContext2D, state: GameState): void 
     context.beginPath();
     context.arc(position.x, position.y, definition.radius, 0, Math.PI * 2);
     context.fill();
+    if (enemy.isElite) {
+      context.fillStyle = ELITE_DEFINITION.color;
+      context.beginPath();
+      context.moveTo(position.x - 8, position.y - definition.radius - 7);
+      context.lineTo(position.x, position.y - definition.radius - 14);
+      context.lineTo(position.x + 8, position.y - definition.radius - 7);
+      context.closePath();
+      context.fill();
+    }
     if (definition.trait?.kind === "armor") {
       context.strokeStyle = "#fff0ba";
       context.lineWidth = 3;
