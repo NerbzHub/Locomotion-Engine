@@ -148,6 +148,19 @@ export const DIFFICULTY_DEFINITIONS = {
 
 export type DifficultyId = keyof typeof DIFFICULTY_DEFINITIONS;
 
+export interface CampaignNodeDefinition {
+  readonly id: string;
+  readonly displayName: string;
+  readonly description: string;
+  readonly mapId: MapId;
+  readonly difficultyId: DifficultyId;
+}
+
+export const CAMPAIGN_NODES: readonly CampaignNodeDefinition[] = [
+  { id: "gate-watch", displayName: "Gate Watch", description: "Hold the original dungeon gate.", mapId: "gate", difficultyId: "standard" },
+  { id: "crossroads-stand", displayName: "Crossroads Stand", description: "Defend the split approach against the Warden.", mapId: "crossroads", difficultyId: "standard" }
+];
+
 /** Enemy balance and presentation are authored game content, not engine concerns. */
 export const ENEMY_DEFINITIONS = {
   slime: {
@@ -267,6 +280,7 @@ export interface GameContent {
   readonly enemies: Readonly<Record<string, EnemyDefinition>>;
   readonly maps: Readonly<Record<string, MapDefinition>>;
   readonly difficulties: Readonly<Record<string, DifficultyDefinition>>;
+  readonly campaignNodes: readonly CampaignNodeDefinition[];
   readonly waves: readonly {
     readonly enemyKinds: readonly string[];
     readonly eliteEnemyIndices?: readonly number[];
@@ -279,5 +293,6 @@ export const GAME_CONTENT = {
   enemies: ENEMY_DEFINITIONS,
   maps: MAP_DEFINITIONS,
   difficulties: DIFFICULTY_DEFINITIONS,
+  campaignNodes: CAMPAIGN_NODES,
   waves: WAVE_DEFINITIONS
 } satisfies GameContent;

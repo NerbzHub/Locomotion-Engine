@@ -32,6 +32,13 @@ export function validateGameContent(content: GameContent): ContentValidationRepo
   validateCollection("maps", maps, issues, validateMap);
   validateCollection("difficulties", difficulties, issues, validateDifficulty);
   validateElite(ELITE_DEFINITION, "elite", issues);
+  for (const [index, node] of content.campaignNodes.entries()) {
+    const path = `campaignNodes[${index}]`;
+    validateDisplayName(node.displayName, `${path}.displayName`, issues);
+    validateDisplayName(node.description, `${path}.description`, issues);
+    if (!content.maps[node.mapId]) addIssue(issues, `${path}.mapId`, "references unknown map");
+    if (!content.difficulties[node.difficultyId]) addIssue(issues, `${path}.difficultyId`, "references unknown difficulty");
+  }
 
   if (content.waves.length === 0) {
     addIssue(issues, "waves", "must contain at least one wave");

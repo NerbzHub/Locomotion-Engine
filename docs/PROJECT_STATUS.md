@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S17 and verified
+**Status:** Gate 1 extended through LE-S18 and verified
 
 **Updated:** 2026-07-18
 
@@ -54,6 +54,8 @@
   on-board presentation for high-priority targets.
 - A final-wave Gate Warden boss with authored health/reward values, phase-based
   speed escalation, event feedback, and distinct presentation.
+- A compact authored campaign flow that maps named scenarios to map/difficulty
+  choices and supports deterministic revisits.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -87,8 +89,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S18 from `docs/NEXT_TEN_SPRINTS.md`: organise maps into a compact,
-replayable campaign flow.
+Begin LE-S19 from `docs/NEXT_TEN_SPRINTS.md`: add safe local progression
+unlocks for campaign content.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

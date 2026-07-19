@@ -2,7 +2,7 @@ import "./style.css";
 import { Diagnostics, Engine, PointerInput } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
 import { renderGame } from "./render";
-import { DIFFICULTY_DEFINITIONS, GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
+import { CAMPAIGN_NODES, DIFFICULTY_DEFINITIONS, GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
 import type { DifficultyId, MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
 import { loadFromLocalStorage, saveToLocalStorage } from "./save";
@@ -24,6 +24,8 @@ const crossroadsButton = requiredElement<HTMLButtonElement>("select-crossroads")
 const casualButton = requiredElement<HTMLButtonElement>("select-casual");
 const standardButton = requiredElement<HTMLButtonElement>("select-standard");
 const veteranButton = requiredElement<HTMLButtonElement>("select-veteran");
+const gateWatchButton = requiredElement<HTMLButtonElement>("campaign-gate-watch");
+const crossroadsStandButton = requiredElement<HTMLButtonElement>("campaign-crossroads-stand");
 const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
@@ -156,6 +158,8 @@ crossroadsButton.addEventListener("click", () => selectMap("crossroads"));
 casualButton.addEventListener("click", () => selectDifficulty("casual"));
 standardButton.addEventListener("click", () => selectDifficulty("standard"));
 veteranButton.addEventListener("click", () => selectDifficulty("veteran"));
+gateWatchButton.addEventListener("click", () => selectCampaignNode("gate-watch"));
+crossroadsStandButton.addEventListener("click", () => selectCampaignNode("crossroads-stand"));
 upgradeTowerButton.addEventListener("click", () => {
   if (inspectedTowerId) upgradeTower(state, inspectedTowerId);
   updateHud();
@@ -224,6 +228,21 @@ function selectDifficulty(difficultyId: DifficultyId): void {
   updateHud();
 }
 
+function selectCampaignNode(nodeId: string): void {
+  if (state.waveActive) return;
+  const node = CAMPAIGN_NODES.find((candidate) => candidate.id === nodeId);
+  if (!node) return;
+  selectedMap = node.mapId;
+  selectedDifficulty = node.difficultyId;
+  state = createGame(initialSeed, selectedMap, selectedDifficulty);
+  gateWatchButton.setAttribute("aria-pressed", String(node.id === "gate-watch"));
+  crossroadsStandButton.setAttribute("aria-pressed", String(node.id === "crossroads-stand"));
+  gateWatchButton.classList.toggle("selected", node.id === "gate-watch");
+  crossroadsStandButton.classList.toggle("selected", node.id === "crossroads-stand");
+  state.message = `${node.displayName}: ${node.description}`;
+  updateHud();
+}
+
 function placementPreview() {
   const cell = keyboardCursorActive ? keyboardCursor : hoveredCell;
   if (!cell) return undefined;
@@ -243,6 +262,8 @@ function updateHud(): void {
   casualButton.disabled = state.waveActive;
   standardButton.disabled = state.waveActive;
   veteranButton.disabled = state.waveActive;
+  gateWatchButton.disabled = state.waveActive;
+  crossroadsStandButton.disabled = state.waveActive;
   startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;
   updatePlacementMessage();
   updateTowerInspector();
