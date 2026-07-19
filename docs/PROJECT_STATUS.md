@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S25 and verified
+**Status:** Gate 1 extended through LE-S26 and verified
 
 **Updated:** 2026-07-18
 
@@ -70,6 +70,8 @@
   including validation and replay-equivalence coverage.
 - A seeded simulation fuzz suite covering 12,000 generated frames with
   reproducible seed/frame invariant failure reporting.
+- A documented simulation performance budget and crowded-board stress test for
+  80 enemies, 12 towers, and 600 fixed frames.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -103,8 +105,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S26 from `docs/NEXT_TEN_SPRINTS.md`: define and verify a practical
-simulation performance budget.
+Begin LE-S27 from `docs/NEXT_TEN_SPRINTS.md`: complete responsive and
+touch-oriented layout support.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.
