@@ -35,9 +35,12 @@ export interface Tower {
   readonly kind: TowerKind;
   readonly cell: Cell;
   level: number;
+  targetPolicy: TargetPolicy;
   cooldownSeconds: number;
   lastTargetId?: EntityId;
 }
+
+export type TargetPolicy = "nearest-exit" | "closest" | "strongest" | "weakest";
 
 export interface TowerStats {
   readonly range: number;
@@ -190,7 +193,7 @@ export function placeTower(state: GameState, cell: Cell, kind: TowerKind = "arch
   }
 
   state.gold -= definition.cost;
-  state.towers.push({ id: state.world.create("tower").id, kind, cell, level: 0, cooldownSeconds: 0 });
+  state.towers.push({ id: state.world.create("tower").id, kind, cell, level: 0, targetPolicy: "nearest-exit", cooldownSeconds: 0 });
   recordEvent(state, "placement", `${definition.displayName} placed at ${cell.column},${cell.row}`);
   state.message = `${definition.displayName} tower placed. Start the wave when you are ready.`;
   return true;
@@ -229,6 +232,14 @@ export function upgradeTower(state: GameState, towerId: EntityId): boolean {
   tower.level += 1;
   recordEvent(state, "upgrade", `${TOWER_DEFINITIONS[tower.kind].displayName} reached level ${tower.level + 1}`);
   state.message = `${TOWER_DEFINITIONS[tower.kind].displayName} upgraded to level ${tower.level + 1}.`;
+  return true;
+}
+
+export function setTowerTargetPolicy(state: GameState, towerId: EntityId, targetPolicy: TargetPolicy): boolean {
+  const tower = state.towers.find((candidate) => candidate.id === towerId);
+  if (!tower) return false;
+  tower.targetPolicy = targetPolicy;
+  state.message = `${TOWER_DEFINITIONS[tower.kind].displayName} now targets ${targetPolicy.replace("-", " ")}.`;
   return true;
 }
 
@@ -445,7 +456,7 @@ function updateTowers(state: GameState, deltaSeconds: number): void {
       continue;
     }
     const origin = towerPosition(tower);
-    const target = selectNearestToExitTarget(state.enemies, origin, stats.range);
+    const target = selectTarget(state.enemies, origin, stats.range, tower.targetPolicy);
     if (!target) {
       continue;
     }
@@ -467,14 +478,24 @@ function updateTowers(state: GameState, deltaSeconds: number): void {
 
 /** Towers prioritize the enemy that has progressed furthest toward the dungeon exit. */
 export function selectNearestToExitTarget(enemies: readonly Enemy[], origin: Point, range: number): Enemy | undefined {
-  let selected: Enemy | undefined;
-  for (const enemy of enemies) {
-    if (distance(origin, enemyPosition(enemy)) > range) continue;
-    if (!selected || enemy.distance > selected.distance || (enemy.distance === selected.distance && enemy.id < selected.id)) {
-      selected = enemy;
-    }
-  }
-  return selected;
+  return selectTarget(enemies, origin, range, "nearest-exit");
+}
+
+export function selectTarget(enemies: readonly Enemy[], origin: Point, range: number, policy: TargetPolicy): Enemy | undefined {
+  const candidates = enemies.filter((enemy) => distance(origin, enemyPosition(enemy)) <= range);
+  return candidates.reduce<Enemy | undefined>((selected, enemy) => {
+    if (!selected) return enemy;
+    const comparison = targetMetric(enemy, origin, policy) - targetMetric(selected, origin, policy);
+    const wantsHigher = policy === "nearest-exit" || policy === "strongest";
+    if ((wantsHigher ? comparison > 0 : comparison < 0) || (comparison === 0 && enemy.id < selected.id)) return enemy;
+    return selected;
+  }, undefined);
+}
+
+function targetMetric(enemy: Enemy, origin: Point, policy: TargetPolicy): number {
+  if (policy === "nearest-exit") return enemy.distance;
+  if (policy === "strongest" || policy === "weakest") return enemy.health;
+  return distance(origin, enemyPosition(enemy));
 }
 
 function updateProjectiles(state: GameState, deltaSeconds: number): void {

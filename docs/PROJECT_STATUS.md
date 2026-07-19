@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S12 and verified
+**Status:** Gate 1 extended through LE-S13 and verified
 
 **Updated:** 2026-07-18
 
@@ -44,6 +44,8 @@
   escape, duration, seed, and map evidence in the developer overlay.
 - Authored Casual, Standard, and Veteran difficulty modes with transparent
   starting resources/lives and deterministic enemy-health scaling.
+- Per-tower targeting policies for nearest exit, closest, strongest, and
+  weakest targets, with saved state and deterministic tie-breaking.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -77,8 +79,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S13 from `docs/NEXT_TEN_SPRINTS.md`: let players select a tower's
-targeting priority with deterministic tie-breaking.
+Begin LE-S14 from `docs/NEXT_TEN_SPRINTS.md`: add the Sentinel support tower
+with a clear, testable slow effect.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

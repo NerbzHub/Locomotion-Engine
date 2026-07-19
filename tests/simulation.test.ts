@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
-import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, startWave, telemetryReport, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
+import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, selectTarget, setTowerTargetPolicy, startWave, telemetryReport, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
   it("rejects towers on the enemy path", () => {
@@ -66,6 +66,24 @@ describe("Dungeon Defense simulation", () => {
     ];
 
     expect(selectNearestToExitTarget(enemies, { x: 64, y: 224 }, 200)?.id).toBe(second);
+  });
+
+  it("uses each named targeting policy with stable tie-breaking", () => {
+    const state = createGame();
+    const first = state.world.create("enemy").id;
+    const second = state.world.create("enemy").id;
+    const enemies = [
+      { id: first, kind: "slime" as const, mapId: "gate" as const, health: 40, maximumHealth: 40, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, distance: 40, reward: 1 },
+      { id: second, kind: "slime" as const, mapId: "gate" as const, health: 10, maximumHealth: 10, speed: 1, armorDamageReduction: 0, burstCooldownSeconds: 0, burstRemainingSeconds: 0, distance: 120, reward: 1 }
+    ];
+
+    expect(selectTarget(enemies, { x: 0, y: 224 }, 300, "nearest-exit")?.id).toBe(second);
+    expect(selectTarget(enemies, { x: 0, y: 224 }, 300, "closest")?.id).toBe(first);
+    expect(selectTarget(enemies, { x: 0, y: 224 }, 300, "strongest")?.id).toBe(first);
+    expect(selectTarget(enemies, { x: 0, y: 224 }, 300, "weakest")?.id).toBe(second);
+    placeTower(state, { column: 1, row: 1 });
+    expect(setTowerTargetPolicy(state, state.towers[0].id, "weakest")).toBe(true);
+    expect(state.towers[0].targetPolicy).toBe("weakest");
   });
 
   it("upgrades a tower using its next authored tier", () => {

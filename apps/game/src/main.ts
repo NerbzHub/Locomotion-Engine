@@ -6,8 +6,8 @@ import { DIFFICULTY_DEFINITIONS, GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITION
 import type { DifficultyId, MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
 import { loadFromLocalStorage, saveToLocalStorage } from "./save";
-import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
-import type { Cell } from "./simulation";
+import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
+import type { Cell, TargetPolicy } from "./simulation";
 
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
 const startWaveButton = requiredElement<HTMLButtonElement>("start-wave");
@@ -35,6 +35,7 @@ const towerInspector = requiredElement<HTMLElement>("tower-inspector");
 const towerName = requiredElement<HTMLElement>("tower-name");
 const towerStatsElement = requiredElement<HTMLElement>("tower-stats");
 const upgradeTowerButton = requiredElement<HTMLButtonElement>("upgrade-tower");
+const targetPolicySelect = requiredElement<HTMLSelectElement>("target-policy");
 const context = canvas.getContext("2d");
 
 if (!context) throw new Error("Canvas 2D is unavailable in this browser.");
@@ -152,6 +153,10 @@ standardButton.addEventListener("click", () => selectDifficulty("standard"));
 veteranButton.addEventListener("click", () => selectDifficulty("veteran"));
 upgradeTowerButton.addEventListener("click", () => {
   if (inspectedTowerId) upgradeTower(state, inspectedTowerId);
+  updateHud();
+});
+targetPolicySelect.addEventListener("change", () => {
+  if (inspectedTowerId) setTowerTargetPolicy(state, inspectedTowerId, targetPolicySelect.value as TargetPolicy);
   updateHud();
 });
 
@@ -276,6 +281,8 @@ function updateTowerInspector(): void {
   towerInspector.hidden = false;
   towerName.textContent = `${definition.displayName} · level ${tower.level + 1}`;
   towerStatsElement.textContent = `Damage ${stats.projectileDamage} · range ${Math.round(stats.range)} · ${stats.cooldownSeconds.toFixed(2)}s cooldown`;
+  targetPolicySelect.value = tower.targetPolicy;
+  targetPolicySelect.disabled = state.gameOver || state.gameWon;
   upgradeTowerButton.textContent = upgrade ? `Upgrade (${upgrade.cost} gold)` : "Maximum level";
   upgradeTowerButton.disabled = !upgrade || state.gold < upgrade.cost || state.gameOver || state.gameWon;
 }
