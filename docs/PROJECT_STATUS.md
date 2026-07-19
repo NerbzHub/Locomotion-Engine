@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S18 and verified
+**Status:** Gate 1 extended through LE-S19 and verified
 
 **Updated:** 2026-07-18
 
@@ -56,6 +56,8 @@
   speed escalation, event feedback, and distinct presentation.
 - A compact authored campaign flow that maps named scenarios to map/difficulty
   choices and supports deterministic revisits.
+- Versioned local campaign progression that unlocks subsequent scenarios after
+  completion, with a clear reset action and validation safeguards.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -89,8 +91,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S19 from `docs/NEXT_TEN_SPRINTS.md`: add safe local progression
-unlocks for campaign content.
+Begin LE-S20 from `docs/NEXT_TEN_SPRINTS.md`: tune economy and encounter
+pacing from the collected deterministic telemetry.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

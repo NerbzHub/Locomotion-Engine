@@ -6,6 +6,7 @@ import { CAMPAIGN_NODES, DIFFICULTY_DEFINITIONS, GAME_CONTENT, MAP_DEFINITIONS, 
 import type { DifficultyId, MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
 import { loadFromLocalStorage, saveToLocalStorage } from "./save";
+import { completeCampaignNode, isCampaignNodeUnlocked, loadProfile, resetProfile, saveProfile } from "./progression";
 import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell, TargetPolicy } from "./simulation";
 
@@ -26,6 +27,7 @@ const standardButton = requiredElement<HTMLButtonElement>("select-standard");
 const veteranButton = requiredElement<HTMLButtonElement>("select-veteran");
 const gateWatchButton = requiredElement<HTMLButtonElement>("campaign-gate-watch");
 const crossroadsStandButton = requiredElement<HTMLButtonElement>("campaign-crossroads-stand");
+const resetProfileButton = requiredElement<HTMLButtonElement>("reset-profile");
 const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
@@ -58,6 +60,9 @@ try {
 const initialSeed = 4_242;
 let selectedMap: MapId = "gate";
 let selectedDifficulty: DifficultyId = "standard";
+let selectedCampaignNodeId = "gate-watch";
+let profile = loadProfile(window.localStorage);
+let recordedCampaignVictory: string | undefined;
 let state = createGame(initialSeed, selectedMap, selectedDifficulty);
 let selectedTower: TowerKind = "archer";
 let hoveredCell: Cell | undefined;
@@ -160,6 +165,12 @@ standardButton.addEventListener("click", () => selectDifficulty("standard"));
 veteranButton.addEventListener("click", () => selectDifficulty("veteran"));
 gateWatchButton.addEventListener("click", () => selectCampaignNode("gate-watch"));
 crossroadsStandButton.addEventListener("click", () => selectCampaignNode("crossroads-stand"));
+resetProfileButton.addEventListener("click", () => {
+  profile = resetProfile(window.localStorage);
+  recordedCampaignVictory = undefined;
+  state.message = "Campaign progress reset.";
+  updateHud();
+});
 upgradeTowerButton.addEventListener("click", () => {
   if (inspectedTowerId) upgradeTower(state, inspectedTowerId);
   updateHud();
@@ -231,7 +242,8 @@ function selectDifficulty(difficultyId: DifficultyId): void {
 function selectCampaignNode(nodeId: string): void {
   if (state.waveActive) return;
   const node = CAMPAIGN_NODES.find((candidate) => candidate.id === nodeId);
-  if (!node) return;
+  if (!node || !isCampaignNodeUnlocked(profile, node.id)) return;
+  selectedCampaignNodeId = node.id;
   selectedMap = node.mapId;
   selectedDifficulty = node.difficultyId;
   state = createGame(initialSeed, selectedMap, selectedDifficulty);
@@ -250,6 +262,11 @@ function placementPreview() {
 }
 
 function updateHud(): void {
+  if (state.gameWon && recordedCampaignVictory !== selectedCampaignNodeId) {
+    profile = completeCampaignNode(profile, selectedCampaignNodeId);
+    saveProfile(window.localStorage, profile);
+    recordedCampaignVictory = selectedCampaignNodeId;
+  }
   gold.textContent = String(state.gold);
   lives.textContent = String(state.lives);
   wave.textContent = `${state.wave}/${TOTAL_WAVES}`;
@@ -263,7 +280,7 @@ function updateHud(): void {
   standardButton.disabled = state.waveActive;
   veteranButton.disabled = state.waveActive;
   gateWatchButton.disabled = state.waveActive;
-  crossroadsStandButton.disabled = state.waveActive;
+  crossroadsStandButton.disabled = state.waveActive || !isCampaignNodeUnlocked(profile, "crossroads-stand");
   startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;
   updatePlacementMessage();
   updateTowerInspector();
