@@ -1,4 +1,4 @@
-import type { DifficultyDefinition, EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerUpgradeDefinition } from "./content";
+import type { DifficultyDefinition, EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerSlowEffect, TowerUpgradeDefinition } from "./content";
 
 export interface ContentValidationIssue {
   readonly path: string;
@@ -84,9 +84,16 @@ function validateTower(definition: TowerDefinition, path: string, issues: Conten
   validatePositiveNumber(definition.projectileDamage, `${path}.projectileDamage`, issues);
   validatePositiveNumber(definition.projectileSpeed, `${path}.projectileSpeed`, issues);
   validateColor(definition.projectileColor, `${path}.projectileColor`, issues);
+  if (definition.slowEffect) validateTowerSlowEffect(definition.slowEffect, `${path}.slowEffect`, issues);
   for (const [index, upgrade] of definition.upgrades.entries()) {
     validateTowerUpgrade(upgrade, `${path}.upgrades[${index}]`, issues);
   }
+}
+
+function validateTowerSlowEffect(effect: TowerSlowEffect, path: string, issues: ContentValidationIssue[]): void {
+  validatePositiveNumber(effect.speedMultiplier, `${path}.speedMultiplier`, issues);
+  if (effect.speedMultiplier >= 1) addIssue(issues, `${path}.speedMultiplier`, "must be less than one to slow enemies");
+  validatePositiveNumber(effect.durationSeconds, `${path}.durationSeconds`, issues);
 }
 
 function validateTowerUpgrade(definition: TowerUpgradeDefinition, path: string, issues: ContentValidationIssue[]): void {

@@ -26,6 +26,8 @@ export interface Enemy {
   readonly armorDamageReduction: number;
   burstCooldownSeconds: number;
   burstRemainingSeconds: number;
+  slowMultiplier: number;
+  slowRemainingSeconds: number;
   distance: number;
   readonly reward: number;
 }
@@ -56,6 +58,7 @@ export interface Projectile {
   readonly damage: number;
   readonly speed: number;
   readonly color: string;
+  readonly slowEffect?: { readonly speedMultiplier: number; readonly durationSeconds: number };
   previousX: number;
   previousY: number;
   x: number;
@@ -339,7 +342,8 @@ export function enemyPosition(enemy: Enemy): Point {
 
 export function enemySpeed(enemy: Enemy): number {
   const trait = ENEMY_DEFINITIONS[enemy.kind].trait;
-  return trait?.kind === "speed-burst" && enemy.burstRemainingSeconds > 0 ? enemy.speed * trait.speedMultiplier : enemy.speed;
+  const burstMultiplier = trait?.kind === "speed-burst" && enemy.burstRemainingSeconds > 0 ? trait.speedMultiplier : 1;
+  return enemy.speed * burstMultiplier * enemy.slowMultiplier;
 }
 
 /** Applies flat armour and returns the amount that actually reached the enemy. */
@@ -402,6 +406,8 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
     armorDamageReduction: enemyDefinition.trait?.kind === "armor" ? enemyDefinition.trait.flatDamageReduction : 0,
     burstCooldownSeconds: enemyDefinition.trait?.kind === "speed-burst" ? enemyDefinition.trait.intervalSeconds : 0,
     burstRemainingSeconds: 0,
+    slowMultiplier: 1,
+    slowRemainingSeconds: 0,
     distance: 0,
     reward: spawn.reward
   });
@@ -412,6 +418,7 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
 function updateEnemies(state: GameState, deltaSeconds: number): void {
   for (const enemy of state.enemies) {
     updateEnemyTrait(enemy, deltaSeconds);
+    updateSlowEffect(enemy, deltaSeconds);
     enemy.distance += enemySpeed(enemy) * deltaSeconds;
   }
   const escaped = state.enemies.filter((enemy) => enemy.distance >= pathLength(enemy.mapId));
@@ -431,6 +438,12 @@ function updateEnemies(state: GameState, deltaSeconds: number): void {
       state.message = `${escaped.length} enem${escaped.length === 1 ? "y" : "ies"} reached the dungeon.`;
     }
   }
+}
+
+function updateSlowEffect(enemy: Enemy, deltaSeconds: number): void {
+  if (enemy.slowRemainingSeconds <= 0) return;
+  enemy.slowRemainingSeconds = Math.max(0, enemy.slowRemainingSeconds - deltaSeconds);
+  if (enemy.slowRemainingSeconds === 0) enemy.slowMultiplier = 1;
 }
 
 function updateEnemyTrait(enemy: Enemy, deltaSeconds: number): void {
@@ -466,6 +479,7 @@ function updateTowers(state: GameState, deltaSeconds: number): void {
       damage: stats.projectileDamage,
       speed: stats.projectileSpeed,
       color: stats.projectileColor,
+      slowEffect: TOWER_DEFINITIONS[tower.kind].slowEffect,
       previousX: origin.x,
       previousY: origin.y,
       x: origin.x,
@@ -515,6 +529,10 @@ function updateProjectiles(state: GameState, deltaSeconds: number): void {
     const travel = projectile.speed * deltaSeconds;
     if (distanceToTarget <= travel) {
       const dealtDamage = applyDamage(target, projectile.damage);
+      if (projectile.slowEffect) {
+        target.slowMultiplier = Math.min(target.slowMultiplier, projectile.slowEffect.speedMultiplier);
+        target.slowRemainingSeconds = Math.max(target.slowRemainingSeconds, projectile.slowEffect.durationSeconds);
+      }
       addEffect(state, "impact", projectile.color, targetPosition, 0.16);
       if (dealtDamage < projectile.damage) addEffect(state, "armor", "#fff0ba", targetPosition, 0.22);
       expired.add(projectile.id);

@@ -18,6 +18,7 @@ const motionButton = requiredElement<HTMLButtonElement>("toggle-motion");
 const diagnosticsButton = requiredElement<HTMLButtonElement>("toggle-diagnostics");
 const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
+const sentinelButton = requiredElement<HTMLButtonElement>("select-sentinel");
 const gateButton = requiredElement<HTMLButtonElement>("select-gate");
 const crossroadsButton = requiredElement<HTMLButtonElement>("select-crossroads");
 const casualButton = requiredElement<HTMLButtonElement>("select-casual");
@@ -146,6 +147,7 @@ diagnosticsButton.addEventListener("click", () => {
 
 archerButton.addEventListener("click", () => selectTower("archer"));
 mageButton.addEventListener("click", () => selectTower("mage"));
+sentinelButton.addEventListener("click", () => selectTower("sentinel"));
 gateButton.addEventListener("click", () => selectMap("gate"));
 crossroadsButton.addEventListener("click", () => selectMap("crossroads"));
 casualButton.addEventListener("click", () => selectDifficulty("casual"));
@@ -182,8 +184,10 @@ function selectTower(kind: TowerKind): void {
   selectedTower = kind;
   archerButton.setAttribute("aria-pressed", String(kind === "archer"));
   mageButton.setAttribute("aria-pressed", String(kind === "mage"));
+  sentinelButton.setAttribute("aria-pressed", String(kind === "sentinel"));
   archerButton.classList.toggle("selected", kind === "archer");
   mageButton.classList.toggle("selected", kind === "mage");
+  sentinelButton.classList.toggle("selected", kind === "sentinel");
   state.message = `${TOWER_DEFINITIONS[kind].displayName} selected. Click grass to place it.`;
   updateHud();
 }

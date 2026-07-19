@@ -77,6 +77,18 @@ function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
       context.fillRect(position.x - 3, position.y - 35, 6, 18);
       continue;
     }
+    if (tower.kind === "sentinel") {
+      context.fillStyle = "#31515a";
+      context.fillRect(position.x - 15, position.y - 15, 30, 30);
+      context.strokeStyle = "#c3ffc0";
+      context.lineWidth = 3;
+      context.beginPath();
+      context.arc(position.x, position.y - 8, 11, 0, Math.PI * 2);
+      context.stroke();
+      context.fillStyle = "#c3ffc0";
+      context.fillRect(position.x - 3, position.y - 11, 6, 6);
+      continue;
+    }
     context.fillStyle = "#303654";
     context.fillRect(position.x - 15, position.y - 15, 30, 30);
     context.fillStyle = "#7de0eb";
@@ -118,6 +130,13 @@ function drawEnemies(context: CanvasRenderingContext2D, state: GameState): void 
       context.lineWidth = 2;
       context.beginPath();
       context.arc(position.x, position.y, definition.radius + 6, 0, Math.PI * 2);
+      context.stroke();
+    }
+    if (enemy.slowRemainingSeconds > 0) {
+      context.strokeStyle = "#c3ffc0";
+      context.lineWidth = 2;
+      context.beginPath();
+      context.arc(position.x, position.y, definition.radius + 3, 0, Math.PI * 2);
       context.stroke();
     }
     context.fillStyle = definition.eyeColor;

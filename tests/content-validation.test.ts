@@ -8,7 +8,7 @@ describe("game content validation", () => {
     const report = assertValidGameContent(GAME_CONTENT);
 
     expect(report.issues).toEqual([]);
-    expect(report.towerCount).toBe(2);
+    expect(report.towerCount).toBe(3);
     expect(report.enemyCount).toBe(3);
     expect(report.waveCount).toBe(3);
   });

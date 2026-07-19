@@ -6,7 +6,13 @@ export interface TowerDefinition {
   readonly projectileDamage: number;
   readonly projectileSpeed: number;
   readonly projectileColor: string;
+  readonly slowEffect?: TowerSlowEffect;
   readonly upgrades: readonly TowerUpgradeDefinition[];
+}
+
+export interface TowerSlowEffect {
+  readonly speedMultiplier: number;
+  readonly durationSeconds: number;
 }
 
 /** Each tier modifies the base tower without mutating its authored definition. */
@@ -165,6 +171,7 @@ export const TOWER_DEFINITIONS = {
     projectileDamage: 8,
     projectileSpeed: 420,
     projectileColor: "#fff2a6",
+    slowEffect: undefined,
     upgrades: [
       { cost: 20, rangeBonus: 24, damageBonus: 4, cooldownMultiplier: 0.88 },
       { cost: 34, rangeBonus: 38, damageBonus: 7, cooldownMultiplier: 0.82 }
@@ -178,9 +185,24 @@ export const TOWER_DEFINITIONS = {
     projectileDamage: 18,
     projectileSpeed: 360,
     projectileColor: "#9be7ff",
+    slowEffect: undefined,
     upgrades: [
       { cost: 28, rangeBonus: 28, damageBonus: 7, cooldownMultiplier: 0.9 },
       { cost: 44, rangeBonus: 42, damageBonus: 12, cooldownMultiplier: 0.84 }
+    ]
+  },
+  sentinel: {
+    displayName: "Sentinel",
+    cost: 40,
+    range: 165,
+    cooldownSeconds: 0.75,
+    projectileDamage: 4,
+    projectileSpeed: 340,
+    projectileColor: "#c3ffc0",
+    slowEffect: { speedMultiplier: 0.55, durationSeconds: 1.2 },
+    upgrades: [
+      { cost: 26, rangeBonus: 24, damageBonus: 3, cooldownMultiplier: 0.9 },
+      { cost: 42, rangeBonus: 36, damageBonus: 5, cooldownMultiplier: 0.84 }
     ]
   }
 } as const satisfies Record<string, TowerDefinition>;

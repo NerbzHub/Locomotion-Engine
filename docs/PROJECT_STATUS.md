@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S13 and verified
+**Status:** Gate 1 extended through LE-S14 and verified
 
 **Updated:** 2026-07-18
 
@@ -46,6 +46,8 @@
   starting resources/lives and deterministic enemy-health scaling.
 - Per-tower targeting policies for nearest exit, closest, strongest, and
   weakest targets, with saved state and deterministic tie-breaking.
+- A data-defined Sentinel support tower with upgrades, visible slowing, and
+  deterministic slow-expiry behaviour.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -79,8 +81,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S14 from `docs/NEXT_TEN_SPRINTS.md`: add the Sentinel support tower
-with a clear, testable slow effect.
+Begin LE-S15 from `docs/NEXT_TEN_SPRINTS.md`: add meaningful tower
+specialisation choices beyond stat increases.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.
