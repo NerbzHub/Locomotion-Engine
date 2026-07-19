@@ -26,6 +26,7 @@ button.secondary { color: #e8f0e9; background: #405b57; }
 button.secondary:hover { background: #526f6a; }
 
 .game-shell { width: min(100% - 2rem, 820px); margin: 2rem auto; }
+.game-shell::before { content: ""; position: fixed; z-index: -1; inset: 0; opacity: 0.22; background-image: radial-gradient(circle at 20% 15%, #405b57 0, transparent 32%), radial-gradient(circle at 80% 85%, #303654 0, transparent 30%); }
 .game-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .game-actions { display: flex; gap: 0.5rem; }
 .audio-settings { display: flex; align-items: center; gap: 0.5rem; margin: -0.5rem 0 1rem; color: #c9dbcf; font-size: 0.85rem; }
@@ -58,14 +59,16 @@ h1 { margin: 0.15rem 0 0; font-size: clamp(1.8rem, 5vw, 2.6rem); }
   display: block;
   width: 100%;
   height: auto;
-  border: 4px solid #405b57;
+  border: 4px solid #56746c;
   border-radius: 0.75rem;
   background: #6a9f58;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
   image-rendering: pixelated;
   touch-action: none;
 }
 
 .hud { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin-top: 1rem; color: #c9dbcf; }
+.hud > span:not(#message):not(#placement-message) { padding: 0.35rem 0.55rem; border-radius: 0.4rem; background: #22343a; }
 .hud strong { color: #fff9dd; }
 #message { flex-basis: 100%; color: #91c4b4; }
 .placement-message { color: #c9dbcf; font-size: 0.9rem; }

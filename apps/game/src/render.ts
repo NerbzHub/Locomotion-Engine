@@ -68,6 +68,10 @@ function drawBoard(context: CanvasRenderingContext2D, state: GameState): void {
 function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
   for (const tower of state.towers) {
     const position = towerPosition(tower);
+    context.fillStyle = "rgba(16, 25, 30, 0.28)";
+    context.beginPath();
+    context.ellipse(position.x + 4, position.y + 17, 19, 7, 0, 0, Math.PI * 2);
+    context.fill();
     if (tower.kind === "archer") {
       context.fillStyle = "#594136";
       context.fillRect(position.x - 15, position.y - 15, 30, 30);
@@ -75,6 +79,7 @@ function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
       context.fillRect(position.x - 7, position.y - 23, 14, 18);
       context.fillStyle = "#2d3944";
       context.fillRect(position.x - 3, position.y - 35, 6, 18);
+      drawTowerLevel(context, tower.level, position);
       continue;
     }
     if (tower.kind === "sentinel") {
@@ -87,6 +92,7 @@ function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
       context.stroke();
       context.fillStyle = "#c3ffc0";
       context.fillRect(position.x - 3, position.y - 11, 6, 6);
+      drawTowerLevel(context, tower.level, position);
       continue;
     }
     context.fillStyle = "#303654";
@@ -100,6 +106,14 @@ function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
     context.fill();
     context.fillStyle = "#c9f8ff";
     context.fillRect(position.x - 4, position.y - 6, 8, 8);
+    drawTowerLevel(context, tower.level, position);
+  }
+}
+
+function drawTowerLevel(context: CanvasRenderingContext2D, level: number, position: Point): void {
+  for (let index = 0; index <= level; index += 1) {
+    context.fillStyle = "#fff1b8";
+    context.fillRect(position.x - 10 + index * 7, position.y + 20, 4, 4);
   }
 }
 
@@ -158,6 +172,11 @@ function drawEnemies(context: CanvasRenderingContext2D, state: GameState): void 
     context.fillStyle = definition.eyeColor;
     context.fillRect(position.x - definition.radius / 2, position.y - 3, 4, 4);
     context.fillRect(position.x + definition.radius / 2 - 4, position.y - 3, 4, 4);
+    context.strokeStyle = "rgba(255, 249, 221, 0.5)";
+    context.lineWidth = 1;
+    context.beginPath();
+    context.arc(position.x, position.y, definition.radius - 1, 0, Math.PI * 2);
+    context.stroke();
     drawHealthBar(context, position, definition.radius, enemy.health / enemy.maximumHealth);
   }
 }
@@ -185,6 +204,7 @@ function drawEffects(context: CanvasRenderingContext2D, state: GameState): void 
     context.globalAlpha = Math.max(0, 1 - progress);
     context.strokeStyle = effect.color;
     context.lineWidth = effect.kind === "defeat" ? 3 : 2;
+    if (effect.kind === "defeat") context.setLineDash([3, 3]);
     context.beginPath();
     context.arc(effect.x, effect.y, radius, 0, Math.PI * 2);
     context.stroke();
@@ -194,8 +214,8 @@ function drawEffects(context: CanvasRenderingContext2D, state: GameState): void 
 
 function drawHealthBar(context: CanvasRenderingContext2D, position: Point, radius: number, ratio: number): void {
   const width = radius * 2 + 4;
-  context.fillStyle = "#372f37";
+  context.fillStyle = "#1b252b";
   context.fillRect(position.x - width / 2, position.y - radius - 11, width, 5);
-  context.fillStyle = "#a7d46f";
+  context.fillStyle = ratio > 0.5 ? "#a7d46f" : ratio > 0.25 ? "#f0c95f" : "#ef7d70";
   context.fillRect(position.x - width / 2, position.y - radius - 11, Math.max(0, ratio) * width, 5);
 }
