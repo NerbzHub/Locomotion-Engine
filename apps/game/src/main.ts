@@ -8,6 +8,7 @@ import { assertValidGameContent } from "./content-validation";
 import { loadFromLocalStorage, saveToLocalStorage } from "./save";
 import { completeCampaignNode, isCampaignNodeUnlocked, loadProfile, resetProfile, saveProfile } from "./progression";
 import { GameAudio, loadAudioSettings, normaliseAudioSettings, saveAudioSettings } from "./audio";
+import { GLOSSARY_ENTRIES, dismissTutorial, shouldShowTutorial } from "./tutorial";
 import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell, TargetPolicy } from "./simulation";
 
@@ -19,6 +20,10 @@ const loadButton = requiredElement<HTMLButtonElement>("load-game");
 const motionButton = requiredElement<HTMLButtonElement>("toggle-motion");
 const audioButton = requiredElement<HTMLButtonElement>("toggle-audio");
 const audioVolume = requiredElement<HTMLInputElement>("audio-volume");
+const helpButton = requiredElement<HTMLButtonElement>("open-help");
+const tutorialPanel = requiredElement<HTMLElement>("tutorial-panel");
+const dismissTutorialButton = requiredElement<HTMLButtonElement>("dismiss-tutorial");
+const glossary = requiredElement<HTMLElement>("glossary");
 const diagnosticsButton = requiredElement<HTMLButtonElement>("toggle-diagnostics");
 const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
@@ -76,6 +81,8 @@ let diagnosticsVisible = false;
 let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 let audioSettings = loadAudioSettings(window.localStorage);
 const audio = new GameAudio(audioSettings);
+glossary.replaceChildren(...GLOSSARY_ENTRIES.flatMap(([term, description]) => [createGlossaryTerm(term), createGlossaryDescription(description)]));
+tutorialPanel.hidden = !shouldShowTutorial(window.localStorage);
 const pointer = new PointerInput(canvas);
 
 pointer.onPointerDown((point) => {
@@ -164,6 +171,11 @@ audioVolume.addEventListener("input", () => {
   audioSettings = normaliseAudioSettings({ ...audioSettings, volume: Number(audioVolume.value) });
   saveAudioSettings(window.localStorage, audioSettings);
   audio.setSettings(audioSettings);
+});
+helpButton.addEventListener("click", () => { tutorialPanel.hidden = false; });
+dismissTutorialButton.addEventListener("click", () => {
+  dismissTutorial(window.localStorage);
+  tutorialPanel.hidden = true;
 });
 
 diagnosticsButton.addEventListener("click", () => {
@@ -376,6 +388,18 @@ function cellAt(x: number, y: number): Cell {
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.max(minimum, Math.min(maximum, value));
+}
+
+function createGlossaryTerm(text: string): HTMLElement {
+  const element = document.createElement("dt");
+  element.textContent = text;
+  return element;
+}
+
+function createGlossaryDescription(text: string): HTMLElement {
+  const element = document.createElement("dd");
+  element.textContent = text;
+  return element;
 }
 
 function requiredElement<ElementType extends HTMLElement>(id: string): ElementType {

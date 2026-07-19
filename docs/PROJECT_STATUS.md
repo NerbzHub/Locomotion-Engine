@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S22 and verified
+**Status:** Gate 1 extended through LE-S23 and verified
 
 **Updated:** 2026-07-18
 
@@ -64,6 +64,8 @@
   mute/volume controls and a safe no-audio path.
 - A visual polish pass with clearer tower progression, enemy statuses, combat
   effects, health-state colours, and higher-contrast board/HUD presentation.
+- A local first-run tutorial, reusable Help panel, and glossary covering build,
+  targeting, enemies, elites, boss phases, and intermissions.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -97,8 +99,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S23 from `docs/NEXT_TEN_SPRINTS.md`: add a first-run tutorial and
-mechanics glossary.
+Begin LE-S24 from `docs/NEXT_TEN_SPRINTS.md`: add deterministic replay export
+and import with compatibility safeguards.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

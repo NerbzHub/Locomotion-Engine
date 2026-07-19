@@ -31,6 +31,14 @@ button.secondary:hover { background: #526f6a; }
 .game-actions { display: flex; gap: 0.5rem; }
 .audio-settings { display: flex; align-items: center; gap: 0.5rem; margin: -0.5rem 0 1rem; color: #c9dbcf; font-size: 0.85rem; }
 .audio-settings input { accent-color: #e9c46a; }
+.tutorial-panel { margin: 0 0 1rem; padding: 1rem; border: 1px solid #91c4b4; border-radius: 0.65rem; color: #d8f3e8; background: #22343a; }
+.tutorial-panel[hidden] { display: none; }
+.tutorial-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.tutorial-panel ol { margin: 0.75rem 0; padding-left: 1.25rem; }
+.tutorial-panel summary { cursor: pointer; color: #fff1b8; font-weight: 700; }
+.tutorial-panel dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 0.75rem; margin: 0.75rem 0 0; }
+.tutorial-panel dt { color: #fff9dd; font-weight: 700; }
+.tutorial-panel dd { margin: 0; }
 .tower-palette { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.5rem; margin-bottom: 1rem; }
 .map-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: -0.4rem 0 1rem; }
 .map-choice { padding: 0.45rem 0.7rem; color: #c9dbcf; background: #31454b; font-size: 0.85rem; }

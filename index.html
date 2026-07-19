@@ -19,10 +19,17 @@
           <button id="load-game" class="secondary" type="button">Load</button>
           <button id="toggle-motion" class="secondary" type="button" aria-pressed="false">Motion: full</button>
           <button id="toggle-audio" class="secondary" type="button" aria-pressed="false">Audio: on</button>
+          <button id="open-help" class="secondary" type="button">Help</button>
           <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
           <button id="restart-game" class="secondary" type="button">Restart</button>
         </div>
       </header>
+
+      <section id="tutorial-panel" class="tutorial-panel" hidden aria-label="Dungeon Defense tutorial">
+        <div class="tutorial-header"><strong>How to defend the dungeon</strong><button id="dismiss-tutorial" class="secondary" type="button">Got it</button></div>
+        <ol><li>Choose a tower and place it on grass.</li><li>Read the next-wave briefing, then start when ready.</li><li>Click a tower to upgrade it, change targeting, or choose a specialisation.</li><li>Use the campaign menu to revisit completed scenarios.</li></ol>
+        <details><summary>Mechanics glossary</summary><dl id="glossary"></dl></details>
+      </section>
 
       <label class="audio-settings">Volume <input id="audio-volume" type="range" min="0" max="1" step="0.05" value="0.35"></label>
 
