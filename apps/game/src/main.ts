@@ -9,6 +9,8 @@ import { loadFromLocalStorage, saveToLocalStorage } from "./save";
 import { completeCampaignNode, isCampaignNodeUnlocked, loadProfile, resetProfile, saveProfile } from "./progression";
 import { GameAudio, loadAudioSettings, normaliseAudioSettings, saveAudioSettings } from "./audio";
 import { GLOSSARY_ENTRIES, dismissTutorial, shouldShowTutorial } from "./tutorial";
+import { exportReplay, importReplay, playReplay } from "./replay";
+import type { ReplayAction } from "./replay";
 import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell, TargetPolicy } from "./simulation";
 
@@ -21,6 +23,8 @@ const motionButton = requiredElement<HTMLButtonElement>("toggle-motion");
 const audioButton = requiredElement<HTMLButtonElement>("toggle-audio");
 const audioVolume = requiredElement<HTMLInputElement>("audio-volume");
 const helpButton = requiredElement<HTMLButtonElement>("open-help");
+const exportReplayButton = requiredElement<HTMLButtonElement>("export-replay");
+const importReplayButton = requiredElement<HTMLButtonElement>("import-replay");
 const tutorialPanel = requiredElement<HTMLElement>("tutorial-panel");
 const dismissTutorialButton = requiredElement<HTMLButtonElement>("dismiss-tutorial");
 const glossary = requiredElement<HTMLElement>("glossary");
@@ -79,6 +83,7 @@ let keyboardCursorActive = false;
 let inspectedTowerId: EntityId | undefined;
 let diagnosticsVisible = false;
 let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let replayActions: ReplayAction[] = [];
 let audioSettings = loadAudioSettings(window.localStorage);
 const audio = new GameAudio(audioSettings);
 glossary.replaceChildren(...GLOSSARY_ENTRIES.flatMap(([term, description]) => [createGlossaryTerm(term), createGlossaryDescription(description)]));
@@ -89,7 +94,7 @@ pointer.onPointerDown((point) => {
   const cell = cellAt(point.x, point.y);
   const tower = towerAtCell(state, cell);
   if (tower) inspectedTowerId = tower.id;
-  else if (placeTower(state, cell, selectedTower)) audio.play("placement");
+  else if (placeTower(state, cell, selectedTower)) { replayActions.push({ step: state.step, type: "place", cell, kind: selectedTower }); audio.play("placement"); }
   updateHud();
 });
 
@@ -122,7 +127,7 @@ canvas.addEventListener("keydown", (event) => {
 });
 
 startWaveButton.addEventListener("click", () => {
-  if (startWave(state)) audio.play("wave");
+  if (startWave(state)) { replayActions.push({ step: state.step, type: "start-wave" }); audio.play("wave"); }
   updateHud();
 });
 
@@ -176,6 +181,15 @@ helpButton.addEventListener("click", () => { tutorialPanel.hidden = false; });
 dismissTutorialButton.addEventListener("click", () => {
   dismissTutorial(window.localStorage);
   tutorialPanel.hidden = true;
+});
+exportReplayButton.addEventListener("click", () => { window.prompt("Copy replay JSON", exportReplay(state, replayActions)); });
+importReplayButton.addEventListener("click", () => {
+  const replay = importReplay(window.prompt("Paste replay JSON") ?? "");
+  if (!replay) { state.message = "Replay is incompatible or malformed."; updateHud(); return; }
+  state = playReplay(replay, Math.max(0, ...replay.actions.map((action) => action.step)));
+  replayActions = [...replay.actions];
+  state.message = `Replay imported: ${replay.actions.length} actions. Start it or compare it in diagnostics.`;
+  updateHud();
 });
 
 diagnosticsButton.addEventListener("click", () => {

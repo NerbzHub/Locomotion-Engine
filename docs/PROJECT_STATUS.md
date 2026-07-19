@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S23 and verified
+**Status:** Gate 1 extended through LE-S24 and verified
 
 **Updated:** 2026-07-18
 
@@ -66,6 +66,8 @@
   effects, health-state colours, and higher-contrast board/HUD presentation.
 - A local first-run tutorial, reusable Help panel, and glossary covering build,
   targeting, enemies, elites, boss phases, and intermissions.
+- Versioned replay JSON export/import for deterministic setup and player actions,
+  including validation and replay-equivalence coverage.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -99,8 +101,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S24 from `docs/NEXT_TEN_SPRINTS.md`: add deterministic replay export
-and import with compatibility safeguards.
+Begin LE-S25 from `docs/NEXT_TEN_SPRINTS.md`: add seeded simulation fuzzing and
+core invariant checks.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.
