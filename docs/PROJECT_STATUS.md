@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S26 and verified
+**Status:** Gate 1 extended through LE-S27 and verified
 
 **Updated:** 2026-07-18
 
@@ -72,6 +72,8 @@
   reproducible seed/frame invariant failure reporting.
 - A documented simulation performance budget and crowded-board stress test for
   80 enemies, 12 towers, and 600 fixed frames.
+- Responsive narrow-screen layout, safe-area handling, touch-safe control
+  sizing, and preserved pointer/keyboard board interaction.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -105,8 +107,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S27 from `docs/NEXT_TEN_SPRINTS.md`: complete responsive and
-touch-oriented layout support.
+Begin LE-S28 from `docs/NEXT_TEN_SPRINTS.md`: prepare a repeatable release
+package, licence, and CI-ready verification workflow.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

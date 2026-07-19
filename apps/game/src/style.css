@@ -6,7 +6,7 @@
 
 * { box-sizing: border-box; }
 
-body { margin: 0; min-width: 320px; }
+body { margin: 0; min-width: 320px; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
 
 button {
   border: 0;
@@ -17,6 +17,7 @@ button {
   font: inherit;
   font-weight: 800;
   cursor: pointer;
+  min-height: 2.75rem;
 }
 
 button:hover { background: #f2d37d; }
@@ -73,6 +74,7 @@ h1 { margin: 0.15rem 0 0; font-size: clamp(1.8rem, 5vw, 2.6rem); }
   box-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
   image-rendering: pixelated;
   touch-action: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hud { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin-top: 1rem; color: #c9dbcf; }
@@ -81,3 +83,28 @@ h1 { margin: 0.15rem 0 0; font-size: clamp(1.8rem, 5vw, 2.6rem); }
 #message { flex-basis: 100%; color: #91c4b4; }
 .placement-message { color: #c9dbcf; font-size: 0.9rem; }
 .hint { color: #95a9a6; font-size: 0.9rem; }
+
+@media (max-width: 640px) {
+  .game-shell { width: min(100% - 1rem, 820px); margin: 0.75rem auto 1.5rem; }
+  .game-header { align-items: flex-start; flex-direction: column; }
+  .game-actions { width: 100%; flex-wrap: wrap; }
+  .game-actions button { flex: 1 1 7.5rem; }
+  .tower-choice { flex: 1 1 8.5rem; min-width: 0; }
+  .map-palette { margin-bottom: 0.75rem; }
+  .map-choice { flex: 1 1 6.5rem; }
+  .wave-briefing { font-size: 0.9rem; }
+  .tower-inspector { align-items: stretch; }
+  .tower-inspector button { margin-left: 0; }
+  .target-policy { justify-content: space-between; }
+  .target-policy select { min-height: 2.5rem; }
+  .hud { gap: 0.45rem; }
+  .hud > span:not(#message):not(#placement-message) { flex: 1 1 5.5rem; text-align: center; }
+  .tutorial-header { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 390px) {
+  h1 { font-size: 1.7rem; }
+  .game-actions button { flex-basis: 6.5rem; padding-inline: 0.65rem; font-size: 0.9rem; }
+  .tower-choice { flex-basis: 100%; }
+  .map-choice { flex-basis: 45%; }
+}
