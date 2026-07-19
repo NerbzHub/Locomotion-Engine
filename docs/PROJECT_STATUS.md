@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S24 and verified
+**Status:** Gate 1 extended through LE-S25 and verified
 
 **Updated:** 2026-07-18
 
@@ -68,6 +68,8 @@
   targeting, enemies, elites, boss phases, and intermissions.
 - Versioned replay JSON export/import for deterministic setup and player actions,
   including validation and replay-equivalence coverage.
+- A seeded simulation fuzz suite covering 12,000 generated frames with
+  reproducible seed/frame invariant failure reporting.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -101,8 +103,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S25 from `docs/NEXT_TEN_SPRINTS.md`: add seeded simulation fuzzing and
-core invariant checks.
+Begin LE-S26 from `docs/NEXT_TEN_SPRINTS.md`: define and verify a practical
+simulation performance budget.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.
