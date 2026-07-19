@@ -1,6 +1,6 @@
 import { SeededRandom, World } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
-import { DIFFICULTY_DEFINITIONS, ELITE_DEFINITION, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
+import { BOSS_DEFINITION, DIFFICULTY_DEFINITIONS, ELITE_DEFINITION, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
 import type { DifficultyId, EnemyKind, MapId, TowerKind } from "./content";
 
 export const BOARD = MAP_DEFINITIONS.gate;
@@ -20,6 +20,8 @@ export interface Enemy {
   readonly id: EntityId;
   readonly kind: EnemyKind;
   readonly isElite: boolean;
+  readonly isBoss?: boolean;
+  bossPhase?: number;
   readonly mapId: MapId;
   health: number;
   readonly maximumHealth: number;
@@ -83,6 +85,7 @@ export type GamePhase = "intermission" | "wave" | "victory" | "defeat";
 export interface PendingSpawn {
   readonly kind: EnemyKind;
   readonly isElite: boolean;
+  readonly isBoss: boolean;
   readonly health: number;
   readonly speed: number;
   readonly reward: number;
@@ -90,7 +93,7 @@ export interface PendingSpawn {
 
 export interface GameEvent {
   readonly step: number;
-  readonly kind: "placement" | "upgrade" | "wave-start" | "spawn" | "defeat" | "escape" | "wave-clear";
+  readonly kind: "placement" | "upgrade" | "wave-start" | "spawn" | "defeat" | "escape" | "wave-clear" | "boss-phase";
   readonly message: string;
 }
 
@@ -300,10 +303,15 @@ export function startWave(state: GameState): boolean {
     state.pendingSpawns.push({
       kind,
       isElite,
+      isBoss: false,
       health,
       speed: state.random.between(enemyDefinition.speedRange[0], enemyDefinition.speedRange[1]),
       reward: Math.round(enemyDefinition.reward * (isElite ? ELITE_DEFINITION.rewardMultiplier : 1))
     });
+  }
+  if (definition.boss) {
+    const bossEnemy = ENEMY_DEFINITIONS[BOSS_DEFINITION.enemyKind];
+    state.pendingSpawns.push({ kind: BOSS_DEFINITION.enemyKind, isElite: false, isBoss: true, health: Math.round(bossEnemy.baseHealth * BOSS_DEFINITION.healthMultiplier * DIFFICULTY_DEFINITIONS[state.difficultyId].enemyHealthMultiplier), speed: bossEnemy.speedRange[0], reward: BOSS_DEFINITION.reward });
   }
   state.message = `Wave ${state.wave} underway: ${waveEnemyNames(definition)}.`;
   state.currentWaveTelemetry = { wave: state.wave, startStep: state.step, endStep: state.step, goldAtStart: state.gold, goldAtEnd: state.gold, livesAtStart: state.lives, livesAtEnd: state.lives, towersAtStart: state.towers.length, kills: 0, escapes: 0 };
@@ -365,7 +373,8 @@ export function enemyPosition(enemy: Enemy): Point {
 export function enemySpeed(enemy: Enemy): number {
   const trait = ENEMY_DEFINITIONS[enemy.kind].trait;
   const burstMultiplier = trait?.kind === "speed-burst" && enemy.burstRemainingSeconds > 0 ? trait.speedMultiplier : 1;
-  return enemy.speed * burstMultiplier * enemy.slowMultiplier;
+  const bossMultiplier = enemy.isBoss ? BOSS_DEFINITION.phaseSpeedMultipliers[enemy.bossPhase ?? 0] : 1;
+  return enemy.speed * burstMultiplier * bossMultiplier * enemy.slowMultiplier;
 }
 
 /** Applies flat armour and returns the amount that actually reached the enemy. */
@@ -422,6 +431,8 @@ function updateSpawning(state: GameState, deltaSeconds: number): void {
     id: state.world.create("enemy").id,
     kind: spawn.kind,
     isElite: spawn.isElite,
+    isBoss: spawn.isBoss,
+    bossPhase: 0,
     mapId: state.mapId,
     health: spawn.health,
     maximumHealth: spawn.health,
@@ -552,6 +563,7 @@ function updateProjectiles(state: GameState, deltaSeconds: number): void {
     const travel = projectile.speed * deltaSeconds;
     if (distanceToTarget <= travel) {
       const dealtDamage = applyDamage(target, projectile.damage);
+      updateBossPhase(state, target);
       if (projectile.slowEffect) {
         target.slowMultiplier = Math.min(target.slowMultiplier, projectile.slowEffect.speedMultiplier);
         target.slowRemainingSeconds = Math.max(target.slowRemainingSeconds, projectile.slowEffect.durationSeconds);
@@ -580,6 +592,16 @@ function removeDefeatedEnemies(state: GameState): void {
     state.world.destroy(enemy.id);
   }
   removeFromArray(state.enemies, (enemy) => enemy.health <= 0);
+}
+
+function updateBossPhase(state: GameState, enemy: Enemy): void {
+  if (!enemy.isBoss) return;
+  const healthRatio = enemy.health / enemy.maximumHealth;
+  const nextPhase = BOSS_DEFINITION.phaseThresholds.filter((threshold) => healthRatio <= threshold).length;
+  if (nextPhase <= (enemy.bossPhase ?? 0)) return;
+  enemy.bossPhase = nextPhase;
+  recordEvent(state, "boss-phase", `${BOSS_DEFINITION.displayName} entered phase ${nextPhase + 1}`);
+  state.message = `${BOSS_DEFINITION.displayName} is enraged!`;
 }
 
 function addEffect(state: GameState, kind: CombatEffect["kind"], color: string, position: Point, duration: number): void {

@@ -138,6 +138,16 @@ describe("Dungeon Defense simulation", () => {
     expect(elite?.reward).toBe(ENEMY_DEFINITIONS.beetle.reward * 2);
   });
 
+  it("adds the authored Warden as the final-wave boss", () => {
+    const state = createGame(55);
+    state.wave = 2;
+    startWave(state);
+    const boss = state.pendingSpawns.find((spawn) => spawn.isBoss);
+
+    expect(boss).toMatchObject({ kind: "beetle", isBoss: true, reward: 40 });
+    expect(boss?.health).toBeGreaterThan(ENEMY_DEFINITIONS.beetle.baseHealth * 3);
+  });
+
   it("moves between explicit intermission and wave phases with a readable briefing", () => {
     const state = createGame(55);
 

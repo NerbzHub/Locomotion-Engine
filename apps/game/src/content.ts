@@ -120,6 +120,26 @@ export interface EliteDefinition {
 
 export const ELITE_DEFINITION: EliteDefinition = { healthMultiplier: 1.7, rewardMultiplier: 2, color: "#ffd166" };
 
+export interface BossDefinition {
+  readonly displayName: string;
+  readonly enemyKind: EnemyKind;
+  readonly healthMultiplier: number;
+  readonly reward: number;
+  readonly phaseThresholds: readonly number[];
+  readonly phaseSpeedMultipliers: readonly number[];
+  readonly color: string;
+}
+
+export const BOSS_DEFINITION: BossDefinition = {
+  displayName: "Gate Warden",
+  enemyKind: "beetle",
+  healthMultiplier: 4,
+  reward: 40,
+  phaseThresholds: [0.66, 0.33],
+  phaseSpeedMultipliers: [1, 1.15, 1.35],
+  color: "#ff9f6e"
+};
+
 export const DIFFICULTY_DEFINITIONS = {
   casual: { displayName: "Casual", startingGold: 65, startingLives: 14, enemyHealthMultiplier: 0.85 },
   standard: { displayName: "Standard", startingGold: 50, startingLives: 10, enemyHealthMultiplier: 1 },
@@ -170,6 +190,7 @@ export type EnemyKind = keyof typeof ENEMY_DEFINITIONS;
 export interface WaveDefinition {
   readonly enemyKinds: readonly EnemyKind[];
   readonly eliteEnemyIndices?: readonly number[];
+  readonly boss?: boolean;
   readonly clearBonus: number;
 }
 
@@ -177,7 +198,7 @@ export interface WaveDefinition {
 export const WAVE_DEFINITIONS: readonly WaveDefinition[] = [
   { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "slime", "slime"], clearBonus: 12 },
   { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "beetle", "beetle", "beetle"], clearBonus: 18 },
-  { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "beetle", "beetle", "beetle", "beetle", "wisp", "wisp"], eliteEnemyIndices: [6], clearBonus: 26 }
+  { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "beetle", "beetle", "beetle", "beetle", "wisp", "wisp"], eliteEnemyIndices: [6], boss: true, clearBonus: 26 }
 ];
 
 /** Tower balance and presentation are authored game content, not engine concerns. */
