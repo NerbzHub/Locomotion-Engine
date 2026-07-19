@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S19 and verified
+**Status:** Gate 1 extended through LE-S20 and verified
 
 **Updated:** 2026-07-18
 
@@ -58,6 +58,8 @@
   choices and supports deterministic revisits.
 - Versioned local campaign progression that unlocks subsequent scenarios after
   completion, with a clear reset action and validation safeguards.
+- A documented economy guide plus content-derived wave income summaries and
+  regression tests for standard-mode reward pacing.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -91,8 +93,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S20 from `docs/NEXT_TEN_SPRINTS.md`: tune economy and encounter
-pacing from the collected deterministic telemetry.
+Begin LE-S21 from `docs/NEXT_TEN_SPRINTS.md`: add optional, accessible audio
+cues for important gameplay events.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

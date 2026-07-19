@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
+import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS, waveEconomySummary } from "../apps/game/src/content";
 import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, selectTarget, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
@@ -125,6 +125,12 @@ describe("Dungeon Defense simulation", () => {
     expect(state.pendingSpawns.map((spawn) => spawn.kind)).toEqual(WAVE_DEFINITIONS[1].enemyKinds);
     expect(state.pendingSpawns.some((spawn) => spawn.kind === "beetle")).toBe(true);
     expect(ENEMY_DEFINITIONS.beetle.baseHealth).toBeGreaterThan(ENEMY_DEFINITIONS.slime.baseHealth);
+  });
+
+  it("derives wave income from the authored enemies, elites, boss, and clear bonus", () => {
+    expect(waveEconomySummary(WAVE_DEFINITIONS[0])).toEqual({ enemyRewards: 42, clearBonus: 12, totalGold: 54 });
+    expect(waveEconomySummary(WAVE_DEFINITIONS[1])).toEqual({ enemyRewards: 66, clearBonus: 18, totalGold: 84 });
+    expect(waveEconomySummary(WAVE_DEFINITIONS[2])).toEqual({ enemyRewards: 146, clearBonus: 26, totalGold: 172 });
   });
 
   it("marks authored elite wave entries with stronger health and rewards", () => {

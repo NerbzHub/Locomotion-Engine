@@ -207,12 +207,27 @@ export interface WaveDefinition {
   readonly clearBonus: number;
 }
 
+export interface WaveEconomySummary {
+  readonly enemyRewards: number;
+  readonly clearBonus: number;
+  readonly totalGold: number;
+}
+
 /** Wave composition deliberately introduces one new enemy type at a time. */
 export const WAVE_DEFINITIONS: readonly WaveDefinition[] = [
   { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "slime", "slime"], clearBonus: 12 },
   { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "beetle", "beetle", "beetle"], clearBonus: 18 },
   { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "beetle", "beetle", "beetle", "beetle", "wisp", "wisp"], eliteEnemyIndices: [6], boss: true, clearBonus: 26 }
 ];
+
+/** Expected income is derived from authored wave content, not duplicated balance constants. */
+export function waveEconomySummary(wave: WaveDefinition): WaveEconomySummary {
+  const enemyRewards = wave.enemyKinds.reduce((total, kind, index) => {
+    const multiplier = wave.eliteEnemyIndices?.includes(index) ? ELITE_DEFINITION.rewardMultiplier : 1;
+    return total + ENEMY_DEFINITIONS[kind].reward * multiplier;
+  }, 0) + (wave.boss ? BOSS_DEFINITION.reward : 0);
+  return { enemyRewards, clearBonus: wave.clearBonus, totalGold: enemyRewards + wave.clearBonus };
+}
 
 /** Tower balance and presentation are authored game content, not engine concerns. */
 export const TOWER_DEFINITIONS = {
