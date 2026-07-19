@@ -38,6 +38,7 @@ export interface Tower {
   readonly cell: Cell;
   level: number;
   targetPolicy: TargetPolicy;
+  specialisationId?: string;
   cooldownSeconds: number;
   lastTargetId?: EntityId;
 }
@@ -216,6 +217,12 @@ export function towerStats(tower: Tower): TowerStats {
     projectileDamage += upgrade.damageBonus;
     cooldownSeconds *= upgrade.cooldownMultiplier;
   }
+  const specialisation = definition.specialisations.find((candidate) => candidate.id === tower.specialisationId);
+  if (specialisation) {
+    range += specialisation.rangeBonus;
+    projectileDamage += specialisation.damageBonus;
+    cooldownSeconds *= specialisation.cooldownMultiplier;
+  }
   return { range, projectileDamage, cooldownSeconds, projectileSpeed: definition.projectileSpeed, projectileColor: definition.projectileColor };
 }
 
@@ -243,6 +250,17 @@ export function setTowerTargetPolicy(state: GameState, towerId: EntityId, target
   if (!tower) return false;
   tower.targetPolicy = targetPolicy;
   state.message = `${TOWER_DEFINITIONS[tower.kind].displayName} now targets ${targetPolicy.replace("-", " ")}.`;
+  return true;
+}
+
+export function specialiseTower(state: GameState, towerId: EntityId, specialisationId: string): boolean {
+  const tower = state.towers.find((candidate) => candidate.id === towerId);
+  if (!tower || tower.specialisationId || tower.level < TOWER_DEFINITIONS[tower?.kind ?? "archer"].upgrades.length) return false;
+  const specialisation = TOWER_DEFINITIONS[tower.kind].specialisations.find((candidate) => candidate.id === specialisationId);
+  if (!specialisation || state.gold < specialisation.cost) return false;
+  state.gold -= specialisation.cost;
+  tower.specialisationId = specialisation.id;
+  state.message = `${TOWER_DEFINITIONS[tower.kind].displayName} specialised as ${specialisation.displayName}.`;
   return true;
 }
 

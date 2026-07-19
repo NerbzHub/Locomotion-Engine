@@ -1,4 +1,4 @@
-import type { DifficultyDefinition, EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerSlowEffect, TowerUpgradeDefinition } from "./content";
+import type { DifficultyDefinition, EnemyDefinition, EnemyTraitDefinition, GameContent, MapDefinition, TowerDefinition, TowerSlowEffect, TowerSpecialisationDefinition, TowerUpgradeDefinition } from "./content";
 
 export interface ContentValidationIssue {
   readonly path: string;
@@ -88,6 +88,15 @@ function validateTower(definition: TowerDefinition, path: string, issues: Conten
   for (const [index, upgrade] of definition.upgrades.entries()) {
     validateTowerUpgrade(upgrade, `${path}.upgrades[${index}]`, issues);
   }
+  for (const [index, specialisation] of definition.specialisations.entries()) validateTowerSpecialisation(specialisation, `${path}.specialisations[${index}]`, issues);
+}
+
+function validateTowerSpecialisation(definition: TowerSpecialisationDefinition, path: string, issues: ContentValidationIssue[]): void {
+  validateDisplayName(definition.displayName, `${path}.displayName`, issues);
+  validatePositiveNumber(definition.cost, `${path}.cost`, issues);
+  validateNonNegativeNumber(definition.rangeBonus, `${path}.rangeBonus`, issues);
+  validateNonNegativeNumber(definition.damageBonus, `${path}.damageBonus`, issues);
+  validatePositiveNumber(definition.cooldownMultiplier, `${path}.cooldownMultiplier`, issues);
 }
 
 function validateTowerSlowEffect(effect: TowerSlowEffect, path: string, issues: ContentValidationIssue[]): void {

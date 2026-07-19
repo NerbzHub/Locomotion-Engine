@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S14 and verified
+**Status:** Gate 1 extended through LE-S15 and verified
 
 **Updated:** 2026-07-18
 
@@ -48,6 +48,8 @@
   weakest targets, with saved state and deterministic tie-breaking.
 - A data-defined Sentinel support tower with upgrades, visible slowing, and
   deterministic slow-expiry behaviour.
+- Costed, irreversible final specialisation branches for each tower, persisted
+  per instance and shown through the tower inspector.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -81,8 +83,8 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S15 from `docs/NEXT_TEN_SPRINTS.md`: add meaningful tower
-specialisation choices beyond stat increases.
+Begin LE-S16 from `docs/NEXT_TEN_SPRINTS.md`: introduce clearly readable elite
+enemies that demand focused attention.
 
 Select the licence before publishing or distributing the project. The browser
 toolchain is now documented in `package.json` and `README.md`.

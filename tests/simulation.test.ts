@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "../apps/game/src/content";
-import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, selectTarget, setTowerTargetPolicy, startWave, telemetryReport, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
+import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, selectTarget, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
   it("rejects towers on the enemy path", () => {
@@ -98,6 +98,23 @@ describe("Dungeon Defense simulation", () => {
     expect(state.gold).toBe(goldBefore - TOWER_DEFINITIONS.archer.upgrades[0].cost);
     expect(towerStats(tower).range).toBeGreaterThan(before.range);
     expect(towerStats(tower).projectileDamage).toBeGreaterThan(before.projectileDamage);
+  });
+
+  it("applies one irreversible specialisation to only its chosen tower", () => {
+    const state = createGame();
+    state.gold = 200;
+    placeTower(state, { column: 1, row: 1 }, "archer");
+    placeTower(state, { column: 2, row: 1 }, "archer");
+    const [first, second] = state.towers;
+    upgradeTower(state, first.id);
+    upgradeTower(state, first.id);
+    const before = towerStats(first);
+
+    expect(specialiseTower(state, first.id, "longbow")).toBe(true);
+    expect(first.specialisationId).toBe("longbow");
+    expect(towerStats(first).range).toBeGreaterThan(before.range);
+    expect(second.specialisationId).toBeUndefined();
+    expect(specialiseTower(state, first.id, "rapid")).toBe(false);
   });
 
   it("instantiates the authored enemy composition for each wave", () => {

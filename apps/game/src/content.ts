@@ -8,6 +8,7 @@ export interface TowerDefinition {
   readonly projectileColor: string;
   readonly slowEffect?: TowerSlowEffect;
   readonly upgrades: readonly TowerUpgradeDefinition[];
+  readonly specialisations: readonly TowerSpecialisationDefinition[];
 }
 
 export interface TowerSlowEffect {
@@ -17,6 +18,15 @@ export interface TowerSlowEffect {
 
 /** Each tier modifies the base tower without mutating its authored definition. */
 export interface TowerUpgradeDefinition {
+  readonly cost: number;
+  readonly rangeBonus: number;
+  readonly damageBonus: number;
+  readonly cooldownMultiplier: number;
+}
+
+export interface TowerSpecialisationDefinition {
+  readonly id: string;
+  readonly displayName: string;
   readonly cost: number;
   readonly rangeBonus: number;
   readonly damageBonus: number;
@@ -175,6 +185,10 @@ export const TOWER_DEFINITIONS = {
     upgrades: [
       { cost: 20, rangeBonus: 24, damageBonus: 4, cooldownMultiplier: 0.88 },
       { cost: 34, rangeBonus: 38, damageBonus: 7, cooldownMultiplier: 0.82 }
+    ],
+    specialisations: [
+      { id: "rapid", displayName: "Rapidfire", cost: 45, rangeBonus: 0, damageBonus: 3, cooldownMultiplier: 0.72 },
+      { id: "longbow", displayName: "Longbow", cost: 45, rangeBonus: 65, damageBonus: 8, cooldownMultiplier: 1 }
     ]
   },
   mage: {
@@ -189,6 +203,10 @@ export const TOWER_DEFINITIONS = {
     upgrades: [
       { cost: 28, rangeBonus: 28, damageBonus: 7, cooldownMultiplier: 0.9 },
       { cost: 44, rangeBonus: 42, damageBonus: 12, cooldownMultiplier: 0.84 }
+    ],
+    specialisations: [
+      { id: "nova", displayName: "Nova", cost: 52, rangeBonus: 15, damageBonus: 18, cooldownMultiplier: 1 },
+      { id: "focus", displayName: "Focus", cost: 52, rangeBonus: 48, damageBonus: 8, cooldownMultiplier: 0.74 }
     ]
   },
   sentinel: {
@@ -203,6 +221,10 @@ export const TOWER_DEFINITIONS = {
     upgrades: [
       { cost: 26, rangeBonus: 24, damageBonus: 3, cooldownMultiplier: 0.9 },
       { cost: 42, rangeBonus: 36, damageBonus: 5, cooldownMultiplier: 0.84 }
+    ],
+    specialisations: [
+      { id: "frost", displayName: "Deep Frost", cost: 48, rangeBonus: 30, damageBonus: 4, cooldownMultiplier: 0.82 },
+      { id: "watcher", displayName: "Watcher", cost: 48, rangeBonus: 58, damageBonus: 7, cooldownMultiplier: 0.92 }
     ]
   }
 } as const satisfies Record<string, TowerDefinition>;
