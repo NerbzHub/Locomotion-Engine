@@ -18,10 +18,13 @@
           <button id="save-game" class="secondary" type="button">Save</button>
           <button id="load-game" class="secondary" type="button">Load</button>
           <button id="toggle-motion" class="secondary" type="button" aria-pressed="false">Motion: full</button>
+          <button id="toggle-audio" class="secondary" type="button" aria-pressed="false">Audio: on</button>
           <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
           <button id="restart-game" class="secondary" type="button">Restart</button>
         </div>
       </header>
+
+      <label class="audio-settings">Volume <input id="audio-volume" type="range" min="0" max="1" step="0.05" value="0.35"></label>
 
       <section class="tower-palette" aria-label="Tower selection">
         <span class="palette-label">Build</span>

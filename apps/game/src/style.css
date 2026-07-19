@@ -28,6 +28,8 @@ button.secondary:hover { background: #526f6a; }
 .game-shell { width: min(100% - 2rem, 820px); margin: 2rem auto; }
 .game-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
 .game-actions { display: flex; gap: 0.5rem; }
+.audio-settings { display: flex; align-items: center; gap: 0.5rem; margin: -0.5rem 0 1rem; color: #c9dbcf; font-size: 0.85rem; }
+.audio-settings input { accent-color: #e9c46a; }
 .tower-palette { display: flex; flex-wrap: wrap; align-items: stretch; gap: 0.5rem; margin-bottom: 1rem; }
 .map-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; margin: -0.4rem 0 1rem; }
 .map-choice { padding: 0.45rem 0.7rem; color: #c9dbcf; background: #31454b; font-size: 0.85rem; }

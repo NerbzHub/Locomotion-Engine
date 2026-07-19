@@ -7,6 +7,7 @@ import type { DifficultyId, MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
 import { loadFromLocalStorage, saveToLocalStorage } from "./save";
 import { completeCampaignNode, isCampaignNodeUnlocked, loadProfile, resetProfile, saveProfile } from "./progression";
+import { GameAudio, loadAudioSettings, normaliseAudioSettings, saveAudioSettings } from "./audio";
 import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell, TargetPolicy } from "./simulation";
 
@@ -16,6 +17,8 @@ const restartButton = requiredElement<HTMLButtonElement>("restart-game");
 const saveButton = requiredElement<HTMLButtonElement>("save-game");
 const loadButton = requiredElement<HTMLButtonElement>("load-game");
 const motionButton = requiredElement<HTMLButtonElement>("toggle-motion");
+const audioButton = requiredElement<HTMLButtonElement>("toggle-audio");
+const audioVolume = requiredElement<HTMLInputElement>("audio-volume");
 const diagnosticsButton = requiredElement<HTMLButtonElement>("toggle-diagnostics");
 const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
@@ -71,13 +74,15 @@ let keyboardCursorActive = false;
 let inspectedTowerId: EntityId | undefined;
 let diagnosticsVisible = false;
 let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+let audioSettings = loadAudioSettings(window.localStorage);
+const audio = new GameAudio(audioSettings);
 const pointer = new PointerInput(canvas);
 
 pointer.onPointerDown((point) => {
   const cell = cellAt(point.x, point.y);
   const tower = towerAtCell(state, cell);
   if (tower) inspectedTowerId = tower.id;
-  else placeTower(state, cell, selectedTower);
+  else if (placeTower(state, cell, selectedTower)) audio.play("placement");
   updateHud();
 });
 
@@ -110,7 +115,7 @@ canvas.addEventListener("keydown", (event) => {
 });
 
 startWaveButton.addEventListener("click", () => {
-  startWave(state);
+  if (startWave(state)) audio.play("wave");
   updateHud();
 });
 
@@ -147,6 +152,18 @@ motionButton.addEventListener("click", () => {
   reducedMotion = !reducedMotion;
   motionButton.setAttribute("aria-pressed", String(reducedMotion));
   motionButton.textContent = reducedMotion ? "Motion: reduced" : "Motion: full";
+});
+
+audioButton.addEventListener("click", () => {
+  audioSettings = normaliseAudioSettings({ ...audioSettings, muted: !audioSettings.muted });
+  saveAudioSettings(window.localStorage, audioSettings);
+  audio.setSettings(audioSettings);
+  updateAudioControls();
+});
+audioVolume.addEventListener("input", () => {
+  audioSettings = normaliseAudioSettings({ ...audioSettings, volume: Number(audioVolume.value) });
+  saveAudioSettings(window.localStorage, audioSettings);
+  audio.setSettings(audioSettings);
 });
 
 diagnosticsButton.addEventListener("click", () => {
@@ -285,6 +302,13 @@ function updateHud(): void {
   updatePlacementMessage();
   updateTowerInspector();
   updateDeveloperOverlay();
+  updateAudioControls();
+}
+
+function updateAudioControls(): void {
+  audioButton.setAttribute("aria-pressed", String(audioSettings.muted));
+  audioButton.textContent = audioSettings.muted ? "Audio: off" : "Audio: on";
+  audioVolume.value = String(audioSettings.volume);
 }
 
 function updateDeveloperOverlay(): void {
