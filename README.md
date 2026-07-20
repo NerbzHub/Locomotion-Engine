@@ -73,7 +73,11 @@ and the next delivery gate.
 
 ## Licensing
 
-No licence has been selected yet. Do not assume permission to reuse or
-redistribute the project until a licence is added by the project owner. See
-[the licence-selection requirements](docs/LICENSE_SELECTION_REQUIRED.md) and
-[third-party notices](NOTICE.md) before preparing a public release.
+Copyright (c) 2026 Nathan Nette. All rights reserved.
+
+This repository is public for viewing and evaluation only. No permission is
+granted to copy, modify, redistribute, sublicense, sell, use in commercial or
+non-commercial products, or create derivative works from this software without
+prior written permission.
+
+See the [third-party notices](NOTICE.md) before preparing a public release.
