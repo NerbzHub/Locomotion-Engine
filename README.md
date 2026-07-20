@@ -14,6 +14,8 @@ the TypeScript source is the active engine and game implementation.
 - [Project status and delivery gates](docs/PROJECT_STATUS.md)
 - [Next ten planned sprints](docs/NEXT_TEN_SPRINTS.md)
 - [Release checklist](docs/RELEASE_CHECKLIST.md)
+- [Playtester criteria and feedback questions](docs/PLAYTESTER_CRITERIA.md)
+- [Packaging plan](docs/PACKAGING_PLAN.md)
 - [Changelog](CHANGELOG.md)
 - [Canonical architecture books](Books/)
 
@@ -55,6 +57,12 @@ pnpm run dev
 
 Use `pnpm run check` to type-check and run the deterministic simulation tests,
 and `pnpm run build` to create a production build.
+
+## Packaging
+
+The recommended tester package is a hosted static build created from `dist/`.
+See [PACKAGING_PLAN.md](docs/PACKAGING_PLAN.md) for the current one-button
+launch recommendation and fallback archive approach.
 
 ## Status
 

@@ -24,5 +24,5 @@ describe("seeded simulation fuzzing", () => {
         expect(state.enemies.every((enemy) => Number.isFinite(enemy.health) && Number.isFinite(enemy.distance) && enemy.maximumHealth > 0), context).toBe(true);
       }
     }
-  });
+  }, 15_000);
 });

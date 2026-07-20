@@ -1,6 +1,6 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S28 and verified, pending owner licence selection for public release
+**Status:** Gate 1 extended through LE-S29 documentation, pending owner licence selection for public release
 
 **Updated:** 2026-07-20
 
@@ -78,6 +78,10 @@
   deterministic tests, and creates a production build on pushes and pull requests.
 - Release checklist, changelog, release-notes template, and third-party notice
   structure for repeatable packaging.
+- Playtester criteria, structured feedback questions, severity triage, and a
+  no-new-feature release-candidate policy.
+- A packaging plan that recommends hosted static builds first, with archive and
+  desktop-wrapper fallbacks.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
@@ -110,8 +114,9 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S29 from `docs/NEXT_TEN_SPRINTS.md`: prepare an external-playtest
-release candidate and collect structured feedback.
+Continue LE-S29 from `docs/NEXT_TEN_SPRINTS.md`: build the external-playtest
+release candidate, publish or archive the exact `dist/` artifact, and collect
+structured feedback using `docs/PLAYTESTER_CRITERIA.md`.
 
 Select the licence before publishing or distributing the project. The release
 workflow is ready, but a public release must not proceed until that owner

@@ -18,10 +18,20 @@ Dungeon Defense.
 - [ ] Perform a browser smoke test of a complete game flow.
 - [ ] Confirm GitHub Actions has passed for the release commit.
 
+## Playtest candidate
+
+- [ ] Prepare tester instructions from `docs/PLAYTESTER_CRITERIA.md`.
+- [ ] Record the candidate name, source commit, build date, and known
+  limitations.
+- [ ] Freeze gameplay/content changes for the candidate window.
+- [ ] Triage feedback by critical, high, medium, or low severity.
+- [ ] Link every accepted fix to feedback evidence from the candidate.
+
 ## Distribution and attribution
 
 - [ ] The project owner has selected and added a root `LICENSE` file.
 - [ ] Review `NOTICE.md` for bundled dependency and asset attributions.
+- [ ] Choose the distribution path from `docs/PACKAGING_PLAN.md`.
 - [ ] Ensure no development-only files, credentials, or local save data are in
   the release archive.
 - [ ] Preserve the generated `dist/` output only when a hosted/archive release
