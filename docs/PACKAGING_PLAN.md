@@ -47,6 +47,28 @@ The production artifact is:
 dist/
 ```
 
+## GitHub Pages deployment
+
+While development is on `AIBranch`, GitHub Pages must build from that branch,
+not `main`. The deployment workflow at `.github/workflows/pages.yml` runs the
+same type-check and test suite used in continuous integration, then runs:
+
+```sh
+pnpm run build:pages
+```
+
+This builds with the `/Locomotion-Engine/` base path required by the GitHub
+repository `NerbzHub/Locomotion-Engine`. In the repository settings, set
+**Pages → Build and deployment → Source** to **GitHub Actions**. Pushing to
+`AIBranch` then publishes the game at:
+
+```text
+https://nerbzhub.github.io/Locomotion-Engine/
+```
+
+When the game is ready to move to `main`, change the workflow trigger to
+`main` as part of that merge.
+
 ## One-button options
 
 For playtesting, the most practical "press a button and it starts" option is a
