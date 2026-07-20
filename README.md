@@ -3,9 +3,9 @@
 Locomotion Engine is a browser-first, deterministic 2D game-engine project.
 Its first proving ground is a whimsical procedural pixel-art tower-defence game.
 
-The project is intentionally at the **pre-build foundation** stage. The existing
-Dungeon Defense HTML files are playable design prototypes; they are not yet the
-engine implementation.
+The first implementation is now a playable, deterministic Dungeon Defense
+vertical slice. The existing HTML files remain useful design references, while
+the TypeScript source is the active engine and game implementation.
 
 ## Start here
 
@@ -13,6 +13,8 @@ engine implementation.
 - [Recommended implementation strategy](docs/IMPLEMENTATION_STRATEGY.md)
 - [Project status and delivery gates](docs/PROJECT_STATUS.md)
 - [Next ten planned sprints](docs/NEXT_TEN_SPRINTS.md)
+- [Release checklist](docs/RELEASE_CHECKLIST.md)
+- [Changelog](CHANGELOG.md)
 - [Canonical architecture books](Books/)
 
 ## Repository layout
@@ -64,4 +66,6 @@ and the next delivery gate.
 ## Licensing
 
 No licence has been selected yet. Do not assume permission to reuse or
-redistribute the project until a licence is added by the project owner.
+redistribute the project until a licence is added by the project owner. See
+[the licence-selection requirements](docs/LICENSE_SELECTION_REQUIRED.md) and
+[third-party notices](NOTICE.md) before preparing a public release.

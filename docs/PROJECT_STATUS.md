@@ -1,8 +1,8 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S27 and verified
+**Status:** Gate 1 extended through LE-S28 and verified, pending owner licence selection for public release
 
-**Updated:** 2026-07-18
+**Updated:** 2026-07-20
 
 ## What exists
 
@@ -74,11 +74,14 @@
   80 enemies, 12 towers, and 600 fixed frames.
 - Responsive narrow-screen layout, safe-area handling, touch-safe control
   sizing, and preserved pointer/keyboard board interaction.
+- A GitHub Actions workflow that installs with the lockfile, type-checks, runs
+  deterministic tests, and creates a production build on pushes and pull requests.
+- Release checklist, changelog, release-notes template, and third-party notice
+  structure for repeatable packaging.
 - Deterministic simulation tests ready to run through Vitest.
 
 ## What does not exist yet
 
-- Continuous integration.
 - A selected project licence.
 - A functional Locomotion Builder.
 
@@ -107,8 +110,9 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S28 from `docs/NEXT_TEN_SPRINTS.md`: prepare a repeatable release
-package, licence, and CI-ready verification workflow.
+Begin LE-S29 from `docs/NEXT_TEN_SPRINTS.md`: prepare an external-playtest
+release candidate and collect structured feedback.
 
-Select the licence before publishing or distributing the project. The browser
-toolchain is now documented in `package.json` and `README.md`.
+Select the licence before publishing or distributing the project. The release
+workflow is ready, but a public release must not proceed until that owner
+decision is reflected in a root `LICENSE` file.
