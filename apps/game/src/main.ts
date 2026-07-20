@@ -56,6 +56,10 @@ const targetPolicySelect = requiredElement<HTMLSelectElement>("target-policy");
 const specialisationControl = requiredElement<HTMLElement>("specialisation-control");
 const specialisationSelect = requiredElement<HTMLSelectElement>("specialisation");
 const specialiseTowerButton = requiredElement<HTMLButtonElement>("specialise-tower");
+const setupPanel = requiredElement<HTMLElement>("setup-panel");
+const towerPalette = requiredElement<HTMLElement>("tower-palette");
+const waveBriefingPanel = requiredElement<HTMLElement>("wave-briefing-panel");
+const gameMenu = requiredElement<HTMLDetailsElement>("game-menu");
 const context = canvas.getContext("2d");
 
 if (!context) throw new Error("Canvas 2D is unavailable in this browser.");
@@ -85,6 +89,7 @@ let diagnosticsVisible = false;
 let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 let replayActions: ReplayAction[] = [];
 let audioSettings = loadAudioSettings(window.localStorage);
+let tutorialOpenedManually = false;
 const audio = new GameAudio(audioSettings);
 glossary.replaceChildren(...GLOSSARY_ENTRIES.flatMap(([term, description]) => [createGlossaryTerm(term), createGlossaryDescription(description)]));
 tutorialPanel.hidden = !shouldShowTutorial(window.localStorage);
@@ -128,12 +133,14 @@ canvas.addEventListener("keydown", (event) => {
 
 startWaveButton.addEventListener("click", () => {
   if (startWave(state)) { replayActions.push({ step: state.step, type: "start-wave" }); audio.play("wave"); }
+  closeGameMenu();
   updateHud();
 });
 
 restartButton.addEventListener("click", () => {
   state = createGame(initialSeed, selectedMap, selectedDifficulty);
   inspectedTowerId = undefined;
+  closeGameMenu();
   updateHud();
 });
 
@@ -177,9 +184,14 @@ audioVolume.addEventListener("input", () => {
   saveAudioSettings(window.localStorage, audioSettings);
   audio.setSettings(audioSettings);
 });
-helpButton.addEventListener("click", () => { tutorialPanel.hidden = false; });
+helpButton.addEventListener("click", () => {
+  tutorialOpenedManually = true;
+  tutorialPanel.hidden = false;
+  closeGameMenu();
+});
 dismissTutorialButton.addEventListener("click", () => {
   dismissTutorial(window.localStorage);
+  tutorialOpenedManually = false;
   tutorialPanel.hidden = true;
 });
 exportReplayButton.addEventListener("click", () => { window.prompt("Copy replay JSON", exportReplay(state, replayActions)); });
@@ -258,7 +270,7 @@ function selectTower(kind: TowerKind): void {
 }
 
 function selectMap(mapId: MapId): void {
-  if (state.waveActive) return;
+  if (!canConfigureScenario()) return;
   selectedMap = mapId;
   state = createGame(initialSeed, selectedMap, selectedDifficulty);
   inspectedTowerId = undefined;
@@ -271,7 +283,7 @@ function selectMap(mapId: MapId): void {
 }
 
 function selectDifficulty(difficultyId: DifficultyId): void {
-  if (state.waveActive) return;
+  if (!canConfigureScenario()) return;
   selectedDifficulty = difficultyId;
   state = createGame(initialSeed, selectedMap, selectedDifficulty);
   for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
@@ -283,7 +295,7 @@ function selectDifficulty(difficultyId: DifficultyId): void {
 }
 
 function selectCampaignNode(nodeId: string): void {
-  if (state.waveActive) return;
+  if (!canConfigureScenario()) return;
   const node = CAMPAIGN_NODES.find((candidate) => candidate.id === nodeId);
   if (!node || !isCampaignNodeUnlocked(profile, node.id)) return;
   selectedCampaignNodeId = node.id;
@@ -315,20 +327,35 @@ function updateHud(): void {
   wave.textContent = `${state.wave}/${TOTAL_WAVES}`;
   message.textContent = state.message;
   waveBriefing.textContent = nextWaveBriefing(state);
+  const showScenarioSetup = canConfigureScenario();
+  setupPanel.hidden = !showScenarioSetup;
+  tutorialPanel.hidden = !showScenarioSetup && !tutorialOpenedManually;
+  towerPalette.hidden = state.gameOver || state.gameWon;
+  waveBriefingPanel.hidden = state.waveActive || state.gameOver || state.gameWon;
+  startWaveButton.hidden = state.waveActive || state.gameOver || state.gameWon;
   startWaveButton.disabled = state.waveActive || state.gameOver || state.gameWon;
   saveButton.disabled = state.phase !== "intermission";
-  gateButton.disabled = state.waveActive;
-  crossroadsButton.disabled = state.waveActive;
-  casualButton.disabled = state.waveActive;
-  standardButton.disabled = state.waveActive;
-  veteranButton.disabled = state.waveActive;
-  gateWatchButton.disabled = state.waveActive;
-  crossroadsStandButton.disabled = state.waveActive || !isCampaignNodeUnlocked(profile, "crossroads-stand");
+  gateButton.disabled = !showScenarioSetup;
+  crossroadsButton.disabled = !showScenarioSetup;
+  casualButton.disabled = !showScenarioSetup;
+  standardButton.disabled = !showScenarioSetup;
+  veteranButton.disabled = !showScenarioSetup;
+  gateWatchButton.disabled = !showScenarioSetup;
+  crossroadsStandButton.disabled = !showScenarioSetup || !isCampaignNodeUnlocked(profile, "crossroads-stand");
+  resetProfileButton.disabled = !showScenarioSetup;
   startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;
   updatePlacementMessage();
   updateTowerInspector();
   updateDeveloperOverlay();
   updateAudioControls();
+}
+
+function canConfigureScenario(): boolean {
+  return (!state.waveActive && state.wave === 0) || state.gameOver || state.gameWon;
+}
+
+function closeGameMenu(): void {
+  gameMenu.open = false;
 }
 
 function updateAudioControls(): void {
