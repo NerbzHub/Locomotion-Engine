@@ -72,9 +72,8 @@ const outcomeTitle = requiredElement<HTMLElement>("outcome-title");
 const outcomeSummary = requiredElement<HTMLElement>("outcome-summary");
 const outcomePrimaryButton = requiredElement<HTMLButtonElement>("outcome-primary");
 const changeMissionButton = requiredElement<HTMLButtonElement>("change-mission");
-const buildConfirmation = requiredElement<HTMLDialogElement>("build-confirmation");
-const buildConfirmationTitle = requiredElement<HTMLElement>("build-confirmation-title");
-const buildConfirmationDetail = requiredElement<HTMLElement>("build-confirmation-detail");
+const boardStage = requiredElement<HTMLElement>("board-stage");
+const buildConfirmControls = requiredElement<HTMLElement>("build-confirm-controls");
 const confirmBuildButton = requiredElement<HTMLButtonElement>("confirm-build");
 const cancelBuildButton = requiredElement<HTMLButtonElement>("cancel-build");
 const context = canvas.getContext("2d");
@@ -143,6 +142,10 @@ canvas.addEventListener("keydown", (event) => {
     return;
   }
   if (event.key === "Enter" || event.key === " ") {
+    if (pendingPlacement) {
+      event.preventDefault();
+      return;
+    }
     const tower = towerAtCell(state, keyboardCursor);
     if (tower) inspectedTowerId = tower.id;
     else requestTowerPlacement(keyboardCursor);
@@ -282,8 +285,11 @@ cancelBuildButton.addEventListener("click", () => {
   closeBuildConfirmation();
   updateHud();
 });
-buildConfirmation.addEventListener("close", () => {
-  pendingPlacement = undefined;
+canvas.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || !pendingPlacement) return;
+  state.message = "Build cancelled. Choose another grass tile when ready.";
+  closeBuildConfirmation();
+  event.preventDefault();
   updateHud();
 });
 upgradeTowerButton.addEventListener("click", () => {
@@ -374,9 +380,10 @@ function selectCampaignNode(nodeId: string): void {
 }
 
 function placementPreview() {
-  const cell = keyboardCursorActive ? keyboardCursor : hoveredCell;
+  const cell = pendingPlacement?.cell ?? (keyboardCursorActive ? keyboardCursor : hoveredCell);
   if (!cell) return undefined;
-  return { cell, kind: selectedTower, status: placementStatus(state, cell, selectedTower) };
+  const kind = pendingPlacement?.kind ?? selectedTower;
+  return { cell, kind, status: placementStatus(state, cell, kind) };
 }
 
 function updateHud(): void {
@@ -410,6 +417,7 @@ function updateHud(): void {
   startWaveButton.textContent = `Start wave ${state.wave + 1}`;
   updateMissionControls();
   updateTowerChoices();
+  updateBuildConfirmationControls();
   message.textContent = contextualMessage();
   updateOutcome();
   updateTowerInspector();
@@ -437,7 +445,7 @@ function startNewDefense(): void {
 }
 
 function isInterfacePaused(): boolean {
-  return state.waveActive && (gameMenu.open || tutorialOpenedManually || buildConfirmation.open);
+  return state.waveActive && (gameMenu.open || tutorialOpenedManually || Boolean(pendingPlacement));
 }
 
 function requestTowerPlacement(cell: Cell): void {
@@ -448,16 +456,30 @@ function requestTowerPlacement(cell: Cell): void {
   }
   const definition = TOWER_DEFINITIONS[selectedTower];
   pendingPlacement = { cell: { ...cell }, kind: selectedTower };
-  buildConfirmationTitle.textContent = `Build ${definition.displayName}?`;
-  buildConfirmationDetail.textContent = `Spend ${definition.cost} gold to place it on tile ${cell.column + 1}, ${cell.row + 1}. You can still cancel without spending gold.`;
-  if (typeof buildConfirmation.showModal === "function") buildConfirmation.showModal();
-  else buildConfirmation.setAttribute("open", "");
+  state.message = `Confirm ${definition.displayName} at tile ${cell.column + 1}, ${cell.row + 1}.`;
+  updateBuildConfirmationControls();
 }
 
 function closeBuildConfirmation(): void {
   pendingPlacement = undefined;
-  if (buildConfirmation.open && typeof buildConfirmation.close === "function") buildConfirmation.close();
-  else buildConfirmation.removeAttribute("open");
+  buildConfirmControls.hidden = true;
+}
+
+function updateBuildConfirmationControls(): void {
+  const placement = pendingPlacement;
+  if (!placement) {
+    buildConfirmControls.hidden = true;
+    return;
+  }
+  const bounds = boardStage.getBoundingClientRect();
+  const cellWidth = bounds.width / BOARD.columns;
+  const cellHeight = bounds.height / BOARD.rows;
+  const centerX = (placement.cell.column + 0.5) * cellWidth;
+  const buttonRadius = 21;
+  const top = Math.max(buttonRadius + 4, placement.cell.row * cellHeight - buttonRadius);
+  buildConfirmControls.style.left = `${centerX}px`;
+  buildConfirmControls.style.top = `${top}px`;
+  buildConfirmControls.hidden = false;
 }
 
 function updateMissionControls(): void {
