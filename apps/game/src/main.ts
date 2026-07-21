@@ -312,7 +312,7 @@ const engine = new Engine({
     if (!isInterfacePaused()) updateGame(state, deltaSeconds);
   },
   render: () => {
-    renderGame(context, state, placementPreview(), reducedMotion);
+    renderGame(context, state, placementPreview(), reducedMotion, inspectedTowerId);
     updateHud();
   }
 });
@@ -455,6 +455,7 @@ function requestTowerPlacement(cell: Cell): void {
     return;
   }
   const definition = TOWER_DEFINITIONS[selectedTower];
+  inspectedTowerId = undefined;
   pendingPlacement = { cell: { ...cell }, kind: selectedTower };
   state.message = `Confirm ${definition.displayName} at tile ${cell.column + 1}, ${cell.row + 1}.`;
   updateBuildConfirmationControls();

@@ -1,7 +1,8 @@
 import type { Cell, GameState, PlacementStatus, Point } from "./simulation";
-import { BOARD, enemyPosition, towerPosition } from "./simulation";
+import { BOARD, enemyPosition, towerPosition, towerStats } from "./simulation";
 import { BOSS_DEFINITION, ELITE_DEFINITION, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
 import type { TowerKind } from "./content";
+import type { EntityId } from "../../../packages/engine/src";
 
 export interface PlacementPreview {
   readonly cell: Cell;
@@ -9,11 +10,12 @@ export interface PlacementPreview {
   readonly status: PlacementStatus;
 }
 
-export function renderGame(context: CanvasRenderingContext2D, state: GameState, preview?: PlacementPreview, reducedMotion = false): void {
+export function renderGame(context: CanvasRenderingContext2D, state: GameState, preview?: PlacementPreview, reducedMotion = false, selectedTowerId?: EntityId): void {
   context.clearRect(0, 0, BOARD.columns * BOARD.tileSize, BOARD.rows * BOARD.tileSize);
   drawBoard(context, state);
   if (preview) drawPlacementPreview(context, preview);
-  drawTowers(context, state);
+  drawSelectedTowerRange(context, state, selectedTowerId);
+  drawTowers(context, state, selectedTowerId);
   drawEnemies(context, state);
   drawProjectiles(context, state);
   if (!reducedMotion) drawEffects(context, state);
@@ -66,10 +68,37 @@ function drawBoard(context: CanvasRenderingContext2D, state: GameState): void {
   context.stroke();
 }
 
-function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
+function drawSelectedTowerRange(context: CanvasRenderingContext2D, state: GameState, selectedTowerId?: EntityId): void {
+  const tower = state.towers.find((candidate) => candidate.id === selectedTowerId);
+  if (!tower) return;
+  const position = towerPosition(tower);
+  context.save();
+  context.fillStyle = "rgba(255, 241, 184, 0.09)";
+  context.strokeStyle = "rgba(255, 241, 184, 0.9)";
+  context.lineWidth = 2;
+  context.setLineDash([6, 4]);
+  context.beginPath();
+  context.arc(position.x, position.y, towerStats(tower).range, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+  context.restore();
+}
+
+function drawTowers(context: CanvasRenderingContext2D, state: GameState, selectedTowerId?: EntityId): void {
   for (const tower of state.towers) {
     drawTower(context, tower.kind, towerPosition(tower), tower.level);
+    if (tower.id === selectedTowerId) drawSelectedTowerMarker(context, towerPosition(tower));
   }
+}
+
+function drawSelectedTowerMarker(context: CanvasRenderingContext2D, position: Point): void {
+  context.save();
+  context.strokeStyle = "#fff1b8";
+  context.lineWidth = 3;
+  context.beginPath();
+  context.arc(position.x, position.y - 7, 25, 0, Math.PI * 2);
+  context.stroke();
+  context.restore();
 }
 
 function drawTower(context: CanvasRenderingContext2D, kind: TowerKind, position: Point, level?: number): void {
