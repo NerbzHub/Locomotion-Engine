@@ -100,7 +100,13 @@
         </div>
       </section>
 
-      <canvas id="game-canvas" width="768" height="512" tabindex="0" aria-label="Dungeon Defense game board. Use arrow keys to move the board cursor, then Enter to build or inspect."></canvas>
+      <div id="board-stage" class="board-stage">
+        <canvas id="game-canvas" width="768" height="512" tabindex="0" aria-label="Dungeon Defense game board. Use arrow keys to move the board cursor, then Enter to build or inspect."></canvas>
+        <div id="build-confirm-controls" class="build-confirm-controls" hidden aria-label="Confirm tower placement">
+          <button id="cancel-build" class="placement-cancel" type="button" aria-label="Cancel tower placement" title="Cancel placement">×</button>
+          <button id="confirm-build" class="placement-confirm" type="button" aria-label="Confirm tower placement" title="Build tower">✓</button>
+        </div>
+      </div>
 
       <section id="tower-inspector" class="tower-inspector" hidden aria-live="polite">
         <div><span class="palette-label">Selected tower</span><strong id="tower-name"></strong></div>

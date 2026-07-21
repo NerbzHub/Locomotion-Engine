@@ -72,6 +72,10 @@ const outcomeTitle = requiredElement<HTMLElement>("outcome-title");
 const outcomeSummary = requiredElement<HTMLElement>("outcome-summary");
 const outcomePrimaryButton = requiredElement<HTMLButtonElement>("outcome-primary");
 const changeMissionButton = requiredElement<HTMLButtonElement>("change-mission");
+const boardStage = requiredElement<HTMLElement>("board-stage");
+const buildConfirmControls = requiredElement<HTMLElement>("build-confirm-controls");
+const confirmBuildButton = requiredElement<HTMLButtonElement>("confirm-build");
+const cancelBuildButton = requiredElement<HTMLButtonElement>("cancel-build");
 const context = canvas.getContext("2d");
 
 if (!context) throw new Error("Canvas 2D is unavailable in this browser.");
@@ -104,16 +108,18 @@ let audioSettings = loadAudioSettings(window.localStorage);
 let tutorialOpenedManually = false;
 let missionSetupVisible = true;
 let outcomeDismissed = false;
+let pendingPlacement: { readonly cell: Cell; readonly kind: TowerKind } | undefined;
 const audio = new GameAudio(audioSettings);
 glossary.replaceChildren(...GLOSSARY_ENTRIES.flatMap(([term, description]) => [createGlossaryTerm(term), createGlossaryDescription(description)]));
 tutorialPanel.hidden = !shouldShowTutorial(window.localStorage);
 const pointer = new PointerInput(canvas);
 
 pointer.onPointerDown((point) => {
+  if (pendingPlacement) return;
   const cell = cellAt(point.x, point.y);
   const tower = towerAtCell(state, cell);
   if (tower) inspectedTowerId = tower.id;
-  else if (placeTower(state, cell, selectedTower)) { replayActions.push({ step: state.step, type: "place", cell, kind: selectedTower }); audio.play("placement"); }
+  else requestTowerPlacement(cell);
   updateHud();
 });
 
@@ -136,9 +142,13 @@ canvas.addEventListener("keydown", (event) => {
     return;
   }
   if (event.key === "Enter" || event.key === " ") {
+    if (pendingPlacement) {
+      event.preventDefault();
+      return;
+    }
     const tower = towerAtCell(state, keyboardCursor);
     if (tower) inspectedTowerId = tower.id;
-    else placeTower(state, keyboardCursor, selectedTower);
+    else requestTowerPlacement(keyboardCursor);
     keyboardCursorActive = true;
     event.preventDefault();
     updateHud();
@@ -260,6 +270,28 @@ changeMissionButton.addEventListener("click", () => {
   outcomeDismissed = true;
   updateHud();
 });
+confirmBuildButton.addEventListener("click", () => {
+  const placement = pendingPlacement;
+  if (!placement) return;
+  if (placeTower(state, placement.cell, placement.kind)) {
+    replayActions.push({ step: state.step, type: "place", cell: placement.cell, kind: placement.kind });
+    audio.play("placement");
+  }
+  closeBuildConfirmation();
+  updateHud();
+});
+cancelBuildButton.addEventListener("click", () => {
+  state.message = "Build cancelled. Choose another grass tile when ready.";
+  closeBuildConfirmation();
+  updateHud();
+});
+canvas.addEventListener("keydown", (event) => {
+  if (event.key !== "Escape" || !pendingPlacement) return;
+  state.message = "Build cancelled. Choose another grass tile when ready.";
+  closeBuildConfirmation();
+  event.preventDefault();
+  updateHud();
+});
 upgradeTowerButton.addEventListener("click", () => {
   if (inspectedTowerId) upgradeTower(state, inspectedTowerId);
   updateHud();
@@ -280,7 +312,7 @@ const engine = new Engine({
     if (!isInterfacePaused()) updateGame(state, deltaSeconds);
   },
   render: () => {
-    renderGame(context, state, placementPreview(), reducedMotion);
+    renderGame(context, state, placementPreview(), reducedMotion, inspectedTowerId);
     updateHud();
   }
 });
@@ -348,9 +380,10 @@ function selectCampaignNode(nodeId: string): void {
 }
 
 function placementPreview() {
-  const cell = keyboardCursorActive ? keyboardCursor : hoveredCell;
+  const cell = pendingPlacement?.cell ?? (keyboardCursorActive ? keyboardCursor : hoveredCell);
   if (!cell) return undefined;
-  return { cell, kind: selectedTower, status: placementStatus(state, cell, selectedTower) };
+  const kind = pendingPlacement?.kind ?? selectedTower;
+  return { cell, kind, status: placementStatus(state, cell, kind) };
 }
 
 function updateHud(): void {
@@ -384,6 +417,7 @@ function updateHud(): void {
   startWaveButton.textContent = `Start wave ${state.wave + 1}`;
   updateMissionControls();
   updateTowerChoices();
+  updateBuildConfirmationControls();
   message.textContent = contextualMessage();
   updateOutcome();
   updateTowerInspector();
@@ -411,7 +445,42 @@ function startNewDefense(): void {
 }
 
 function isInterfacePaused(): boolean {
-  return state.waveActive && (gameMenu.open || tutorialOpenedManually);
+  return state.waveActive && (gameMenu.open || tutorialOpenedManually || Boolean(pendingPlacement));
+}
+
+function requestTowerPlacement(cell: Cell): void {
+  const status = placementStatus(state, cell, selectedTower);
+  if (status !== "valid") {
+    placeTower(state, cell, selectedTower);
+    return;
+  }
+  const definition = TOWER_DEFINITIONS[selectedTower];
+  inspectedTowerId = undefined;
+  pendingPlacement = { cell: { ...cell }, kind: selectedTower };
+  state.message = `Confirm ${definition.displayName} at tile ${cell.column + 1}, ${cell.row + 1}.`;
+  updateBuildConfirmationControls();
+}
+
+function closeBuildConfirmation(): void {
+  pendingPlacement = undefined;
+  buildConfirmControls.hidden = true;
+}
+
+function updateBuildConfirmationControls(): void {
+  const placement = pendingPlacement;
+  if (!placement) {
+    buildConfirmControls.hidden = true;
+    return;
+  }
+  const bounds = boardStage.getBoundingClientRect();
+  const cellWidth = bounds.width / BOARD.columns;
+  const cellHeight = bounds.height / BOARD.rows;
+  const centerX = (placement.cell.column + 0.5) * cellWidth;
+  const buttonRadius = 21;
+  const top = Math.max(buttonRadius + 4, placement.cell.row * cellHeight - buttonRadius);
+  buildConfirmControls.style.left = `${centerX}px`;
+  buildConfirmControls.style.top = `${top}px`;
+  buildConfirmControls.hidden = false;
 }
 
 function updateMissionControls(): void {
