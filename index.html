@@ -116,6 +116,16 @@
         <pre id="developer-overlay-text"></pre>
       </section>
 
+      <dialog id="build-confirmation" class="build-confirmation" aria-labelledby="build-confirmation-title" aria-describedby="build-confirmation-detail">
+        <span class="palette-label">Confirm build</span>
+        <h2 id="build-confirmation-title">Build tower?</h2>
+        <p id="build-confirmation-detail"></p>
+        <div class="confirmation-actions">
+          <button id="cancel-build" class="secondary" type="button">Cancel</button>
+          <button id="confirm-build" type="button">Build tower</button>
+        </div>
+      </dialog>
+
       <section id="command-dock" class="command-dock" aria-label="Build and wave controls">
         <div id="wave-briefing-panel" class="wave-briefing" aria-live="polite">
           <span class="palette-label">Incoming threat</span>

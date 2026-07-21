@@ -72,6 +72,11 @@ const outcomeTitle = requiredElement<HTMLElement>("outcome-title");
 const outcomeSummary = requiredElement<HTMLElement>("outcome-summary");
 const outcomePrimaryButton = requiredElement<HTMLButtonElement>("outcome-primary");
 const changeMissionButton = requiredElement<HTMLButtonElement>("change-mission");
+const buildConfirmation = requiredElement<HTMLDialogElement>("build-confirmation");
+const buildConfirmationTitle = requiredElement<HTMLElement>("build-confirmation-title");
+const buildConfirmationDetail = requiredElement<HTMLElement>("build-confirmation-detail");
+const confirmBuildButton = requiredElement<HTMLButtonElement>("confirm-build");
+const cancelBuildButton = requiredElement<HTMLButtonElement>("cancel-build");
 const context = canvas.getContext("2d");
 
 if (!context) throw new Error("Canvas 2D is unavailable in this browser.");
@@ -104,16 +109,18 @@ let audioSettings = loadAudioSettings(window.localStorage);
 let tutorialOpenedManually = false;
 let missionSetupVisible = true;
 let outcomeDismissed = false;
+let pendingPlacement: { readonly cell: Cell; readonly kind: TowerKind } | undefined;
 const audio = new GameAudio(audioSettings);
 glossary.replaceChildren(...GLOSSARY_ENTRIES.flatMap(([term, description]) => [createGlossaryTerm(term), createGlossaryDescription(description)]));
 tutorialPanel.hidden = !shouldShowTutorial(window.localStorage);
 const pointer = new PointerInput(canvas);
 
 pointer.onPointerDown((point) => {
+  if (pendingPlacement) return;
   const cell = cellAt(point.x, point.y);
   const tower = towerAtCell(state, cell);
   if (tower) inspectedTowerId = tower.id;
-  else if (placeTower(state, cell, selectedTower)) { replayActions.push({ step: state.step, type: "place", cell, kind: selectedTower }); audio.play("placement"); }
+  else requestTowerPlacement(cell);
   updateHud();
 });
 
@@ -138,7 +145,7 @@ canvas.addEventListener("keydown", (event) => {
   if (event.key === "Enter" || event.key === " ") {
     const tower = towerAtCell(state, keyboardCursor);
     if (tower) inspectedTowerId = tower.id;
-    else placeTower(state, keyboardCursor, selectedTower);
+    else requestTowerPlacement(keyboardCursor);
     keyboardCursorActive = true;
     event.preventDefault();
     updateHud();
@@ -258,6 +265,25 @@ outcomePrimaryButton.addEventListener("click", () => {
 changeMissionButton.addEventListener("click", () => {
   missionSetupVisible = true;
   outcomeDismissed = true;
+  updateHud();
+});
+confirmBuildButton.addEventListener("click", () => {
+  const placement = pendingPlacement;
+  if (!placement) return;
+  if (placeTower(state, placement.cell, placement.kind)) {
+    replayActions.push({ step: state.step, type: "place", cell: placement.cell, kind: placement.kind });
+    audio.play("placement");
+  }
+  closeBuildConfirmation();
+  updateHud();
+});
+cancelBuildButton.addEventListener("click", () => {
+  state.message = "Build cancelled. Choose another grass tile when ready.";
+  closeBuildConfirmation();
+  updateHud();
+});
+buildConfirmation.addEventListener("close", () => {
+  pendingPlacement = undefined;
   updateHud();
 });
 upgradeTowerButton.addEventListener("click", () => {
@@ -411,7 +437,27 @@ function startNewDefense(): void {
 }
 
 function isInterfacePaused(): boolean {
-  return state.waveActive && (gameMenu.open || tutorialOpenedManually);
+  return state.waveActive && (gameMenu.open || tutorialOpenedManually || buildConfirmation.open);
+}
+
+function requestTowerPlacement(cell: Cell): void {
+  const status = placementStatus(state, cell, selectedTower);
+  if (status !== "valid") {
+    placeTower(state, cell, selectedTower);
+    return;
+  }
+  const definition = TOWER_DEFINITIONS[selectedTower];
+  pendingPlacement = { cell: { ...cell }, kind: selectedTower };
+  buildConfirmationTitle.textContent = `Build ${definition.displayName}?`;
+  buildConfirmationDetail.textContent = `Spend ${definition.cost} gold to place it on tile ${cell.column + 1}, ${cell.row + 1}. You can still cancel without spending gold.`;
+  if (typeof buildConfirmation.showModal === "function") buildConfirmation.showModal();
+  else buildConfirmation.setAttribute("open", "");
+}
+
+function closeBuildConfirmation(): void {
+  pendingPlacement = undefined;
+  if (buildConfirmation.open && typeof buildConfirmation.close === "function") buildConfirmation.close();
+  else buildConfirmation.removeAttribute("open");
 }
 
 function updateMissionControls(): void {
