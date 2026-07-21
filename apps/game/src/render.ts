@@ -32,6 +32,7 @@ function drawPlacementPreview(context: CanvasRenderingContext2D, preview: Placem
   context.arc(center.x, center.y, TOWER_DEFINITIONS[preview.kind].range, 0, Math.PI * 2);
   context.stroke();
   context.restore();
+  if (isValid) drawTower(context, preview.kind, center);
 }
 
 function drawBoard(context: CanvasRenderingContext2D, state: GameState): void {
@@ -67,34 +68,35 @@ function drawBoard(context: CanvasRenderingContext2D, state: GameState): void {
 
 function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
   for (const tower of state.towers) {
-    const position = towerPosition(tower);
-    context.fillStyle = "rgba(16, 25, 30, 0.28)";
+    drawTower(context, tower.kind, towerPosition(tower), tower.level);
+  }
+}
+
+function drawTower(context: CanvasRenderingContext2D, kind: TowerKind, position: Point, level?: number): void {
+  context.save();
+  if (level === undefined) context.globalAlpha = 0.5;
+  context.fillStyle = "rgba(16, 25, 30, 0.28)";
+  context.beginPath();
+  context.ellipse(position.x + 4, position.y + 17, 19, 7, 0, 0, Math.PI * 2);
+  context.fill();
+  if (kind === "archer") {
+    context.fillStyle = "#594136";
+    context.fillRect(position.x - 15, position.y - 15, 30, 30);
+    context.fillStyle = "#d8d1b5";
+    context.fillRect(position.x - 7, position.y - 23, 14, 18);
+    context.fillStyle = "#2d3944";
+    context.fillRect(position.x - 3, position.y - 35, 6, 18);
+  } else if (kind === "sentinel") {
+    context.fillStyle = "#31515a";
+    context.fillRect(position.x - 15, position.y - 15, 30, 30);
+    context.strokeStyle = "#c3ffc0";
+    context.lineWidth = 3;
     context.beginPath();
-    context.ellipse(position.x + 4, position.y + 17, 19, 7, 0, 0, Math.PI * 2);
-    context.fill();
-    if (tower.kind === "archer") {
-      context.fillStyle = "#594136";
-      context.fillRect(position.x - 15, position.y - 15, 30, 30);
-      context.fillStyle = "#d8d1b5";
-      context.fillRect(position.x - 7, position.y - 23, 14, 18);
-      context.fillStyle = "#2d3944";
-      context.fillRect(position.x - 3, position.y - 35, 6, 18);
-      drawTowerLevel(context, tower.level, position);
-      continue;
-    }
-    if (tower.kind === "sentinel") {
-      context.fillStyle = "#31515a";
-      context.fillRect(position.x - 15, position.y - 15, 30, 30);
-      context.strokeStyle = "#c3ffc0";
-      context.lineWidth = 3;
-      context.beginPath();
-      context.arc(position.x, position.y - 8, 11, 0, Math.PI * 2);
-      context.stroke();
-      context.fillStyle = "#c3ffc0";
-      context.fillRect(position.x - 3, position.y - 11, 6, 6);
-      drawTowerLevel(context, tower.level, position);
-      continue;
-    }
+    context.arc(position.x, position.y - 8, 11, 0, Math.PI * 2);
+    context.stroke();
+    context.fillStyle = "#c3ffc0";
+    context.fillRect(position.x - 3, position.y - 11, 6, 6);
+  } else {
     context.fillStyle = "#303654";
     context.fillRect(position.x - 15, position.y - 15, 30, 30);
     context.fillStyle = "#7de0eb";
@@ -106,8 +108,9 @@ function drawTowers(context: CanvasRenderingContext2D, state: GameState): void {
     context.fill();
     context.fillStyle = "#c9f8ff";
     context.fillRect(position.x - 4, position.y - 6, 8, 8);
-    drawTowerLevel(context, tower.level, position);
   }
+  if (level !== undefined) drawTowerLevel(context, level, position);
+  context.restore();
 }
 
 function drawTowerLevel(context: CanvasRenderingContext2D, level: number, position: Point): void {
