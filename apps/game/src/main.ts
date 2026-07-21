@@ -45,7 +45,12 @@ const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
 const message = requiredElement<HTMLElement>("message");
 const waveBriefing = requiredElement<HTMLElement>("wave-briefing");
-const placementMessage = requiredElement<HTMLElement>("placement-message");
+const missionContext = requiredElement<HTMLElement>("mission-context");
+const selectedTowerSummary = requiredElement<HTMLElement>("selected-tower-summary");
+const archerDetail = requiredElement<HTMLElement>("archer-detail");
+const mageDetail = requiredElement<HTMLElement>("mage-detail");
+const sentinelDetail = requiredElement<HTMLElement>("sentinel-detail");
+const crossroadsUnlockCopy = requiredElement<HTMLElement>("crossroads-unlock-copy");
 const developerOverlay = requiredElement<HTMLElement>("developer-overlay");
 const developerOverlayText = requiredElement<HTMLElement>("developer-overlay-text");
 const towerInspector = requiredElement<HTMLElement>("tower-inspector");
@@ -60,6 +65,13 @@ const setupPanel = requiredElement<HTMLElement>("setup-panel");
 const towerPalette = requiredElement<HTMLElement>("tower-palette");
 const waveBriefingPanel = requiredElement<HTMLElement>("wave-briefing-panel");
 const gameMenu = requiredElement<HTMLDetailsElement>("game-menu");
+const commandDock = requiredElement<HTMLElement>("command-dock");
+const outcomePanel = requiredElement<HTMLElement>("outcome-panel");
+const outcomeKicker = requiredElement<HTMLElement>("outcome-kicker");
+const outcomeTitle = requiredElement<HTMLElement>("outcome-title");
+const outcomeSummary = requiredElement<HTMLElement>("outcome-summary");
+const outcomePrimaryButton = requiredElement<HTMLButtonElement>("outcome-primary");
+const changeMissionButton = requiredElement<HTMLButtonElement>("change-mission");
 const context = canvas.getContext("2d");
 
 if (!context) throw new Error("Canvas 2D is unavailable in this browser.");
@@ -76,7 +88,7 @@ try {
 const initialSeed = 4_242;
 let selectedMap: MapId = "gate";
 let selectedDifficulty: DifficultyId = "standard";
-let selectedCampaignNodeId = "gate-watch";
+let selectedCampaignNodeId: string | undefined = "gate-watch";
 let profile = loadProfile(window.localStorage);
 let recordedCampaignVictory: string | undefined;
 let state = createGame(initialSeed, selectedMap, selectedDifficulty);
@@ -90,6 +102,8 @@ let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
 let replayActions: ReplayAction[] = [];
 let audioSettings = loadAudioSettings(window.localStorage);
 let tutorialOpenedManually = false;
+let missionSetupVisible = true;
+let outcomeDismissed = false;
 const audio = new GameAudio(audioSettings);
 glossary.replaceChildren(...GLOSSARY_ENTRIES.flatMap(([term, description]) => [createGlossaryTerm(term), createGlossaryDescription(description)]));
 tutorialPanel.hidden = !shouldShowTutorial(window.localStorage);
@@ -106,7 +120,7 @@ pointer.onPointerDown((point) => {
 pointer.onPointerMove((point) => {
   hoveredCell = cellAt(point.x, point.y);
   keyboardCursorActive = false;
-  updatePlacementMessage();
+  updateHud();
 });
 
 canvas.addEventListener("keydown", (event) => {
@@ -132,14 +146,18 @@ canvas.addEventListener("keydown", (event) => {
 });
 
 startWaveButton.addEventListener("click", () => {
-  if (startWave(state)) { replayActions.push({ step: state.step, type: "start-wave" }); audio.play("wave"); }
+  if (startWave(state)) {
+    replayActions.push({ step: state.step, type: "start-wave" });
+    missionSetupVisible = false;
+    audio.play("wave");
+  }
   closeGameMenu();
   updateHud();
 });
 
 restartButton.addEventListener("click", () => {
-  state = createGame(initialSeed, selectedMap, selectedDifficulty);
-  inspectedTowerId = undefined;
+  if (!window.confirm("Restart this run? Your current towers and wave progress will be lost.")) return;
+  startNewDefense();
   closeGameMenu();
   updateHud();
 });
@@ -156,6 +174,9 @@ loadButton.addEventListener("click", () => {
     state = result.state;
     selectedMap = state.mapId;
     selectedDifficulty = state.difficultyId;
+    selectedCampaignNodeId = undefined;
+    missionSetupVisible = false;
+    outcomeDismissed = false;
     inspectedTowerId = undefined;
     gateButton.setAttribute("aria-pressed", String(selectedMap === "gate"));
     crossroadsButton.setAttribute("aria-pressed", String(selectedMap === "crossroads"));
@@ -226,6 +247,19 @@ resetProfileButton.addEventListener("click", () => {
   state.message = "Campaign progress reset.";
   updateHud();
 });
+outcomePrimaryButton.addEventListener("click", () => {
+  if (state.gameWon && selectedCampaignNodeId === "gate-watch" && isCampaignNodeUnlocked(profile, "crossroads-stand")) {
+    selectCampaignNode("crossroads-stand");
+    return;
+  }
+  startNewDefense();
+  updateHud();
+});
+changeMissionButton.addEventListener("click", () => {
+  missionSetupVisible = true;
+  outcomeDismissed = true;
+  updateHud();
+});
 upgradeTowerButton.addEventListener("click", () => {
   if (inspectedTowerId) upgradeTower(state, inspectedTowerId);
   updateHud();
@@ -242,7 +276,9 @@ specialiseTowerButton.addEventListener("click", () => {
 const engine = new Engine({
   fixedDeltaSeconds: 1 / 60,
   diagnostics,
-  update: (deltaSeconds) => updateGame(state, deltaSeconds),
+  update: (deltaSeconds) => {
+    if (!isInterfacePaused()) updateGame(state, deltaSeconds);
+  },
   render: () => {
     renderGame(context, state, placementPreview(), reducedMotion);
     updateHud();
@@ -265,32 +301,33 @@ function selectTower(kind: TowerKind): void {
   archerButton.classList.toggle("selected", kind === "archer");
   mageButton.classList.toggle("selected", kind === "mage");
   sentinelButton.classList.toggle("selected", kind === "sentinel");
-  state.message = `${TOWER_DEFINITIONS[kind].displayName} selected. Click grass to place it.`;
+  state.message = `${TOWER_DEFINITIONS[kind].displayName} selected. Choose a grass tile.`;
   updateHud();
 }
 
 function selectMap(mapId: MapId): void {
   if (!canConfigureScenario()) return;
   selectedMap = mapId;
-  state = createGame(initialSeed, selectedMap, selectedDifficulty);
-  inspectedTowerId = undefined;
+  selectedCampaignNodeId = undefined;
+  startNewDefense();
   gateButton.setAttribute("aria-pressed", String(mapId === "gate"));
   crossroadsButton.setAttribute("aria-pressed", String(mapId === "crossroads"));
   gateButton.classList.toggle("selected", mapId === "gate");
   crossroadsButton.classList.toggle("selected", mapId === "crossroads");
-  state.message = `${MAP_DEFINITIONS[mapId].displayName} selected. Prepare your defense.`;
+  state.message = `${MAP_DEFINITIONS[mapId].displayName} custom game selected.`;
   updateHud();
 }
 
 function selectDifficulty(difficultyId: DifficultyId): void {
   if (!canConfigureScenario()) return;
   selectedDifficulty = difficultyId;
-  state = createGame(initialSeed, selectedMap, selectedDifficulty);
+  selectedCampaignNodeId = undefined;
+  startNewDefense();
   for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
     button.setAttribute("aria-pressed", String(id === difficultyId));
     button.classList.toggle("selected", id === difficultyId);
   }
-  state.message = `${DIFFICULTY_DEFINITIONS[difficultyId].displayName} difficulty selected.`;
+  state.message = `${DIFFICULTY_DEFINITIONS[difficultyId].displayName} custom difficulty selected.`;
   updateHud();
 }
 
@@ -301,7 +338,7 @@ function selectCampaignNode(nodeId: string): void {
   selectedCampaignNodeId = node.id;
   selectedMap = node.mapId;
   selectedDifficulty = node.difficultyId;
-  state = createGame(initialSeed, selectedMap, selectedDifficulty);
+  startNewDefense();
   gateWatchButton.setAttribute("aria-pressed", String(node.id === "gate-watch"));
   crossroadsStandButton.setAttribute("aria-pressed", String(node.id === "crossroads-stand"));
   gateWatchButton.classList.toggle("selected", node.id === "gate-watch");
@@ -317,7 +354,7 @@ function placementPreview() {
 }
 
 function updateHud(): void {
-  if (state.gameWon && recordedCampaignVictory !== selectedCampaignNodeId) {
+  if (state.gameWon && selectedCampaignNodeId && recordedCampaignVictory !== selectedCampaignNodeId) {
     profile = completeCampaignNode(profile, selectedCampaignNodeId);
     saveProfile(window.localStorage, profile);
     recordedCampaignVictory = selectedCampaignNodeId;
@@ -325,37 +362,118 @@ function updateHud(): void {
   gold.textContent = String(state.gold);
   lives.textContent = String(state.lives);
   wave.textContent = `${state.wave}/${TOTAL_WAVES}`;
-  message.textContent = state.message;
   waveBriefing.textContent = nextWaveBriefing(state);
-  const showScenarioSetup = canConfigureScenario();
-  setupPanel.hidden = !showScenarioSetup;
-  tutorialPanel.hidden = !showScenarioSetup && !tutorialOpenedManually;
-  towerPalette.hidden = state.gameOver || state.gameWon;
-  waveBriefingPanel.hidden = state.waveActive || state.gameOver || state.gameWon;
-  startWaveButton.hidden = state.waveActive || state.gameOver || state.gameWon;
-  startWaveButton.disabled = state.waveActive || state.gameOver || state.gameWon;
+  const gameEnded = state.gameOver || state.gameWon;
+  setupPanel.hidden = !missionSetupVisible;
+  tutorialPanel.hidden = !missionSetupVisible && !tutorialOpenedManually;
+  outcomePanel.hidden = !gameEnded || outcomeDismissed;
+  commandDock.hidden = gameEnded;
+  towerPalette.hidden = gameEnded;
+  waveBriefingPanel.hidden = state.waveActive || gameEnded;
+  startWaveButton.hidden = state.waveActive || gameEnded;
+  startWaveButton.disabled = state.waveActive || gameEnded;
   saveButton.disabled = state.phase !== "intermission";
-  gateButton.disabled = !showScenarioSetup;
-  crossroadsButton.disabled = !showScenarioSetup;
-  casualButton.disabled = !showScenarioSetup;
-  standardButton.disabled = !showScenarioSetup;
-  veteranButton.disabled = !showScenarioSetup;
-  gateWatchButton.disabled = !showScenarioSetup;
-  crossroadsStandButton.disabled = !showScenarioSetup || !isCampaignNodeUnlocked(profile, "crossroads-stand");
-  resetProfileButton.disabled = !showScenarioSetup;
-  startWaveButton.textContent = state.waveActive ? "Wave underway" : state.gameWon || state.gameOver ? "Wave complete" : `Start wave ${state.wave + 1}`;
-  updatePlacementMessage();
+  gateButton.disabled = !missionSetupVisible;
+  crossroadsButton.disabled = !missionSetupVisible;
+  casualButton.disabled = !missionSetupVisible;
+  standardButton.disabled = !missionSetupVisible;
+  veteranButton.disabled = !missionSetupVisible;
+  gateWatchButton.disabled = !missionSetupVisible;
+  crossroadsStandButton.disabled = !missionSetupVisible || !isCampaignNodeUnlocked(profile, "crossroads-stand");
+  resetProfileButton.disabled = !missionSetupVisible;
+  startWaveButton.textContent = `Start wave ${state.wave + 1}`;
+  updateMissionControls();
+  updateTowerChoices();
+  message.textContent = contextualMessage();
+  updateOutcome();
   updateTowerInspector();
   updateDeveloperOverlay();
   updateAudioControls();
 }
 
 function canConfigureScenario(): boolean {
-  return (!state.waveActive && state.wave === 0) || state.gameOver || state.gameWon;
+  return missionSetupVisible || state.gameOver || state.gameWon;
 }
 
 function closeGameMenu(): void {
   gameMenu.open = false;
+}
+
+function startNewDefense(): void {
+  state = createGame(initialSeed, selectedMap, selectedDifficulty);
+  inspectedTowerId = undefined;
+  hoveredCell = undefined;
+  keyboardCursorActive = false;
+  replayActions = [];
+  recordedCampaignVictory = undefined;
+  missionSetupVisible = false;
+  outcomeDismissed = false;
+}
+
+function isInterfacePaused(): boolean {
+  return state.waveActive && (gameMenu.open || tutorialOpenedManually);
+}
+
+function updateMissionControls(): void {
+  const node = selectedCampaignNodeId ? CAMPAIGN_NODES.find((candidate) => candidate.id === selectedCampaignNodeId) : undefined;
+  missionContext.textContent = node ? `${node.displayName} · ${DIFFICULTY_DEFINITIONS[state.difficultyId].displayName}` : `${MAP_DEFINITIONS[state.mapId].displayName} · ${DIFFICULTY_DEFINITIONS[state.difficultyId].displayName}`;
+  gateWatchButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "gate-watch"));
+  crossroadsStandButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "crossroads-stand"));
+  gateWatchButton.classList.toggle("selected", selectedCampaignNodeId === "gate-watch");
+  crossroadsStandButton.classList.toggle("selected", selectedCampaignNodeId === "crossroads-stand");
+  gateButton.setAttribute("aria-pressed", String(state.mapId === "gate"));
+  crossroadsButton.setAttribute("aria-pressed", String(state.mapId === "crossroads"));
+  gateButton.classList.toggle("selected", state.mapId === "gate");
+  crossroadsButton.classList.toggle("selected", state.mapId === "crossroads");
+  for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
+    button.setAttribute("aria-pressed", String(state.difficultyId === id));
+    button.classList.toggle("selected", state.difficultyId === id);
+  }
+  crossroadsUnlockCopy.textContent = isCampaignNodeUnlocked(profile, "crossroads-stand") ? "Unlocked — defend the split approach." : "Clear Gate Watch to unlock.";
+}
+
+function updateTowerChoices(): void {
+  const details: Record<TowerKind, HTMLElement> = { archer: archerDetail, mage: mageDetail, sentinel: sentinelDetail };
+  const buttons: Record<TowerKind, HTMLButtonElement> = { archer: archerButton, mage: mageButton, sentinel: sentinelButton };
+  const roles: Record<TowerKind, string> = { archer: "reliable starter", mage: "crowd range", sentinel: "slows fast enemies" };
+  const definition = TOWER_DEFINITIONS[selectedTower];
+  selectedTowerSummary.textContent = `${definition.displayName} · ${definition.cost} gold · range ${Math.round(definition.range)}. ${roles[selectedTower]}. Tap grass to place.`;
+  for (const kind of Object.keys(TOWER_DEFINITIONS) as TowerKind[]) {
+    const tower = TOWER_DEFINITIONS[kind];
+    const shortfall = Math.max(0, tower.cost - state.gold);
+    details[kind].textContent = shortfall === 0 ? `${tower.cost} gold · ${roles[kind]}` : `Need ${shortfall} more gold`;
+    buttons[kind].classList.toggle("unaffordable", shortfall > 0);
+  }
+}
+
+function contextualMessage(): string {
+  const cell = keyboardCursorActive ? keyboardCursor : hoveredCell;
+  if (!cell) return state.message;
+  const status = placementStatus(state, cell, selectedTower);
+  if (status === "valid") return `${TOWER_DEFINITIONS[selectedTower].displayName} ready — tap grass to place.`;
+  const descriptions: Record<typeof status, string> = {
+    path: "Path tiles cannot hold towers.",
+    occupied: "That tile already has a tower — tap it to inspect.",
+    unaffordable: `Need ${TOWER_DEFINITIONS[selectedTower].cost - state.gold} more gold for ${TOWER_DEFINITIONS[selectedTower].displayName}.`,
+    ended: "This run has ended. Choose your next action above."
+  };
+  return descriptions[status];
+}
+
+function updateOutcome(): void {
+  if (!state.gameWon && !state.gameOver) return;
+  if (state.gameWon) {
+    const canAdvance = selectedCampaignNodeId === "gate-watch" && isCampaignNodeUnlocked(profile, "crossroads-stand");
+    outcomeKicker.textContent = canAdvance ? "Mission unlocked" : "Mission complete";
+    outcomeTitle.textContent = "Dungeon defended";
+    outcomeSummary.textContent = `You cleared all ${TOTAL_WAVES} waves with ${state.lives} lives remaining and built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}.`;
+    outcomePrimaryButton.textContent = canAdvance ? "Play Crossroads Stand" : "Play again";
+  } else {
+    outcomeKicker.textContent = "Run ended";
+    outcomeTitle.textContent = "The dungeon fell";
+    outcomeSummary.textContent = `You reached wave ${state.wave}/${TOTAL_WAVES}, built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}, and can try a new defense.`;
+    outcomePrimaryButton.textContent = "Try again";
+  }
 }
 
 function updateAudioControls(): void {
@@ -374,24 +492,6 @@ function updateDeveloperOverlay(): void {
     `events:\n${events}`,
     `telemetry:\n${telemetryReport(state)}`
   ].join("\n");
-}
-
-function updatePlacementMessage(): void {
-  const cell = keyboardCursorActive ? keyboardCursor : hoveredCell;
-  if (!cell) {
-    placementMessage.textContent = "";
-    return;
-  }
-  const status = placementStatus(state, cell, selectedTower);
-  const definition = TOWER_DEFINITIONS[selectedTower];
-  const descriptions: Record<typeof status, string> = {
-    valid: `${definition.displayName} ready: ${definition.cost} gold.`,
-    path: "Path tiles cannot hold towers.",
-    occupied: "This tile is occupied — click the tower to inspect it.",
-    unaffordable: `Need ${definition.cost} gold for ${definition.displayName}.`,
-    ended: "Restart to build a new defense."
-  };
-  placementMessage.textContent = descriptions[status];
 }
 
 function updateTowerInspector(): void {

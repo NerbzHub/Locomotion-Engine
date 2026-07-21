@@ -10,26 +10,44 @@
     <main class="game-shell">
       <header class="game-header">
         <div>
-          <p class="eyebrow">Locomotion Engine · Gate 1</p>
+          <p id="mission-context" class="eyebrow">Gate Watch · Standard</p>
           <h1>Dungeon Defense</h1>
         </div>
         <div class="header-controls">
-          <button id="start-wave" type="button">Start wave</button>
+          <section class="hud" aria-label="Current resources" aria-live="polite">
+            <span>Gold <strong id="gold">50</strong></span>
+            <span>Lives <strong id="lives">10</strong></span>
+            <span>Wave <strong id="wave">0/3</strong></span>
+          </section>
           <details id="game-menu" class="game-menu">
             <summary>Menu</summary>
             <div class="menu-panel">
-              <div class="menu-actions">
-                <button id="save-game" class="secondary" type="button">Save game</button>
-                <button id="load-game" class="secondary" type="button">Load game</button>
-                <button id="toggle-motion" class="secondary" type="button" aria-pressed="false">Motion: full</button>
-                <button id="toggle-audio" class="secondary" type="button" aria-pressed="false">Audio: on</button>
-                <button id="open-help" class="secondary" type="button">How to play</button>
-                <button id="export-replay" class="secondary" type="button">Export replay</button>
-                <button id="import-replay" class="secondary" type="button">Import replay</button>
-                <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
-                <button id="restart-game" class="secondary" type="button">New defense</button>
+              <p class="menu-note">Combat pauses while this menu is open.</p>
+              <div class="menu-group">
+                <span class="menu-label">Game</span>
+                <div class="menu-actions">
+                  <button id="save-game" class="secondary" type="button">Save game</button>
+                  <button id="load-game" class="secondary" type="button">Load game</button>
+                  <button id="open-help" class="secondary" type="button">How to play</button>
+                </div>
               </div>
-              <label class="audio-settings">Volume <input id="audio-volume" type="range" min="0" max="1" step="0.05" value="0.35"></label>
+              <details class="menu-group">
+                <summary>Settings</summary>
+                <div class="menu-actions settings-actions">
+                  <button id="toggle-motion" class="secondary" type="button" aria-pressed="false">Motion: full</button>
+                  <button id="toggle-audio" class="secondary" type="button" aria-pressed="false">Audio: on</button>
+                </div>
+                <label class="audio-settings">Volume <input id="audio-volume" type="range" min="0" max="1" step="0.05" value="0.35"></label>
+              </details>
+              <details class="menu-group developer-tools">
+                <summary>Developer tools</summary>
+                <div class="menu-actions">
+                  <button id="export-replay" class="secondary" type="button">Export replay</button>
+                  <button id="import-replay" class="secondary" type="button">Import replay</button>
+                  <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
+                </div>
+              </details>
+              <button id="restart-game" class="danger" type="button">Restart run…</button>
             </div>
           </details>
         </div>
@@ -37,66 +55,52 @@
 
       <section id="tutorial-panel" class="tutorial-panel" hidden aria-label="Dungeon Defense tutorial">
         <details>
-          <summary>New here? Learn how to play</summary>
-          <ol><li>Choose a tower and place it on grass.</li><li>Read the next-wave briefing, then start when ready.</li><li>Click a tower to upgrade it, change targeting, or choose a specialisation.</li><li>Use the campaign menu to revisit completed scenarios.</li></ol>
+          <summary>How to play</summary>
+          <ol><li>Choose a tower in the command dock, then place it on grass.</li><li>Read the incoming threat and start when ready.</li><li>Click a tower to upgrade it or set its target priority.</li></ol>
           <details><summary>Mechanics glossary</summary><dl id="glossary"></dl></details>
           <button id="dismiss-tutorial" class="secondary" type="button">Got it</button>
         </details>
       </section>
 
-      <section id="setup-panel" class="setup-panel" aria-label="Mission setup">
-        <div class="setup-heading"><span class="palette-label">Mission setup</span><p>Choose a scenario, then build your first defence.</p></div>
-        <section class="map-palette" aria-label="Map selection">
-          <span class="palette-label">Map</span>
-          <button id="select-gate" class="map-choice selected" type="button" aria-pressed="true">Dungeon Gate</button>
-          <button id="select-crossroads" class="map-choice" type="button" aria-pressed="false">Crossroads</button>
-        </section>
-
-        <section class="map-palette" aria-label="Difficulty selection">
-          <span class="palette-label">Difficulty</span>
-          <button id="select-casual" class="map-choice" type="button" aria-pressed="false">Casual</button>
-          <button id="select-standard" class="map-choice selected" type="button" aria-pressed="true">Standard</button>
-          <button id="select-veteran" class="map-choice" type="button" aria-pressed="false">Veteran</button>
-        </section>
-
-        <section class="map-palette" aria-label="Campaign selection">
-          <span class="palette-label">Campaign</span>
-          <button id="campaign-gate-watch" class="map-choice selected" type="button" aria-pressed="true">Gate Watch</button>
-          <button id="campaign-crossroads-stand" class="map-choice" type="button" aria-pressed="false">Crossroads Stand</button>
-          <button id="reset-profile" class="map-choice" type="button">Reset progress</button>
-        </section>
+      <section id="setup-panel" class="setup-panel" aria-label="Choose a mission">
+        <div class="setup-heading"><span class="palette-label">Choose a mission</span><p>Start with Gate Watch, then unlock the next stand.</p></div>
+        <div class="mission-cards">
+          <button id="campaign-gate-watch" class="mission-card selected" type="button" aria-pressed="true">
+            <span class="mission-card-kicker">Mission 1</span><strong>Gate Watch</strong><span>Dungeon Gate · Standard</span><small>Hold the original dungeon gate.</small>
+          </button>
+          <button id="campaign-crossroads-stand" class="mission-card" type="button" aria-pressed="false">
+            <span class="mission-card-kicker">Mission 2</span><strong>Crossroads Stand</strong><span>Crossroads · Standard</span><small id="crossroads-unlock-copy">Clear Gate Watch to unlock.</small>
+          </button>
+        </div>
+        <details class="custom-mission">
+          <summary>Custom game options</summary>
+          <p>Choose a map and difficulty outside the campaign path.</p>
+          <section class="map-palette" aria-label="Map selection">
+            <span class="palette-label">Map</span>
+            <button id="select-gate" class="map-choice selected" type="button" aria-pressed="true">Dungeon Gate</button>
+            <button id="select-crossroads" class="map-choice" type="button" aria-pressed="false">Crossroads</button>
+          </section>
+          <section class="map-palette" aria-label="Difficulty selection">
+            <span class="palette-label">Difficulty</span>
+            <button id="select-casual" class="map-choice" type="button" aria-pressed="false">Casual</button>
+            <button id="select-standard" class="map-choice selected" type="button" aria-pressed="true">Standard</button>
+            <button id="select-veteran" class="map-choice" type="button" aria-pressed="false">Veteran</button>
+          </section>
+        </details>
+        <button id="reset-profile" class="text-button" type="button">Reset campaign progress</button>
       </section>
 
-      <section id="tower-palette" class="tower-palette" aria-label="Tower selection">
-        <span class="palette-label">Build</span>
-        <button id="select-archer" class="tower-choice selected" type="button" aria-pressed="true">
-          <strong>Archer</strong><span>25 gold · fast shots</span>
-        </button>
-        <button id="select-mage" class="tower-choice" type="button" aria-pressed="false">
-          <strong>Mage</strong><span>35 gold · long range</span>
-        </button>
-        <button id="select-sentinel" class="tower-choice" type="button" aria-pressed="false">
-          <strong>Sentinel</strong><span>40 gold · slows enemies</span>
-        </button>
-      </section>
-
-      <section id="wave-briefing-panel" class="wave-briefing" aria-live="polite">
-        <span class="palette-label">Intermission</span>
-        <strong id="wave-briefing"></strong>
-      </section>
-
-      <section class="hud" aria-live="polite">
-        <span>Gold <strong id="gold">50</strong></span>
-        <span>Lives <strong id="lives">10</strong></span>
-        <span>Wave <strong id="wave">0/3</strong></span>
+      <section id="outcome-panel" class="outcome-panel" hidden aria-live="polite">
+        <span id="outcome-kicker" class="palette-label">Mission complete</span>
+        <h2 id="outcome-title"></h2>
+        <p id="outcome-summary"></p>
+        <div class="outcome-actions">
+          <button id="outcome-primary" type="button"></button>
+          <button id="change-mission" class="secondary" type="button">Change mission</button>
+        </div>
       </section>
 
       <canvas id="game-canvas" width="768" height="512" tabindex="0" aria-label="Dungeon Defense game board. Use arrow keys to move the board cursor, then Enter to build or inspect."></canvas>
-
-      <section class="context-message" aria-live="polite">
-        <span id="message">Click a grass tile to place an archer tower (25 gold).</span>
-        <span id="placement-message" class="placement-message"></span>
-      </section>
 
       <section id="tower-inspector" class="tower-inspector" hidden aria-live="polite">
         <div><span class="palette-label">Selected tower</span><strong id="tower-name"></strong></div>
@@ -112,6 +116,28 @@
         <pre id="developer-overlay-text"></pre>
       </section>
 
+      <section id="command-dock" class="command-dock" aria-label="Build and wave controls">
+        <div id="wave-briefing-panel" class="wave-briefing" aria-live="polite">
+          <span class="palette-label">Incoming threat</span>
+          <strong id="wave-briefing"></strong>
+        </div>
+        <div id="tower-palette" class="tower-palette" aria-label="Tower selection">
+          <button id="select-archer" class="tower-choice selected" type="button" aria-pressed="true">
+            <strong>Archer</strong><span id="archer-detail">25 gold · reliable starter</span>
+          </button>
+          <button id="select-mage" class="tower-choice" type="button" aria-pressed="false">
+            <strong>Mage</strong><span id="mage-detail">35 gold · crowd range</span>
+          </button>
+          <button id="select-sentinel" class="tower-choice" type="button" aria-pressed="false">
+            <strong>Sentinel</strong><span id="sentinel-detail">40 gold · slows fast enemies</span>
+          </button>
+        </div>
+        <div class="command-action">
+          <p id="selected-tower-summary">Archer · 25 gold · reliable starter. Tap grass to place.</p>
+          <button id="start-wave" type="button">Start wave 1</button>
+        </div>
+        <p id="message" class="context-message" aria-live="polite">Choose a tower, then tap grass to place it.</p>
+      </section>
     </main>
     <script type="module" src="/apps/game/src/main.ts"></script>
   </body>
