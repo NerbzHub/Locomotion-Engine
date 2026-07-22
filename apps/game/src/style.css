@@ -31,15 +31,16 @@ button.danger:hover { background: #955045; }
 
 .game-shell { width: min(100% - 2rem, 900px); margin: 1rem auto 2rem; }
 .game-shell::before { content: ""; position: fixed; z-index: -1; inset: 0; opacity: 0.22; background-image: radial-gradient(circle at 20% 15%, #405b57 0, transparent 32%), radial-gradient(circle at 80% 85%, #303654 0, transparent 30%); }
-.game-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; }
+.game-header { margin-bottom: 0.75rem; }
 .eyebrow, .palette-label, .menu-label { color: #91c4b4; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; }
 .eyebrow { margin: 0; }
 h1 { margin: 0.1rem 0 0; font-size: clamp(1.75rem, 5vw, 2.5rem); }
 h2 { margin: 0; color: #fff9dd; font-size: clamp(1.5rem, 4vw, 2rem); }
 
-.header-controls { display: flex; align-items: center; gap: 0.65rem; }
-.hud { display: flex; gap: 0.4rem; margin: 0; color: #c9dbcf; }
-.hud > span { padding: 0.35rem 0.55rem; border-radius: 0.4rem; background: #22343a; font-size: 0.85rem; white-space: nowrap; }
+.tactical-hud { position: absolute; z-index: 4; top: 0.7rem; right: 0.7rem; left: 0.7rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 0.65rem; pointer-events: none; }
+.tactical-hud > * { pointer-events: auto; }
+.hud { display: flex; gap: 0.35rem; margin: 0; color: #d8f3e8; }
+.hud > span { padding: 0.4rem 0.6rem; border: 1px solid rgba(255, 249, 221, 0.35); border-radius: 0.45rem; background: rgba(23, 33, 43, 0.92); box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28); font-size: 0.88rem; white-space: nowrap; }
 .hud strong { color: #fff9dd; }
 
 .game-menu { position: relative; }
@@ -56,8 +57,12 @@ h2 { margin: 0; color: #fff9dd; font-size: clamp(1.5rem, 4vw, 2rem); }
 .audio-settings { display: flex; align-items: center; gap: 0.5rem; margin: 0.65rem 0 0; color: #c9dbcf; font-size: 0.82rem; }
 .audio-settings input { accent-color: #e9c46a; }
 
-.tutorial-panel, .setup-panel, .outcome-panel { margin-bottom: 0.75rem; padding: 0.9rem; border: 1px solid #526f6a; border-radius: 0.65rem; color: #d8f3e8; background: #22343a; }
-.tutorial-panel[hidden], .setup-panel[hidden], .outcome-panel[hidden], .tower-inspector[hidden], .developer-overlay[hidden], .tower-palette[hidden], .wave-briefing[hidden], .command-action[hidden] { display: none; }
+.landing-panel, .tutorial-panel, .setup-panel, .outcome-panel { margin-bottom: 0.75rem; padding: 0.9rem; border: 1px solid #526f6a; border-radius: 0.65rem; color: #d8f3e8; background: #22343a; }
+.landing-panel { display: grid; min-height: min(58vh, 30rem); align-content: center; justify-items: start; gap: 0.85rem; padding: clamp(1.25rem, 6vw, 3rem); background: linear-gradient(145deg, rgba(49, 69, 75, 0.98), rgba(34, 52, 58, 0.98)); }
+.landing-panel h2 { max-width: 13ch; }
+.landing-panel p { max-width: 34rem; margin: 0; color: #c9dbcf; }
+.landing-panel button { margin-top: 0.35rem; }
+.tutorial-panel[hidden], .setup-panel[hidden], .outcome-panel[hidden], .landing-panel[hidden], .board-stage[hidden], .tactical-hud[hidden], .tower-inspector[hidden], .developer-overlay[hidden], .tower-palette[hidden], .wave-briefing[hidden], .command-action[hidden] { display: none; }
 .tutorial-panel summary, .custom-mission summary { color: #fff1b8; font-weight: 800; cursor: pointer; }
 .tutorial-panel ol { margin: 0.75rem 0; padding-left: 1.25rem; }
 .tutorial-panel dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.35rem 0.75rem; margin: 0.75rem 0 0; }
@@ -79,6 +84,9 @@ h2 { margin: 0; color: #fff9dd; font-size: clamp(1.5rem, 4vw, 2rem); }
 .mission-card:disabled { color: #8ca29a; background: #273b40; }
 .custom-mission { padding-top: 0.2rem; }
 .custom-mission[open] { display: grid; gap: 0.65rem; }
+.setup-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; }
+.setup-actions button:last-child { margin-left: auto; }
+.setup-summary { margin: -0.1rem 0 0; padding: 0.6rem 0.7rem; border-left: 3px solid #91c4b4; color: #d8f3e8; background: #273b40; font-size: 0.88rem; }
 .map-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
 .map-palette .palette-label { flex-basis: 100%; }
 .map-choice { min-height: 2.5rem; padding: 0.45rem 0.7rem; color: #c9dbcf; background: #31454b; font-size: 0.84rem; }
@@ -124,14 +132,18 @@ h2 { margin: 0; color: #fff9dd; font-size: clamp(1.5rem, 4vw, 2rem); }
 
 @media (max-width: 720px) {
   .game-shell { width: min(100% - 1rem, 900px); margin: 0 auto; padding-bottom: calc(8.75rem + env(safe-area-inset-bottom)); }
-  .game-header { position: sticky; z-index: 4; top: 0; align-items: flex-start; flex-direction: column; margin: 0; padding: 0.65rem 0 0.5rem; background: #17212b; }
-  .header-controls { width: 100%; justify-content: space-between; }
-  .hud { flex: 1; }
-  .hud > span { flex: 1; padding-inline: 0.25rem; text-align: center; }
-  .menu-panel { position: fixed; top: auto; right: 0.5rem; bottom: calc(0.5rem + env(safe-area-inset-bottom)); left: 0.5rem; width: auto; max-height: min(78vh, 38rem); overflow-y: auto; }
+  .game-header { margin: 0; padding: 0.65rem 0 0.5rem; }
+  .tactical-hud { top: 0.45rem; right: 0.45rem; left: 0.45rem; gap: 0.35rem; }
+  .hud { gap: 0.2rem; }
+  .hud > span { padding: 0.3rem 0.4rem; font-size: 0.76rem; }
+  .game-menu > summary { min-height: 2.25rem; padding: 0.45rem 0.6rem; font-size: 0.78rem; }
+  .menu-panel { position: fixed; z-index: 6; top: auto; right: 0.5rem; bottom: calc(0.5rem + env(safe-area-inset-bottom)); left: 0.5rem; width: auto; max-height: min(78vh, 38rem); overflow-y: auto; }
   .mission-cards { grid-template-columns: 1fr; }
   .mission-card { min-height: 6.8rem; }
   .setup-heading { align-items: flex-start; flex-direction: column; gap: 0.2rem; }
+  .setup-summary { font-size: 0.82rem; }
+  .setup-actions { display: grid; grid-template-columns: 1fr 1.5fr; }
+  .setup-actions button:last-child { margin-left: 0; }
   .map-choice { flex: 1 1 0; min-width: 0; padding-inline: 0.35rem; }
   .tower-inspector { align-items: stretch; }
   .tower-inspector button { margin-left: 0; }
@@ -150,7 +162,7 @@ h2 { margin: 0; color: #fff9dd; font-size: clamp(1.5rem, 4vw, 2rem); }
 
 @media (max-width: 390px) {
   h1 { font-size: 1.65rem; }
-  .hud > span { font-size: 0.76rem; }
+  .hud > span { padding-inline: 0.3rem; font-size: 0.68rem; }
   .menu-actions { grid-template-columns: 1fr; }
   .command-action p { font-size: 0.72rem; }
   .command-action button { min-width: 6.5rem; padding-inline: 0.55rem; font-size: 0.85rem; }

@@ -61,6 +61,27 @@ Ask testers to complete these tasks in order:
 If the tester gets stuck, ask them to write down where and why before giving
 help. The stuck moment is evidence.
 
+## Entry and HUD verification (LE-P03)
+
+Run these checks before the longer candidate script whenever the game-entry or
+tactical HUD changes. They are deliberately short so a first-time player can
+complete them without coaching.
+
+1. Open a fresh game. Confirm that the board, towers, Gold, Lives, Wave, and
+   Menu are not shown before choosing **Enter the dungeon**.
+2. Choose **Enter the dungeon**, change a mission or custom-game option, and
+   state what mission/difficulty is selected before pressing **Begin mission**.
+3. Begin the mission. Confirm that Gold, Lives, and Wave are visible at the
+   board's upper-left and Menu is visible at the upper-right without scrolling.
+4. Open Menu, change one setting, close it, and confirm that the board remains
+   visible and combat resumes only after the menu closes.
+5. Repeat steps 1–4 with keyboard-only input and once on a narrow or touch
+   viewport. Use **Back** from mission selection and confirm it returns to the
+   title without exposing an interactive board.
+
+Record the viewport size, input method, and any overlap, clipping, focus-loss,
+or unclear status wording. A failed check is release-blocking for LE-P03.
+
 ## Feedback questions
 
 Ask every tester these questions:

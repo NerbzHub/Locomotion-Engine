@@ -6,8 +6,10 @@
 merged into `main`. LE-S29 is prepared but not complete: the project uses an
 all-rights-reserved, no-licence policy recorded in the root `LICENSE.md`, and
 the release candidate must first incorporate the FI2/FI3 usability remediation
-branch below. The next active delivery work is therefore LE-P01, not LE-S29 or
-LE-S56. LE-S30 and every later numbered sprint remain planned.
+branch below. LE-P01 and LE-P02 are complete. LE-P03 implementation and
+automated verification are complete, with its documented first-time-player and
+device checks remaining before it can be closed; LE-S29 must not begin first.
+LE-S30 and every later numbered sprint remain planned.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -208,6 +210,8 @@ feature branches.
 
 ## LE-P01 — Intentional game entry (FI2)
 
+**Status: completed on 2026-07-22.**
+
 **Goal:** Ensure the player deliberately enters a mission before the tactical
 board can be seen or interacted with.
 
@@ -229,6 +233,8 @@ gameplay rules after a wave begins.
 
 ## LE-P02 — Persistent tactical HUD (FI3)
 
+**Status: completed on 2026-07-22.**
+
 **Goal:** Put the information required for immediate tactical decisions where
 it is visible at a glance throughout active board play.
 
@@ -249,6 +255,10 @@ secondary information that does not support the next player decision.
 **Depends on:** LE-P01, LE-S10, LE-S22, and LE-S27.
 
 ## LE-P03 — Entry and HUD hardening
+
+**Status: implementation complete on 2026-07-22; manual browser/device
+verification pending.** See the LE-P03 section in
+`docs/PLAYTESTER_CRITERIA.md`.
 
 **Goal:** Prove that the new game-entry and tactical-information contract is
 clear, accessible, and release-ready before external playtesting.
@@ -656,6 +666,9 @@ named release build without manual repair.
 **Depends on:** LE-S25 through LE-S27.
 
 ## LE-S29 — Playtest release candidate
+
+**Status: candidate preparation created on 2026-07-22; distribution blocked
+pending LE-P03 manual verification.** See `docs/PLAYTEST_CANDIDATE_RC1.md`.
 
 **Goal:** Collect focused external feedback against a stable, observable build.
 
