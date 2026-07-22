@@ -2,7 +2,7 @@ import "./style.css";
 import { Diagnostics, Engine, PointerInput } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
 import { renderGame } from "./render";
-import { CAMPAIGN_NODES, DIFFICULTY_DEFINITIONS, GAME_CONTENT, MAP_DEFINITIONS, TOWER_DEFINITIONS } from "./content";
+import { CAMPAIGN_NODES, DIFFICULTY_DEFINITIONS, GAME_CONTENT, TOWER_DEFINITIONS } from "./content";
 import type { DifficultyId, MapId, TowerKind } from "./content";
 import { assertValidGameContent } from "./content-validation";
 import { loadFromLocalStorage, saveToLocalStorage } from "./save";
@@ -34,8 +34,6 @@ const diagnosticsButton = requiredElement<HTMLButtonElement>("toggle-diagnostics
 const archerButton = requiredElement<HTMLButtonElement>("select-archer");
 const mageButton = requiredElement<HTMLButtonElement>("select-mage");
 const sentinelButton = requiredElement<HTMLButtonElement>("select-sentinel");
-const gateButton = requiredElement<HTMLButtonElement>("select-gate");
-const crossroadsButton = requiredElement<HTMLButtonElement>("select-crossroads");
 const casualButton = requiredElement<HTMLButtonElement>("select-casual");
 const standardButton = requiredElement<HTMLButtonElement>("select-standard");
 const veteranButton = requiredElement<HTMLButtonElement>("select-veteran");
@@ -46,15 +44,12 @@ const landingPanel = requiredElement<HTMLElement>("landing-panel");
 const enterDungeonButton = requiredElement<HTMLButtonElement>("enter-dungeon");
 const returnToTitleButton = requiredElement<HTMLButtonElement>("return-to-title");
 const beginMissionButton = requiredElement<HTMLButtonElement>("begin-mission");
-const missionSelectionSummary = requiredElement<HTMLElement>("mission-selection-summary");
 const headerControls = requiredElement<HTMLElement>("header-controls");
 const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
 const message = requiredElement<HTMLElement>("message");
 const waveBriefing = requiredElement<HTMLElement>("wave-briefing");
-const missionContext = requiredElement<HTMLElement>("mission-context");
-const selectedTowerSummary = requiredElement<HTMLElement>("selected-tower-summary");
 const archerDetail = requiredElement<HTMLElement>("archer-detail");
 const mageDetail = requiredElement<HTMLElement>("mage-detail");
 const sentinelDetail = requiredElement<HTMLElement>("sentinel-detail");
@@ -198,10 +193,6 @@ loadButton.addEventListener("click", () => {
     gameScreen = beginDefense();
     outcomeDismissed = false;
     inspectedTowerId = undefined;
-    gateButton.setAttribute("aria-pressed", String(selectedMap === "gate"));
-    crossroadsButton.setAttribute("aria-pressed", String(selectedMap === "crossroads"));
-    gateButton.classList.toggle("selected", selectedMap === "gate");
-    crossroadsButton.classList.toggle("selected", selectedMap === "crossroads");
   } else {
     state.message = result.message;
   }
@@ -254,8 +245,6 @@ diagnosticsButton.addEventListener("click", () => {
 archerButton.addEventListener("click", () => selectTower("archer"));
 mageButton.addEventListener("click", () => selectTower("mage"));
 sentinelButton.addEventListener("click", () => selectTower("sentinel"));
-gateButton.addEventListener("click", () => selectMap("gate"));
-crossroadsButton.addEventListener("click", () => selectMap("crossroads"));
 casualButton.addEventListener("click", () => selectDifficulty("casual"));
 standardButton.addEventListener("click", () => selectDifficulty("standard"));
 veteranButton.addEventListener("click", () => selectDifficulty("veteran"));
@@ -373,27 +362,14 @@ function selectTower(kind: TowerKind): void {
   updateHud();
 }
 
-function selectMap(mapId: MapId): void {
-  if (!canConfigureScenario()) return;
-  selectedMap = mapId;
-  selectedCampaignNodeId = undefined;
-  gateButton.setAttribute("aria-pressed", String(mapId === "gate"));
-  crossroadsButton.setAttribute("aria-pressed", String(mapId === "crossroads"));
-  gateButton.classList.toggle("selected", mapId === "gate");
-  crossroadsButton.classList.toggle("selected", mapId === "crossroads");
-  state.message = `${MAP_DEFINITIONS[mapId].displayName} custom game selected.`;
-  updateHud();
-}
-
 function selectDifficulty(difficultyId: DifficultyId): void {
   if (!canConfigureScenario()) return;
   selectedDifficulty = difficultyId;
-  selectedCampaignNodeId = undefined;
   for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
     button.setAttribute("aria-pressed", String(id === difficultyId));
     button.classList.toggle("selected", id === difficultyId);
   }
-  state.message = `${DIFFICULTY_DEFINITIONS[difficultyId].displayName} custom difficulty selected.`;
+  state.message = `${DIFFICULTY_DEFINITIONS[difficultyId].displayName} difficulty selected.`;
   updateHud();
 }
 
@@ -443,19 +419,16 @@ function updateHud(): void {
   startWaveButton.hidden = !defending || state.waveActive || gameEnded;
   startWaveButton.disabled = !defending || state.waveActive || gameEnded;
   saveButton.disabled = state.phase !== "intermission";
-  gateButton.disabled = gameScreen !== "mission-select";
-  crossroadsButton.disabled = gameScreen !== "mission-select";
   casualButton.disabled = gameScreen !== "mission-select";
   standardButton.disabled = gameScreen !== "mission-select";
   veteranButton.disabled = gameScreen !== "mission-select";
   gateWatchButton.disabled = gameScreen !== "mission-select";
   crossroadsStandButton.disabled = gameScreen !== "mission-select" || !isCampaignNodeUnlocked(profile, "crossroads-stand");
-  resetProfileButton.disabled = gameScreen !== "mission-select";
   startWaveButton.textContent = `Start wave ${state.wave + 1}`;
   updateMissionControls();
   updateTowerChoices();
   updateBuildConfirmationControls();
-  message.textContent = contextualMessage();
+  message.textContent = state.message;
   updateOutcome();
   updateTowerInspector();
   updateDeveloperOverlay();
@@ -522,19 +495,11 @@ function updateBuildConfirmationControls(): void {
 
 function updateMissionControls(): void {
   const node = selectedCampaignNodeId ? CAMPAIGN_NODES.find((candidate) => candidate.id === selectedCampaignNodeId) : undefined;
-  missionContext.textContent = node ? `${node.displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}` : `${MAP_DEFINITIONS[selectedMap].displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}`;
-  beginMissionButton.textContent = node ? `Begin ${node.displayName}` : `Begin ${MAP_DEFINITIONS[selectedMap].displayName}`;
-  missionSelectionSummary.textContent = node
-    ? `${node.displayName} selected · ${MAP_DEFINITIONS[selectedMap].displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}.`
-    : `Custom game selected · ${MAP_DEFINITIONS[selectedMap].displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}.`;
+  beginMissionButton.textContent = `Begin ${node?.displayName ?? "mission"}`;
   gateWatchButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "gate-watch"));
   crossroadsStandButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "crossroads-stand"));
   gateWatchButton.classList.toggle("selected", selectedCampaignNodeId === "gate-watch");
   crossroadsStandButton.classList.toggle("selected", selectedCampaignNodeId === "crossroads-stand");
-  gateButton.setAttribute("aria-pressed", String(selectedMap === "gate"));
-  crossroadsButton.setAttribute("aria-pressed", String(selectedMap === "crossroads"));
-  gateButton.classList.toggle("selected", selectedMap === "gate");
-  crossroadsButton.classList.toggle("selected", selectedMap === "crossroads");
   for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
     button.setAttribute("aria-pressed", String(selectedDifficulty === id));
     button.classList.toggle("selected", selectedDifficulty === id);
@@ -546,28 +511,12 @@ function updateTowerChoices(): void {
   const details: Record<TowerKind, HTMLElement> = { archer: archerDetail, mage: mageDetail, sentinel: sentinelDetail };
   const buttons: Record<TowerKind, HTMLButtonElement> = { archer: archerButton, mage: mageButton, sentinel: sentinelButton };
   const roles: Record<TowerKind, string> = { archer: "reliable starter", mage: "crowd range", sentinel: "slows fast enemies" };
-  const definition = TOWER_DEFINITIONS[selectedTower];
-  selectedTowerSummary.textContent = `${definition.displayName} · ${definition.cost} gold · range ${Math.round(definition.range)}. ${roles[selectedTower]}. Tap grass to place.`;
   for (const kind of Object.keys(TOWER_DEFINITIONS) as TowerKind[]) {
     const tower = TOWER_DEFINITIONS[kind];
     const shortfall = Math.max(0, tower.cost - state.gold);
     details[kind].textContent = shortfall === 0 ? `${tower.cost} gold · ${roles[kind]}` : `Need ${shortfall} more gold`;
     buttons[kind].classList.toggle("unaffordable", shortfall > 0);
   }
-}
-
-function contextualMessage(): string {
-  const cell = keyboardCursorActive ? keyboardCursor : hoveredCell;
-  if (!cell) return state.message;
-  const status = placementStatus(state, cell, selectedTower);
-  if (status === "valid") return `${TOWER_DEFINITIONS[selectedTower].displayName} ready — tap grass to place.`;
-  const descriptions: Record<typeof status, string> = {
-    path: "Path tiles cannot hold towers.",
-    occupied: "That tile already has a tower — tap it to inspect.",
-    unaffordable: `Need ${TOWER_DEFINITIONS[selectedTower].cost - state.gold} more gold for ${TOWER_DEFINITIONS[selectedTower].displayName}.`,
-    ended: "This run has ended. Choose your next action above."
-  };
-  return descriptions[status];
 }
 
 function updateOutcome(): void {
