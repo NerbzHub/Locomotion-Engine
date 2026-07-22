@@ -10,7 +10,6 @@
     <main class="game-shell">
       <header class="game-header">
         <div>
-          <p id="mission-context" class="eyebrow">Gate Watch · Standard</p>
           <h1>Dungeon Defense</h1>
         </div>
       </header>
@@ -32,36 +31,25 @@
       </section>
 
       <section id="setup-panel" class="setup-panel" aria-label="Choose a mission" hidden>
-        <div class="setup-heading"><span class="palette-label">Choose a mission</span><p>Start with Gate Watch, then unlock the next stand.</p></div>
+        <div class="setup-heading"><span class="palette-label">1. Select level</span></div>
         <div class="mission-cards">
           <button id="campaign-gate-watch" class="mission-card selected" type="button" aria-pressed="true">
-            <span class="mission-card-kicker">Mission 1</span><strong>Gate Watch</strong><span>Dungeon Gate · Standard</span><small>Hold the original dungeon gate.</small>
+            <span class="mission-card-kicker">Mission 1</span><strong>Gate Watch</strong><small>Hold the original dungeon gate.</small>
           </button>
           <button id="campaign-crossroads-stand" class="mission-card" type="button" aria-pressed="false">
-            <span class="mission-card-kicker">Mission 2</span><strong>Crossroads Stand</strong><span>Crossroads · Standard</span><small id="crossroads-unlock-copy">Clear Gate Watch to unlock.</small>
+            <span class="mission-card-kicker">Mission 2</span><strong>Crossroads Stand</strong><small id="crossroads-unlock-copy">Clear Gate Watch to unlock.</small>
           </button>
         </div>
-        <details class="custom-mission">
-          <summary>Custom game options</summary>
-          <p>Choose a map and difficulty outside the campaign path.</p>
-          <section class="map-palette" aria-label="Map selection">
-            <span class="palette-label">Map</span>
-            <button id="select-gate" class="map-choice selected" type="button" aria-pressed="true">Dungeon Gate</button>
-            <button id="select-crossroads" class="map-choice" type="button" aria-pressed="false">Crossroads</button>
-          </section>
-          <section class="map-palette" aria-label="Difficulty selection">
-            <span class="palette-label">Difficulty</span>
-            <button id="select-casual" class="map-choice" type="button" aria-pressed="false">Casual</button>
-            <button id="select-standard" class="map-choice selected" type="button" aria-pressed="true">Standard</button>
-            <button id="select-veteran" class="map-choice" type="button" aria-pressed="false">Veteran</button>
-          </section>
-        </details>
-        <p id="mission-selection-summary" class="setup-summary" role="status">Gate Watch selected · Dungeon Gate · Standard.</p>
+        <section class="difficulty-palette" aria-label="2. Select difficulty">
+          <span class="palette-label">2. Select difficulty</span>
+          <button id="select-casual" class="difficulty-choice" type="button" aria-pressed="false">Casual</button>
+          <button id="select-standard" class="difficulty-choice selected" type="button" aria-pressed="true">Standard</button>
+          <button id="select-veteran" class="difficulty-choice" type="button" aria-pressed="false">Veteran</button>
+        </section>
         <div class="setup-actions">
           <button id="return-to-title" class="secondary" type="button">Back</button>
-          <button id="begin-mission" type="button" aria-describedby="mission-selection-summary">Begin Gate Watch</button>
+          <button id="begin-mission" type="button">Begin Gate Watch</button>
         </div>
-        <button id="reset-profile" class="text-button" type="button">Reset campaign progress</button>
       </section>
 
       <section id="outcome-panel" class="outcome-panel" hidden aria-live="polite">
@@ -110,6 +98,12 @@
                   <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
                 </div>
               </details>
+              <details class="menu-group">
+                <summary>Campaign</summary>
+                <div class="menu-actions">
+                  <button id="reset-profile" class="secondary" type="button">Reset campaign progress</button>
+                </div>
+              </details>
               <button id="restart-game" class="danger" type="button">Restart run…</button>
             </div>
           </details>
@@ -151,10 +145,9 @@
           </button>
         </div>
         <div class="command-action">
-          <p id="selected-tower-summary">Archer · 25 gold · reliable starter. Tap grass to place.</p>
           <button id="start-wave" type="button">Start wave 1</button>
         </div>
-        <p id="message" class="context-message" aria-live="polite">Choose a tower, then tap grass to place it.</p>
+        <p id="message" class="sr-only" aria-live="polite">Choose a tower, then tap grass to place it.</p>
       </section>
     </main>
     <script type="module" src="/apps/game/src/main.ts"></script>
