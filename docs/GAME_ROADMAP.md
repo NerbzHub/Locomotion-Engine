@@ -667,6 +667,9 @@ named release build without manual repair.
 
 ## LE-S29 — Playtest release candidate
 
+**Status: candidate preparation created on 2026-07-22; distribution blocked
+pending LE-P03 manual verification.** See `docs/PLAYTEST_CANDIDATE_RC1.md`.
+
 **Goal:** Collect focused external feedback against a stable, observable build.
 
 **Deliverables:** a release-candidate build, a structured feedback form,
