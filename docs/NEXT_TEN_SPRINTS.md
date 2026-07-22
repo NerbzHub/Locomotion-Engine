@@ -1,13 +1,24 @@
-# Next Fifty Sprints
+# Dungeon Defense Implementation Roadmap
 
 **Status:** Proposed implementation plan
 
 **Starting point:** LE-S01 through LE-S05 are complete: Dungeon Defense has a
 deterministic three-wave loop, selectable and upgradeable Archer/Mage towers,
-and distinct data-defined Slime, Beetle, and Wisp behaviour. The 50 upcoming
-sprints below run from LE-S06 through LE-S55. Their purpose is to turn that
-proof into a clear, replayable, and maintainable small game without prematurely
-building a generic engine.
+and distinct data-defined Slime, Beetle, and Wisp behaviour. The roadmap below
+runs from LE-S06 through LE-S108. LE-S06 through LE-S55 turn the proof into a
+clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
+toward the full Game Vision: evolving fantasy eras, memorable run progression,
+procedural variation, and an endless defence that remains readable. LE-S101
+through LE-S108 complete the visual-first asset workflow and provide the final
+quality gates for the complete experience.
+
+**Revision basis:** Books 05 and 06 refine this roadmap in three important
+ways. Procedural visuals are modular, deterministic, and driven by an explicit
+Entity DNA model rather than by unconstrained code generation. Their authoring
+workflow proceeds from a debug workbench to sprite-sheet import and visual
+assignment. Charm systems are introduced progressively with explicit caps,
+visual-priority rules, and player-readable consequences; they are not treated
+as late decorative polish.
 
 ## Planning rules
 
@@ -72,7 +83,7 @@ legacy identifiers in Book 03.
 | LE-S44 | Localisation foundation | Player-facing copy is ready for translation without changing game rules. |
 | LE-S45 | Accessibility second pass | External accessibility feedback improves the complete feature set. |
 | LE-S46 | Mobile completion | Touch play reaches release quality on supported devices. |
-| LE-S47 | Content pack import | Validated authored content packs can extend the game safely. |
+| LE-S47 | Visual asset catalogue | Validated modular visual assets can be registered safely. |
 | LE-S48 | Proven engine extraction | Only validated reusable primitives move into the engine package. |
 | LE-S49 | Quality automation | CI gates protect deterministic, visual, and packaging quality. |
 | LE-S50 | Privacy and resilience | Local data, imports, and failures have clear, safe boundaries. |
@@ -81,6 +92,59 @@ legacy identifiers in Book 03.
 | LE-S53 | Save migration hardening | Long-lived profiles and replays migrate safely across releases. |
 | LE-S54 | Gate 2 release candidate | The expanded game is frozen for focused validation. |
 | LE-S55 | Gate 2 release | The post-release expansion ships with maintainable foundations. |
+| LE-S56 | Entity DNA and content tags | Stable entity identity connects gameplay, visuals, and content rules. |
+| LE-S57 | Relic choice loop | Boss rewards create compact, meaningful build-defining choices. |
+| LE-S58 | Relic library one | The first elemental and tower-family relics make builds diverge. |
+| LE-S59 | First fantasy tower | A Cleric Shrine introduces a clear support role. |
+| LE-S60 | Tower evolution framework | Towers can take data-defined, mutually exclusive specialisation paths. |
+| LE-S61 | Archer evolution | Archer paths create precision, speed, and ranger identities. |
+| LE-S62 | Mage evolution | Mage paths create elemental identities and visible status effects. |
+| LE-S63 | Enemy resistance framework | Readable resistances and vulnerabilities support later tactical counters. |
+| LE-S64 | The Frontier era | Endless defence gains its first named era and local-threat content. |
+| LE-S65 | Era transitions | World and encounter rules change cleanly between eras. |
+| LE-S66 | The Wilderness era | Organised, durable enemies and nature pressure expand the mid-game. |
+| LE-S67 | Druid Grove | Roots and summoned allies add area control and a Summon build path. |
+| LE-S68 | Elite modifier framework | Controlled modifiers create variant enemies without unreadable stacking. |
+| LE-S69 | Elite encounter direction | Elite rules, rewards, and UI make escalation understandable. |
+| LE-S70 | Procedural boss framework | Bosses are assembled from validated archetypes, abilities, and modifiers. |
+| LE-S71 | The Dark Ages era | Undead mechanics and holy counterplay establish a new strategic era. |
+| LE-S72 | Paladin Watchtower | Holy damage and anti-undead utility create a specialised counter tower. |
+| LE-S73 | Necromancer Tower | Defeated enemies can become bounded allied skeletons. |
+| LE-S74 | Hero foundation | Named heroes enter runs with classes, traits, and survivable state. |
+| LE-S75 | Hero combat and recovery | Heroes become readable battlefield participants without replacing towers. |
+| LE-S76 | Merchant encounters | Temporary shops create controlled, legible economic decisions. |
+| LE-S77 | Event framework | A bounded event scheduler introduces temporary opportunities and threats. |
+| LE-S78 | Frontier events | Treasure Goblin, Fairy Blessing, and Sheep Parade prove event clarity. |
+| LE-S79 | Biome and condition framework | Visual world changes can carry validated gameplay modifiers. |
+| LE-S80 | Weather conditions | Rain, fog, snow, and Blood Moon create readable environmental variation. |
+| LE-S81 | The Infernal War era | Demons, portals, and hostile battlefield rules escalate the game. |
+| LE-S82 | Alchemist | Status-effect mixtures and controlled randomness add a versatile tower. |
+| LE-S83 | Warlock Circle | Risk/reward summons establish dangerous late-game magic. |
+| LE-S84 | The Dragon Age | Flying and large-enemy rules shift placement and targeting priorities. |
+| LE-S85 | Ballista and anti-large combat | Extreme-range precision answers dragons without invalidating other towers. |
+| LE-S86 | Dragon Egg | A protected long-term investment grows through visible run stages. |
+| LE-S87 | Advanced procedural bosses | Named boss combinations create replayable capstones for late eras. |
+| LE-S88 | Modular sprite resolver | Entity DNA resolves deterministic, layered sprite parts. |
+| LE-S89 | Sprite debug workbench | Developers can inspect seeds, parts, palettes, and generated sprites. |
+| LE-S90 | Procedural enemy variation | Enemies gain coherent generated silhouettes and accessory variation. |
+| LE-S91 | Procedural character variation | Heroes and merchants receive generated appearance and identity. |
+| LE-S92 | Charm feedback foundation | Damage, impacts, and statuses make combat consequences visible. |
+| LE-S93 | Battlefield memory | Corpses, marks, and wear add history within strict readability budgets. |
+| LE-S94 | Emergent behaviour | Bounded variation makes waves feel alive without becoming random. |
+| LE-S95 | Conditions and visual priority | World effects combine safely under a clear render hierarchy. |
+| LE-S96 | The Celestial and Cosmic Age | Titans and strange threats introduce late-game rule twists. |
+| LE-S97 | Portal Tower | A late-game summon tower makes controlled absurdity tactically useful. |
+| LE-S98 | End-of-Reality content | Reality-breaking encounters remain constrained by readable rules. |
+| LE-S99 | Endless pacing and combinations | Long-run scaling uses eras, composition, and events—not health alone. |
+| LE-S100 | Emergent-story journal | A run records the people, relics, bosses, and moments worth remembering. |
+| LE-S101 | Sprite-sheet importer | Creators can import constrained modular sprite sheets visually. |
+| LE-S102 | Visual assignment builder | Imported parts are assigned to Entity DNA categories with live preview. |
+| LE-S103 | Visual asset editor | A focused inspector makes modular visual content safe to author. |
+| LE-S104 | Vision balance laboratory | Reference scenarios protect build diversity and late-game fairness. |
+| LE-S105 | Vision accessibility and clarity | Complex content receives a final readability and accessibility pass. |
+| LE-S106 | Endless performance hardening | The complete vision meets memory and frame-time budgets. |
+| LE-S107 | Vision release candidate | The complete endless experience is frozen for focused external validation. |
+| LE-S108 | Vision release | Dungeon Defense ships as the full Game Vision milestone. |
 
 ## LE-S01 — Content validation
 
@@ -693,16 +757,20 @@ mobile device matrix without hidden desktop-only dependencies.
 
 **Depends on:** LE-S27, LE-S35, LE-S42, and LE-S45.
 
-## LE-S47 — Content pack import
+## LE-S47 — Visual asset catalogue
 
-**Goal:** Permit safe extension through authored data packs, not executable
-mod code.
+**Goal:** Register modular visual assets through validated data rather than
+ad-hoc file naming or executable mod code.
 
-**Deliverables:** a versioned pack manifest, strict content validation,
-namespacing, import/export UX, quotas, and invalid-pack test cases.
+**Deliverables:** a versioned visual-asset manifest; part categories for head,
+torso, legs, weapon, accessory, and effect; dimension/transparency checks;
+namespacing; quotas; and invalid-manifest tests.
 
-**Done when:** a valid pack can add isolated content and an unsafe or
-incompatible pack fails before it reaches gameplay.
+**Done when:** authored sprite parts can be added as safe content, while a
+missing, oversized, or incompatible asset is rejected before rendering.
+
+**Not in scope:** a player-facing sprite-sheet import tool; that follows after
+the modular renderer is proven.
 
 **Depends on:** LE-S33 and LE-S44.
 
@@ -804,10 +872,661 @@ release artifact are independently reproducible.
 
 **Depends on:** LE-S54.
 
+## LE-S56 — Entity DNA and content tags
+
+**Goal:** Give every procedurally variable unit a stable, data-driven identity
+that joins gameplay semantics to visual generation.
+
+**Deliverables:** Entity DNA v1 containing species, role, biome, tier, traits,
+and a seed; tags for damage, tower role, creature family, summon, and status
+effects; validation; inspection UI; and deterministic resolver tests.
+
+**Done when:** a rule can target a tag such as Fire, Holy, Dragon, or Support,
+and the same Entity DNA always resolves to the same permitted visual identity
+without making visuals a simulation dependency.
+
+**Depends on:** LE-S33, LE-S47, LE-S48, and LE-S52.
+
+## LE-S57 — Relic choice loop
+
+**Goal:** Make boss victories produce a compact, consequential choice.
+
+**Deliverables:** a post-boss choice flow, three validated relic options, run
+state persistence, clear effect descriptions, and deterministic choice tests.
+
+**Done when:** selecting one relic changes a later decision without hiding its
+rule or invalidating a replay.
+
+**Depends on:** LE-S17, LE-S24, LE-S53, and LE-S56.
+
+## LE-S58 — Relic library one
+
+**Goal:** Prove build variety with a deliberately small relic set.
+
+**Deliverables:** Archer, Fire, Ice, Nature, and economy relics; stacking
+rules; balance scenarios; and clear active-relic presentation.
+
+**Done when:** two successful runs can use visibly different strategies rather
+than merely different numerical bonuses.
+
+**Depends on:** LE-S57.
+
+## LE-S59 — First fantasy tower
+
+**Goal:** Add Cleric Shrine as the first support-oriented tower family.
+
+**Deliverables:** blessing/healing rules, range and target feedback, upgrade
+data, content tags, balance tests, and tutorial copy.
+
+**Done when:** Cleric Shrine provides a useful role that cannot be replaced by
+simply building another damage tower.
+
+**Depends on:** LE-S56 and LE-S58.
+
+## LE-S60 — Tower evolution framework
+
+**Goal:** Support mutually exclusive tower identities rather than linear stats.
+
+**Deliverables:** data-defined branch prerequisites, selection UI, compatibility
+with saves/replays, inspection comparison, and validation tests.
+
+**Done when:** an individual tower can permanently choose one clear tactical
+path without modifying its authored base definition.
+
+**Depends on:** LE-S15, LE-S53, and LE-S56.
+
+## LE-S61 — Archer evolution
+
+**Goal:** Create three readable Archer identities.
+
+**Deliverables:** precision/longbow, rapid-fire, and ranger-support branches;
+visual differentiation; scenarios; and branch balance tests.
+
+**Done when:** each branch has a distinct target, placement, or relic synergy.
+
+**Depends on:** LE-S58 through LE-S60.
+
+## LE-S62 — Mage evolution
+
+**Goal:** Give Mage elemental identities with understandable status effects.
+
+**Deliverables:** Fire, Frost, and Arcane branches; status application rules;
+effect icons; and stacking/expiry tests.
+
+**Done when:** elemental effects are legible during combat and countered
+appropriately by enemy rules.
+
+**Depends on:** LE-S60 and LE-S61.
+
+## LE-S63 — Enemy resistance framework
+
+**Goal:** Make tactical counters explicit before they become numerous.
+
+**Deliverables:** validated resistance/vulnerability definitions, inspection
+copy, combat calculation tests, and no-surprise default rules.
+
+**Done when:** a player can learn why a damage type performed differently
+without consulting hidden data.
+
+**Depends on:** LE-S56 and LE-S62.
+
+## LE-S64 — The Frontier era
+
+**Goal:** Turn early endless waves into a named, authored fantasy era.
+
+**Deliverables:** era definition, Frontier palette, rats/goblins/kobolds/bandits,
+encounter tables, and era-entry presentation.
+
+**Done when:** an endless run begins with coherent local-threat progression
+rather than an anonymous sequence of wave numbers.
+
+**Depends on:** LE-S35, LE-S56, and LE-S63.
+
+## LE-S65 — Era transitions
+
+**Goal:** Change a run's world without disrupting its simulation or clarity.
+
+**Deliverables:** deterministic transition rules, preview of the next era,
+palette/ambient swap, encounter handoff, save/replay coverage, and tests.
+
+**Done when:** an era change feels momentous while all existing towers, relics,
+and controls remain understandable.
+
+**Depends on:** LE-S64.
+
+## LE-S66 — The Wilderness era
+
+**Goal:** Introduce organised and durable mid-game threats.
+
+**Deliverables:** wolves, orcs, ogres, shamans, a Wilderness encounter table,
+support-enemy rules, and balance scenarios.
+
+**Done when:** the era demands a new tactical response beyond more raw damage.
+
+**Depends on:** LE-S63 through LE-S65.
+
+## LE-S67 — Druid Grove
+
+**Goal:** Add roots and bounded allied creatures as a nature-control tower.
+
+**Deliverables:** root status, summon limits/lifetime, clear ownership visuals,
+upgrade data, and deterministic lifecycle tests.
+
+**Done when:** Druid Grove is effective at control without allowing summoned
+units to obscure the board or escape simulation limits.
+
+**Depends on:** LE-S59, LE-S63, and LE-S66.
+
+## LE-S68 — Elite modifier framework
+
+**Goal:** Create safe, composable variation for familiar enemies.
+
+**Deliverables:** modifier schema, compatibility rules, visual markers, strict
+combination caps, and deterministic generation tests.
+
+**Done when:** a Giant, Swift, Armoured, or Regenerating enemy is immediately
+recognisable and no illegal modifier combination can spawn.
+
+**Depends on:** LE-S56, LE-S63, and LE-S66.
+
+## LE-S69 — Elite encounter direction
+
+**Goal:** Teach the player why an elite is present and what defeating it offers.
+
+**Deliverables:** encounter warnings, elite health/ability feedback, reward
+rules, defeat summary, and accessible explanations.
+
+**Done when:** elites create an intentional spike rather than a confusing
+statistical surprise.
+
+**Depends on:** LE-S68.
+
+## LE-S70 — Procedural boss framework
+
+**Goal:** Assemble replayable bosses from authored, testable parts.
+
+**Deliverables:** base archetypes, ability slots, modifier allow-lists,
+procedural naming, preview card, and seed reproducibility tests.
+
+**Done when:** bosses feel specific to a run while every ability and weakness
+can be understood before and during the encounter.
+
+**Depends on:** LE-S57, LE-S63, and LE-S69.
+
+## LE-S71 — The Dark Ages era
+
+**Goal:** Establish undead threats and supernatural counterplay.
+
+**Deliverables:** skeleton, zombie, ghoul, wraith, and necromancer content;
+resurrection/summon constraints; era palette; and encounter scenarios.
+
+**Done when:** moving into the Dark Ages changes build priorities in a
+communicated, fair way.
+
+**Depends on:** LE-S65, LE-S67, and LE-S70.
+
+## LE-S72 — Paladin Watchtower
+
+**Goal:** Introduce a specialised holy counter-tower.
+
+**Deliverables:** Holy damage, anti-undead/demon rules, support identity,
+branch data, presentation, and counterplay tests.
+
+**Done when:** Paladin Watchtower is compelling in relevant eras but not the
+universal best tower.
+
+**Depends on:** LE-S63 and LE-S71.
+
+## LE-S73 — Necromancer Tower
+
+**Goal:** Convert enemy defeats into a bounded allied-skeleton strategy.
+
+**Deliverables:** corpse/defeat conversion rules, skeleton cap and expiry,
+ownership/readability cues, upgrades, and replay tests.
+
+**Done when:** the tower creates a distinct summoner build without turning
+defeats into unbounded entities.
+
+**Depends on:** LE-S67, LE-S71, and LE-S72.
+
+## LE-S74 — Hero foundation
+
+**Goal:** Add persistent run characters without adding scripted narrative.
+
+**Deliverables:** generated name/class/traits, hero arrival, run persistence,
+read-only hero panel, and deterministic generation tests.
+
+**Done when:** a hero is recognisably an individual in the current run before
+they have complex combat behaviour.
+
+**Depends on:** LE-S53, LE-S57, and LE-S71.
+
+## LE-S75 — Hero combat and recovery
+
+**Goal:** Make heroes useful, vulnerable, and readable on the board.
+
+**Deliverables:** one simple class ability, movement/target rules, downed and
+recovery states, clear status feedback, and lifecycle tests.
+
+**Done when:** a hero complements tower choices without creating micromanaged
+real-time-unit gameplay.
+
+**Depends on:** LE-S74.
+
+## LE-S76 — Merchant encounters
+
+**Goal:** Add temporary shops as controlled run-economy decisions.
+
+**Deliverables:** generated merchant identity, constrained inventory, purchase
+flow, cost validation, expiry, and replay/save coverage.
+
+**Done when:** a merchant offers an interesting optional choice and never
+forces the player to manage an opaque inventory system.
+
+**Depends on:** LE-S57, LE-S74, and LE-S75.
+
+## LE-S77 — Event framework
+
+**Goal:** Introduce temporary run changes through a bounded, testable system.
+
+**Deliverables:** event definitions, eligibility/cooldown rules, event briefing,
+safe resolution paths, and deterministic schedule tests.
+
+**Done when:** events can surprise a player without silently changing core
+rules or overlapping into unreadable chaos.
+
+**Depends on:** LE-S65, LE-S69, and LE-S76.
+
+## LE-S78 — Frontier events
+
+**Goal:** Validate events with three low-complexity, highly readable examples.
+
+**Deliverables:** Treasure Goblin/Gold Carrier, Fairy Blessing, and Sheep
+Parade; clear rewards/rules; scenario tests; and playtest notes.
+
+**Done when:** each event changes a decision or moment in the run without
+requiring a separate tutorial.
+
+**Depends on:** LE-S77.
+
+## LE-S79 — Biome and condition framework
+
+**Goal:** Let world presentation and gameplay conditions evolve together.
+
+**Deliverables:** biome definitions, condition modifiers, compatibility rules,
+palette/decor hooks, preview UI, and seed tests.
+
+**Done when:** a biome affects content probabilities or rules through authored
+data rather than renderer-specific conditional code.
+
+**Depends on:** LE-S65, LE-S77, and LE-S78.
+
+## LE-S80 — Weather conditions
+
+**Goal:** Add the first visible and tactically meaningful conditions.
+
+**Deliverables:** rain, fog, snow, and Blood Moon; concise effect descriptions,
+reduced-motion treatment, balance tests, and accessibility review.
+
+**Done when:** players can identify the condition, understand its consequence,
+and keep playing effectively with motion reduced.
+
+**Depends on:** LE-S79.
+
+## LE-S81 — The Infernal War era
+
+**Goal:** Escalate into demons, portals, and hostile battlefield pressure.
+
+**Deliverables:** imps, hellhounds, demons, infernal encounter tables, one
+portal rule, visual palette, and counterplay scenarios.
+
+**Done when:** Infernal War feels more dangerous through new behaviour, not
+only larger enemy health pools.
+
+**Depends on:** LE-S70, LE-S72, and LE-S80.
+
+## LE-S82 — Alchemist
+
+**Goal:** Add a flexible status-effect tower with controlled uncertainty.
+
+**Deliverables:** poison, burn, slow, and one constrained unusual outcome;
+effect priority rules; visual feedback; upgrade data; and tests.
+
+**Done when:** every potion result is visible and tactically useful without
+requiring the player to memorise hidden random tables.
+
+**Depends on:** LE-S62, LE-S63, and LE-S81.
+
+## LE-S83 — Warlock Circle
+
+**Goal:** Establish dangerous magic and limited imp summoning.
+
+**Deliverables:** a drawback/benefit contract, imp lifecycle cap, Demon tags,
+upgrade choices, UI explanation, and deterministic scenarios.
+
+**Done when:** the tower enables powerful high-risk builds while its downside
+is explicit and controllable.
+
+**Depends on:** LE-S67, LE-S73, LE-S81, and LE-S82.
+
+## LE-S84 — The Dragon Age
+
+**Goal:** Make flying and large enemies create a new late-game defence problem.
+
+**Deliverables:** wyvern/dragon movement categories, targeting eligibility,
+Dragon tags, era encounters, and visible priority guidance.
+
+**Done when:** a player can tell which defences can answer a dragon and why.
+
+**Depends on:** LE-S63, LE-S70, and LE-S81.
+
+## LE-S85 — Ballista and anti-large combat
+
+**Goal:** Add extreme-range physical precision as an answer to dragons.
+
+**Deliverables:** Ballista, anti-large rules, target feedback, upgrade paths,
+balance comparisons, and touch/keyboard inspection support.
+
+**Done when:** Ballista is strong against large threats yet weak enough against
+ordinary crowds to preserve varied tower compositions.
+
+**Depends on:** LE-S61, LE-S84.
+
+## LE-S86 — Dragon Egg
+
+**Goal:** Create a long-term tower investment with emotional, visible growth.
+
+**Deliverables:** egg through ancient-dragon stages, deterministic growth
+conditions, protection/defeat rules, clear progress UI, and save tests.
+
+**Done when:** preserving an Egg creates a memorable strategic commitment
+without making a failed investment irrecoverably ruin a run.
+
+**Depends on:** LE-S53, LE-S75, LE-S84, and LE-S85.
+
+## LE-S87 — Advanced procedural bosses
+
+**Goal:** Add late-era boss personalities without sacrificing rule clarity.
+
+**Deliverables:** additional archetypes/abilities, safe modifier compositions,
+generated title cards, counterplay preview, and long-run test scenarios.
+
+**Done when:** a boss such as a crystal dragon or void lich has a distinct,
+reproducible identity and a legible response.
+
+**Depends on:** LE-S70, LE-S84, and LE-S86.
+
+## LE-S88 — Modular sprite resolver
+
+**Goal:** Resolve Entity DNA into a deterministic layered sprite on Canvas.
+
+**Deliverables:** part-selection rules; shared origins for head, torso, legs,
+weapon, accessory, and effect layers; palette constraints; fallback parts; and
+resolver snapshots.
+
+**Done when:** the same valid Entity DNA assembles the same readable sprite,
+and a missing optional part degrades safely.
+
+**Depends on:** LE-S47, LE-S56, and LE-S87.
+
+## LE-S89 — Sprite debug workbench
+
+**Goal:** Give developers a visual-first way to validate generated identity.
+
+**Deliverables:** unit selector, seed input, generate action, Canvas preview,
+resolved-part inspector, and copyable Entity DNA.
+
+**Done when:** a designer can reproduce and diagnose a generated sprite without
+editing files or reading renderer internals.
+
+**Depends on:** LE-S88.
+
+## LE-S90 — Procedural enemy variation
+
+**Goal:** Give enemy instances personality while preserving recognition.
+
+**Deliverables:** body/head/accessory/palette variation, trait-driven visual
+rules, rarity weighting, silhouette safeguards, elite/boss integration, and
+visual snapshots.
+
+**Done when:** two goblins can look individual but are still identified at a
+glance as the same tactical enemy kind.
+
+**Depends on:** LE-S68, LE-S70, LE-S88, and LE-S89.
+
+## LE-S91 — Procedural character variation
+
+**Goal:** Apply constrained generated identity to heroes and merchants.
+
+**Deliverables:** appearance-part sets, name-to-appearance seed rules, hero and
+merchant portraits, fallback rendering, and reproducibility tests.
+
+**Done when:** a named character’s visual identity remains stable throughout a
+run, replay, and supported save migration.
+
+**Depends on:** LE-S74, LE-S76, LE-S88, and LE-S89.
+
+## LE-S92 — Charm feedback foundation
+
+**Goal:** Make combat consequences satisfying and visible before adding more
+systems.
+
+**Deliverables:** capped, aggregated damage numbers; critical-hit emphasis; a
+distinct kill burst; visual-first poison/burn/stun feedback; impact direction;
+and reduced-motion alternatives.
+
+**Done when:** players can distinguish damage, a defeat, and an active status
+at a glance without the board becoming text-heavy.
+
+**Depends on:** LE-S62, LE-S80, and LE-S90.
+
+## LE-S93 — Battlefield memory
+
+**Goal:** Let recent combat leave a small, readable history on the board.
+
+**Deliverables:** fresh-to-decay-to-bones corpse lifecycle, configurable corpse
+cap with oldest-first eviction, short-lived arrows/scorch marks, optional tower
+wear, biome-based decay, and budget tests.
+
+**Done when:** combat leaves charming traces that never hide enemies, paths, or
+placement decisions.
+
+**Depends on:** LE-S79, LE-S80, and LE-S92.
+
+## LE-S94 — Emergent behaviour
+
+**Goal:** Make units feel alive through constrained, observable variation.
+
+**Deliverables:** authored micro-behaviours (hesitation, clustering, occasional
+rush), rare panic state, broken-formation encounter rule, bounded elite
+mutation, rare returning-survivor evolution with optional hover names, and
+deterministic scenario tests.
+
+**Done when:** variation feels intentional and tactically meaningful, with
+every enabled behaviour disclosed through visible cues or inspection.
+
+**Depends on:** LE-S68, LE-S77, LE-S90, and LE-S93.
+
+## LE-S95 — Conditions and visual priority
+
+**Goal:** Safely combine charm systems under explicit board-readability rules.
+
+**Deliverables:** effect-interaction rules (such as fire accelerating decay),
+renderer priority of enemies over effects over corpses over background, per-type
+caps, background motion, and dense-board accessibility tests.
+
+**Done when:** a late-game board remains understandable despite layered weather,
+effects, history, and procedural variation.
+
+**Depends on:** LE-S80, LE-S92 through LE-S94.
+
+## LE-S96 — The Celestial and Cosmic Age
+
+**Goal:** Introduce titans and strange threats through comprehensible twists.
+
+**Deliverables:** celestial palette, titan/void enemy roles, one unusual but
+explained movement or defence rule, encounter tables, and balance scenarios.
+
+**Done when:** the game feels dramatically stranger while its board state is
+still readable without a glossary during combat.
+
+**Depends on:** LE-S87, LE-S90, and LE-S95.
+
+## LE-S97 — Portal Tower
+
+**Goal:** Make late-game summoning a strategic source of controlled absurdity.
+
+**Deliverables:** Portal Tower, selected summon pool, limits and expiry,
+target/ownership feedback, branch data, and performance tests.
+
+**Done when:** its summoned creatures create a distinct build path without
+overwhelming the board or invalidating other late-game towers.
+
+**Depends on:** LE-S73, LE-S83, LE-S91, and LE-S96.
+
+## LE-S98 — End-of-Reality content
+
+**Goal:** Deliver deliberate excess while preserving bounded game rules.
+
+**Deliverables:** reality-eater or sentient-moon encounter, constrained visual
+effects, clear rules card, capstone boss scenario, and accessibility review.
+
+**Done when:** the encounter is surprising and memorable but a player can
+still identify threats, targets, ranges, and their next useful action.
+
+**Depends on:** LE-S87, LE-S95 through LE-S97.
+
+## LE-S99 — Endless pacing and combinations
+
+**Goal:** Make long-run escalation depend on eras, composition, events, and
+visible controlled chaos rather than health alone.
+
+**Deliverables:** authored era loop, combination budgets, anti-repetition
+rules, progressive charm-system activation, checkpoint summaries, seed
+scenarios, and economy/difficulty review.
+
+**Done when:** survival remains strategically varied deep into a run, with
+complexity increasing gradually rather than appearing all at once.
+
+**Depends on:** LE-S64 through LE-S98.
+
+## LE-S100 — Emergent-story journal
+
+**Goal:** Preserve the individual history that makes a run worth recalling.
+
+**Deliverables:** compact run chronicle for heroes, relics, bosses, events,
+eras, returning survivors, and notable defeats; local export; privacy-safe
+copy; and tests.
+
+**Done when:** a completed run produces a concise, accurate story record
+without turning gameplay into a narrative-management screen.
+
+**Depends on:** LE-S24, LE-S74 through LE-S78, LE-S94, LE-S98, and LE-S99.
+
+## LE-S101 — Sprite-sheet importer
+
+**Goal:** Let creators import constrained modular sprite sheets visually.
+
+**Deliverables:** 1024×1024 limit, transparent-background validation, tile-grid
+overlay, selectable 30×30 regions with optional padding, import diagnostics,
+and invalid-sheet tests.
+
+**Done when:** a creator can upload one compliant sheet and see its usable
+regions without manually arranging asset folders.
+
+**Depends on:** LE-S47, LE-S88, and LE-S89.
+
+## LE-S102 — Visual assignment builder
+
+**Goal:** Turn imported regions into usable modular parts through visual work.
+
+**Deliverables:** category assignment for head, torso, legs, weapon,
+accessory, and effect; live assembled preview; alignment controls; manifest
+generation; undo/reset; and validation tests.
+
+**Done when:** a creator can select, assign, preview, and save a new unit's
+parts without hand-authoring a JSON manifest.
+
+**Depends on:** LE-S56, LE-S89, and LE-S101.
+
+## LE-S103 — Visual asset editor
+
+**Goal:** Provide a compact, inspector-led authoring surface for mature assets.
+
+**Deliverables:** asset/unit list, preview canvas, Entity DNA and metadata
+inspector, validation feedback, export/import using an LLM-compatible data
+contract, and documented support limits.
+
+**Done when:** the visual workflow supports safe iteration while remaining a
+focused content tool rather than an unbounded general-purpose game editor.
+
+**Depends on:** LE-S90 through LE-S92, and LE-S102.
+
+## LE-S104 — Vision balance laboratory
+
+**Goal:** Protect build diversity and fair late-game challenge with evidence.
+
+**Deliverables:** reference seeds across every era, automated outcome reports,
+synergy/outlier review, difficulty targets, and versioned balance decisions.
+
+**Done when:** a dominant relic, tower branch, enemy combination, or charm
+effect is found through repeatable scenarios before release.
+
+**Depends on:** LE-S52, LE-S99 through LE-S101, and LE-S103.
+
+## LE-S105 — Vision accessibility and clarity
+
+**Goal:** Ensure complete-game complexity remains usable and understandable.
+
+**Deliverables:** external accessibility sessions, compact glossary/inspect
+flows, zoom-based detail and optional deeper-stat discovery, information-density
+audit, remediations, and regression coverage.
+
+**Done when:** the full era and content set retains readable controls, status,
+contrast, motion alternatives, and touch support.
+
+**Depends on:** LE-S45, LE-S95, LE-S98, and LE-S104.
+
+## LE-S106 — Endless performance hardening
+
+**Goal:** Meet explicit frame-time and memory budgets for late-run content.
+
+**Deliverables:** stress seeds, entity/effect/corpse budgets, leak detection,
+procedural-art cache policy, low-power fallback, and performance CI checks.
+
+**Done when:** supported devices sustain the agreed experience through the
+defined long-run test scenarios without a progressively degraded board.
+
+**Depends on:** LE-S26, LE-S95 through LE-S99, and LE-S105.
+
+## LE-S107 — Vision release candidate
+
+**Goal:** Freeze the complete Game Vision for focused validation.
+
+**Deliverables:** feature freeze, verified balance manifest, external endless
+playtest, accessibility/performance sign-off, release notes, and blocker triage.
+
+**Done when:** only accepted release-blocking fixes can change the candidate,
+and every declared Game Vision system has test or playtest evidence.
+
+**Depends on:** LE-S100 through LE-S106.
+
+## LE-S108 — Vision release
+
+**Goal:** Ship Dungeon Defense as the complete Game Vision milestone.
+
+**Deliverables:** tagged release, reproducible browser artifact, final credits,
+known-limitations record, archived balance evidence, and roadmap retrospective.
+
+**Done when:** a player can begin with a small frontier defence and reach a
+replayable, performant, accessible End-of-Reality endless run.
+
+**Depends on:** LE-S107.
+
 ## Replanning checkpoints
 
 Review the plan after LE-S10, LE-S15, LE-S20, LE-S25, LE-S30, LE-S40, LE-S48,
-and LE-S55. At each checkpoint, decide which capabilities have proven reusable
-enough to graduate into `packages/engine/`. Until then, favour a compact
-working game over generic systems such as ECS breadth, physics, inventory, or
-mod support.
+LE-S55, LE-S60, LE-S70, LE-S80, LE-S90, LE-S100, LE-S104, and LE-S108. At each
+checkpoint, decide which capabilities have proven reusable enough to graduate
+into `packages/engine/`. Until then, favour a compact working game over generic
+systems such as ECS breadth, physics, inventory, or mod support.

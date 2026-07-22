@@ -1,0 +1,297 @@
+# Locomotion Engine — Book 05 (Draft)
+## Charm Systems & Emergent Design
+
+---
+
+# 🧠 Philosophy
+
+Charm is not created by large features.
+
+Charm emerges from:
+- small systems
+- consistent rules
+- visible consequences
+- restraint
+
+The goal is to create a game that feels:
+
+> “alive, reactive, and deeper than expected”
+
+---
+
+# 🎯 Core Design Rule
+
+> Systems should be discoverable, not explained.
+
+Players should notice things naturally over time.
+
+---
+
+# 🧬 Category 1 — Unit Identity Systems
+
+## 1. Persistent Unit Memory
+Units can carry subtle identity across waves.
+
+- survivors gain minor traits
+- visual indicators (scars, tint, posture)
+- optional rare “returning enemy” moments
+
+---
+
+## 2. Trait-Based Visual Changes
+Stats influence appearance:
+
+- fast → lean, lighter colours
+- tank → bulkier, heavier armour
+- elite → glow / accents
+
+---
+
+## 3. Variant Weighting
+Some parts are rarer:
+
+- uncommon helmets
+- rare weapons
+- subtle rarity increases over time
+
+---
+
+## 4. Micro Naming (Optional / Rare)
+Occasionally:
+- enemies generate simple names
+- appears only on hover or zoom
+
+---
+
+# ⚔️ Category 2 — Combat Feedback Systems
+
+## 5. Damage Numbers (Smart)
+- aggregated values
+- crits highlighted
+- limited concurrent display
+
+---
+
+## 6. Kill Feedback
+- small pop or burst
+- distinct from damage
+
+---
+
+## 7. Status Effects (Visual First)
+- poison drip
+- burn flicker
+- stun sparks
+
+---
+
+## 8. Impact Persistence
+- arrows remain briefly
+- scorch marks linger
+- hit direction slightly visible
+
+---
+
+# 💀 Category 3 — Battlefield Memory
+
+## 9. Corpse Lifecycle System
+Stages:
+- fresh → decay → bones → gone
+
+---
+
+## 10. Corpse Cap System
+- max corpse count (configurable)
+- oldest removed first
+
+---
+
+## 11. Environmental Staining
+- blood/dirt tint ground slightly
+- fades over time
+
+---
+
+## 12. Biome-Based Decay
+- swamp → faster decay
+- snow → slower decay
+
+---
+
+# 🧠 Category 4 — Behaviour Systems
+
+## 13. Micro Behaviour Variations
+- hesitation near damage
+- clustering behind tanks
+- occasional rush behaviour
+
+---
+
+## 14. Panic State (Rare)
+- low HP → flee briefly or erratic movement
+
+---
+
+## 15. Opportunistic Behaviour
+- some units move faster when path clears
+
+---
+
+## 16. Elite Mutation (Rare)
+- unit evolves mid-wave
+- visual + stat shift
+
+---
+
+# 🎲 Category 5 — Rare Events
+
+## 17. Gold Carrier Unit
+- steals gold if escapes
+- visually distinct
+
+---
+
+## 18. Broken Formation
+- wave slightly desyncs
+- feels more organic
+
+---
+
+## 19. Survivor Evolution
+- surviving unit returns later stronger
+
+---
+
+## 20. Mini-Boss Spawn
+- emerges from regular unit pool
+
+---
+
+# 🌍 Category 6 — World Systems
+
+## 21. Subtle Background Motion
+- fog drift
+- embers
+- ambient particles
+
+---
+
+## 22. Tower Wear (Optional)
+- towers visually change slightly over time
+
+---
+
+## 23. Audio Reinforcement (Future)
+- subtle audio cues for:
+  - crits
+  - deaths
+  - elites
+
+---
+
+# 🎮 Category 7 — Player Perception Systems
+
+## 24. Zoom-Based Detail
+- more detail visible when zoomed in
+- encourages inspection
+
+---
+
+## 25. Hidden Information Layer
+- deeper stats not shown immediately
+- optional discovery
+
+---
+
+## 26. Delayed Understanding
+- player notices patterns before being told
+
+---
+
+# 🧩 Category 8 — System Interactions
+
+## 27. Systems Affect Systems
+- fire → faster corpse decay
+- poison → lingering ground effect
+
+---
+
+## 28. Stacking Effects
+- multiple small systems combine into larger moments
+
+---
+
+## 29. Visual Priority Rules
+- ensure readability:
+  - enemies > effects > corpses > background
+
+---
+
+# 🎯 Category 9 — Restraint Systems
+
+## 30. Caps & Limits
+Everything has a cap:
+- corpses
+- damage numbers
+- effects
+
+---
+
+## 31. Controlled Chaos
+Chaos increases with waves but:
+- always readable
+- never overwhelming
+
+---
+
+# 🧠 Final Principle
+
+> The player should never feel the system is random.
+
+Instead:
+
+> It should feel like everything is intentional, even when procedural.
+
+---
+
+# 🚀 Outcome
+
+When these systems combine:
+
+- early game → clean, simple  
+- mid game → varied, interesting  
+- late game → chaotic but meaningful  
+
+The player experience becomes:
+
+> “I didn’t notice when it got complex… but now it is.”
+
+---
+
+# 💡 Summary
+
+Locomotion’s charm comes from:
+
+- persistence
+- subtle variation
+- emergent behaviour
+- visual storytelling
+
+Not from feature count.
+
+---
+
+# 🧭 Future Expansion
+
+These systems should be:
+
+- modular
+- optional
+- progressively enabled
+
+---
+
+> Charm is not a feature.  
+> It is the result of systems interacting over time.
+
+---
