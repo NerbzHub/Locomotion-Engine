@@ -29,7 +29,8 @@ Dungeon Defense.
 
 ## Distribution and attribution
 
-- [ ] The project owner has selected and added a root `LICENSE` file.
+- [ ] Confirm root `LICENSE.md` retains the all-rights-reserved, no-licence
+  notice, or explicitly update it if the owner's distribution policy changes.
 - [ ] Review `NOTICE.md` for bundled dependency and asset attributions.
 - [ ] Choose the distribution path from `docs/PACKAGING_PLAN.md`.
 - [ ] Ensure no development-only files, credentials, or local save data are in

@@ -1,8 +1,9 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S29 documentation, pending owner licence selection for public release
+**Status:** Gate 1 extended through LE-S29 documentation; copyright and
+no-licence notice selected for public source viewing
 
-**Updated:** 2026-07-20
+**Updated:** 2026-07-22
 
 ## What exists
 
@@ -86,7 +87,6 @@
 
 ## What does not exist yet
 
-- A selected project licence.
 - A functional Locomotion Builder.
 
 ## Current source-of-truth policy
@@ -96,7 +96,7 @@
 | Vision and architecture | `Books/Book 00` through `Books/Book 02` |
 | Engineering practice | `LOCOMOTION.md` and `Books/Engineering Standards.md` |
 | Historical construction detail | `Books/Book 03 - Construction Schedule.md` |
-| Implementation sequence | `docs/IMPLEMENTATION_STRATEGY.md` and `docs/NEXT_TEN_SPRINTS.md` |
+| Implementation sequence | `docs/IMPLEMENTATION_STRATEGY.md` and `docs/GAME_ROADMAP.md` |
 | Existing game behaviour reference | `Final Products/v1 20 Rounds/` |
 
 ## Verification evidence
@@ -114,10 +114,11 @@ errors occur.
 
 ## Next delivery gate
 
-Continue LE-S29 from `docs/NEXT_TEN_SPRINTS.md`: build the external-playtest
+Continue LE-S29 from `docs/GAME_ROADMAP.md`: build the external-playtest
 release candidate, publish or archive the exact `dist/` artifact, and collect
 structured feedback using `docs/PLAYTESTER_CRITERIA.md`.
 
-Select the licence before publishing or distributing the project. The release
-workflow is ready, but a public release must not proceed until that owner
-decision is reflected in a root `LICENSE` file.
+The owner has selected **no software licence**: repository material is
+all-rights-reserved and public source viewing does not grant reuse permission.
+See the root `LICENSE.md`. The next step is to build the exact candidate
+artifact and collect structured external feedback.

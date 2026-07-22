@@ -27,5 +27,5 @@
 
 ### Attribution and licence
 
-- Licence: link the root `LICENSE` file.
+- Licence/copyright notice: link the root `LICENSE.md` file.
 - Third-party notices: link `NOTICE.md`.

@@ -12,7 +12,7 @@ the TypeScript source is the active engine and game implementation.
 - [Project collaboration rules](LOCOMOTION.md)
 - [Recommended implementation strategy](docs/IMPLEMENTATION_STRATEGY.md)
 - [Project status and delivery gates](docs/PROJECT_STATUS.md)
-- [Next ten planned sprints](docs/NEXT_TEN_SPRINTS.md)
+- [Game roadmap and sprint plan](docs/GAME_ROADMAP.md)
 - [Release checklist](docs/RELEASE_CHECKLIST.md)
 - [Playtester criteria and feedback questions](docs/PLAYTESTER_CRITERIA.md)
 - [Packaging plan](docs/PACKAGING_PLAN.md)
@@ -73,11 +73,10 @@ and the next delivery gate.
 
 ## Licensing
 
-Copyright (c) 2026 Nathan Nette. All rights reserved.
+**All rights reserved — no licence is granted.** This repository is public for
+viewing and evaluation only. You may not use, copy, modify, redistribute,
+sublicense, sell, or create derivative works from its code or other material
+without prior written permission from Nathan Nette.
 
-This repository is public for viewing and evaluation only. No permission is
-granted to copy, modify, redistribute, sublicense, sell, use in commercial or
-non-commercial products, or create derivative works from this software without
-prior written permission.
-
-See the [third-party notices](NOTICE.md) before preparing a public release.
+See the [copyright and permissions notice](LICENSE.md) and
+[third-party notices](NOTICE.md) before preparing a public release.

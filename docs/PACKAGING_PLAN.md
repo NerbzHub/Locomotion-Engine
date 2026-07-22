@@ -116,12 +116,14 @@ unless the issue is confirmed in both.
 - [ ] Send testers `docs/PLAYTESTER_CRITERIA.md`.
 - [ ] Triage feedback using the severity guide.
 
-## Public release blocker
+## Public release and copyright notice
 
-No public distribution should happen until the project owner selects and adds a
-root `LICENSE` file. Private tester sharing can proceed only if the owner is
-comfortable with the sharing scope and the testers understand the build is not
-licensed for reuse or redistribution yet.
+The project uses an all-rights-reserved, no-licence policy in the root
+`LICENSE.md`. Keep that notice and the README licensing statement with every
+source archive. Public hosting permits viewing (and may permit GitHub forks
+under GitHub's terms), but does not grant reuse, modification, distribution, or
+derivative-work permission. Private tester sharing should still be limited to
+people the owner trusts, with the no-reuse policy made clear.
 
 ## Later desktop-app option
 

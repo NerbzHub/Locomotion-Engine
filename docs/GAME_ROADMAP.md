@@ -3,11 +3,11 @@
 **Status:** Active implementation plan
 
 **Current position (2026-07-22):** LE-S01 through LE-S28 are implemented and
-merged into `main`. LE-S29 is prepared but not complete: it requires the owner
-to select a licence before a public candidate is published, followed by the
-external playtest defined in `docs/PLAYTESTER_CRITERIA.md`. LE-S30 and every
-later sprint remain planned. The next active delivery work is therefore LE-S29,
-not LE-S56.
+merged into `main`. LE-S29 is prepared but not complete: the project uses an
+all-rights-reserved, no-licence policy recorded in the root `LICENSE.md`, and
+the remaining work is to publish or archive the candidate and run the external
+playtest defined in `docs/PLAYTESTER_CRITERIA.md`. LE-S30 and every later sprint
+remain planned. The next active delivery work is therefore LE-S29, not LE-S56.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -53,7 +53,7 @@ feature branches.
 | Completed combat depth | LE-S11–LE-S17 | Already merged | Difficulty, targeting, Sentinel, specialisations, elites, boss. |
 | Completed campaign polish | LE-S18–LE-S23 | Already merged | Campaign, progression, economy, audio, presentation, tutorial. |
 | Completed release foundations | LE-S24–LE-S28 | Already merged | Replays, fuzzing, performance, mobile, packaging. |
-| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | Licensed playtest candidate, triage, and Gate 1 release. |
+| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | Playtest candidate, triage, and Gate 1 release. |
 | Post-release learning | LE-S31–LE-S33 | `feature/post-release-foundations` | Stabilised feedback and safer content authoring. |
 | Endless challenge | LE-S34–LE-S36 | `feature/endless-challenges` | Mutators, endless mode, and optional mastery goals. |
 | Campaign expansion | LE-S37–LE-S41 | `feature/campaign-expansion` | Splitter/Bombard play, hazards, maps, and chapter two. |

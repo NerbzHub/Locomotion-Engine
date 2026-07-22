@@ -52,8 +52,8 @@ game concern.
 
 Complete the project layout, repository hygiene, status documentation, and
 contribution guidance. Preserve the existing prototype files unchanged as a
-behavioural reference. Select a licence separately; this is a project-owner
-decision and is intentionally not guessed here.
+behavioural reference. The project owner has selected an all-rights-reserved,
+no-licence policy; see the root `LICENSE.md`.
 
 **Done when:** a new contributor can identify the goal, source-of-truth
 documents, directory ownership, and next implementation target in minutes.
