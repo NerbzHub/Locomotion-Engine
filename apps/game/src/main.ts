@@ -11,6 +11,8 @@ import { GameAudio, loadAudioSettings, normaliseAudioSettings, saveAudioSettings
 import { GLOSSARY_ENTRIES, dismissTutorial, shouldShowTutorial } from "./tutorial";
 import { exportReplay, importReplay, playReplay } from "./replay";
 import type { ReplayAction } from "./replay";
+import { beginDefense, canInteractWithBoard, openMissionSelection, returnToLanding } from "./entry-flow";
+import type { GameScreen } from "./entry-flow";
 import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
 import type { Cell, TargetPolicy } from "./simulation";
 
@@ -40,6 +42,11 @@ const veteranButton = requiredElement<HTMLButtonElement>("select-veteran");
 const gateWatchButton = requiredElement<HTMLButtonElement>("campaign-gate-watch");
 const crossroadsStandButton = requiredElement<HTMLButtonElement>("campaign-crossroads-stand");
 const resetProfileButton = requiredElement<HTMLButtonElement>("reset-profile");
+const landingPanel = requiredElement<HTMLElement>("landing-panel");
+const enterDungeonButton = requiredElement<HTMLButtonElement>("enter-dungeon");
+const returnToTitleButton = requiredElement<HTMLButtonElement>("return-to-title");
+const beginMissionButton = requiredElement<HTMLButtonElement>("begin-mission");
+const headerControls = requiredElement<HTMLElement>("header-controls");
 const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
 const wave = requiredElement<HTMLElement>("wave");
@@ -106,7 +113,7 @@ let reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matche
 let replayActions: ReplayAction[] = [];
 let audioSettings = loadAudioSettings(window.localStorage);
 let tutorialOpenedManually = false;
-let missionSetupVisible = true;
+let gameScreen: GameScreen = "landing";
 let outcomeDismissed = false;
 let pendingPlacement: { readonly cell: Cell; readonly kind: TowerKind } | undefined;
 const audio = new GameAudio(audioSettings);
@@ -115,6 +122,7 @@ tutorialPanel.hidden = !shouldShowTutorial(window.localStorage);
 const pointer = new PointerInput(canvas);
 
 pointer.onPointerDown((point) => {
+  if (!canInteractWithBoard(gameScreen)) return;
   if (pendingPlacement) return;
   const cell = cellAt(point.x, point.y);
   const tower = towerAtCell(state, cell);
@@ -124,12 +132,14 @@ pointer.onPointerDown((point) => {
 });
 
 pointer.onPointerMove((point) => {
+  if (!canInteractWithBoard(gameScreen)) return;
   hoveredCell = cellAt(point.x, point.y);
   keyboardCursorActive = false;
   updateHud();
 });
 
 canvas.addEventListener("keydown", (event) => {
+  if (!canInteractWithBoard(gameScreen)) return;
   const direction: Record<string, Cell> = {
     ArrowLeft: { column: -1, row: 0 }, ArrowRight: { column: 1, row: 0 }, ArrowUp: { column: 0, row: -1 }, ArrowDown: { column: 0, row: 1 }
   };
@@ -158,7 +168,6 @@ canvas.addEventListener("keydown", (event) => {
 startWaveButton.addEventListener("click", () => {
   if (startWave(state)) {
     replayActions.push({ step: state.step, type: "start-wave" });
-    missionSetupVisible = false;
     audio.play("wave");
   }
   closeGameMenu();
@@ -185,7 +194,7 @@ loadButton.addEventListener("click", () => {
     selectedMap = state.mapId;
     selectedDifficulty = state.difficultyId;
     selectedCampaignNodeId = undefined;
-    missionSetupVisible = false;
+    gameScreen = beginDefense();
     outcomeDismissed = false;
     inspectedTowerId = undefined;
     gateButton.setAttribute("aria-pressed", String(selectedMap === "gate"));
@@ -251,6 +260,22 @@ standardButton.addEventListener("click", () => selectDifficulty("standard"));
 veteranButton.addEventListener("click", () => selectDifficulty("veteran"));
 gateWatchButton.addEventListener("click", () => selectCampaignNode("gate-watch"));
 crossroadsStandButton.addEventListener("click", () => selectCampaignNode("crossroads-stand"));
+enterDungeonButton.addEventListener("click", () => {
+  gameScreen = openMissionSelection();
+  updateHud();
+  beginMissionButton.focus();
+});
+returnToTitleButton.addEventListener("click", () => {
+  gameScreen = returnToLanding();
+  closeBuildConfirmation();
+  updateHud();
+  enterDungeonButton.focus();
+});
+beginMissionButton.addEventListener("click", () => {
+  startNewDefense();
+  updateHud();
+  canvas.focus();
+});
 resetProfileButton.addEventListener("click", () => {
   profile = resetProfile(window.localStorage);
   recordedCampaignVictory = undefined;
@@ -259,16 +284,25 @@ resetProfileButton.addEventListener("click", () => {
 });
 outcomePrimaryButton.addEventListener("click", () => {
   if (state.gameWon && selectedCampaignNodeId === "gate-watch" && isCampaignNodeUnlocked(profile, "crossroads-stand")) {
-    selectCampaignNode("crossroads-stand");
+    const nextMission = CAMPAIGN_NODES.find((candidate) => candidate.id === "crossroads-stand");
+    if (nextMission) {
+      selectedCampaignNodeId = nextMission.id;
+      selectedMap = nextMission.mapId;
+      selectedDifficulty = nextMission.difficultyId;
+      startNewDefense();
+      updateHud();
+    }
     return;
   }
   startNewDefense();
   updateHud();
 });
 changeMissionButton.addEventListener("click", () => {
-  missionSetupVisible = true;
+  gameScreen = openMissionSelection();
   outcomeDismissed = true;
+  closeBuildConfirmation();
   updateHud();
+  beginMissionButton.focus();
 });
 confirmBuildButton.addEventListener("click", () => {
   const placement = pendingPlacement;
@@ -286,6 +320,7 @@ cancelBuildButton.addEventListener("click", () => {
   updateHud();
 });
 canvas.addEventListener("keydown", (event) => {
+  if (!canInteractWithBoard(gameScreen)) return;
   if (event.key !== "Escape" || !pendingPlacement) return;
   state.message = "Build cancelled. Choose another grass tile when ready.";
   closeBuildConfirmation();
@@ -341,7 +376,6 @@ function selectMap(mapId: MapId): void {
   if (!canConfigureScenario()) return;
   selectedMap = mapId;
   selectedCampaignNodeId = undefined;
-  startNewDefense();
   gateButton.setAttribute("aria-pressed", String(mapId === "gate"));
   crossroadsButton.setAttribute("aria-pressed", String(mapId === "crossroads"));
   gateButton.classList.toggle("selected", mapId === "gate");
@@ -354,7 +388,6 @@ function selectDifficulty(difficultyId: DifficultyId): void {
   if (!canConfigureScenario()) return;
   selectedDifficulty = difficultyId;
   selectedCampaignNodeId = undefined;
-  startNewDefense();
   for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
     button.setAttribute("aria-pressed", String(id === difficultyId));
     button.classList.toggle("selected", id === difficultyId);
@@ -370,7 +403,6 @@ function selectCampaignNode(nodeId: string): void {
   selectedCampaignNodeId = node.id;
   selectedMap = node.mapId;
   selectedDifficulty = node.difficultyId;
-  startNewDefense();
   gateWatchButton.setAttribute("aria-pressed", String(node.id === "gate-watch"));
   crossroadsStandButton.setAttribute("aria-pressed", String(node.id === "crossroads-stand"));
   gateWatchButton.classList.toggle("selected", node.id === "gate-watch");
@@ -397,23 +429,27 @@ function updateHud(): void {
   wave.textContent = `${state.wave}/${TOTAL_WAVES}`;
   waveBriefing.textContent = nextWaveBriefing(state);
   const gameEnded = state.gameOver || state.gameWon;
-  setupPanel.hidden = !missionSetupVisible;
-  tutorialPanel.hidden = !missionSetupVisible && !tutorialOpenedManually;
-  outcomePanel.hidden = !gameEnded || outcomeDismissed;
-  commandDock.hidden = gameEnded;
-  towerPalette.hidden = gameEnded;
-  waveBriefingPanel.hidden = state.waveActive || gameEnded;
-  startWaveButton.hidden = state.waveActive || gameEnded;
-  startWaveButton.disabled = state.waveActive || gameEnded;
+  const defending = canInteractWithBoard(gameScreen);
+  landingPanel.hidden = gameScreen !== "landing";
+  setupPanel.hidden = gameScreen !== "mission-select";
+  headerControls.hidden = !defending;
+  boardStage.hidden = !defending;
+  tutorialPanel.hidden = !defending || (!shouldShowTutorial(window.localStorage) && !tutorialOpenedManually);
+  outcomePanel.hidden = !defending || !gameEnded || outcomeDismissed;
+  commandDock.hidden = !defending || gameEnded;
+  towerPalette.hidden = !defending || gameEnded;
+  waveBriefingPanel.hidden = !defending || state.waveActive || gameEnded;
+  startWaveButton.hidden = !defending || state.waveActive || gameEnded;
+  startWaveButton.disabled = !defending || state.waveActive || gameEnded;
   saveButton.disabled = state.phase !== "intermission";
-  gateButton.disabled = !missionSetupVisible;
-  crossroadsButton.disabled = !missionSetupVisible;
-  casualButton.disabled = !missionSetupVisible;
-  standardButton.disabled = !missionSetupVisible;
-  veteranButton.disabled = !missionSetupVisible;
-  gateWatchButton.disabled = !missionSetupVisible;
-  crossroadsStandButton.disabled = !missionSetupVisible || !isCampaignNodeUnlocked(profile, "crossroads-stand");
-  resetProfileButton.disabled = !missionSetupVisible;
+  gateButton.disabled = gameScreen !== "mission-select";
+  crossroadsButton.disabled = gameScreen !== "mission-select";
+  casualButton.disabled = gameScreen !== "mission-select";
+  standardButton.disabled = gameScreen !== "mission-select";
+  veteranButton.disabled = gameScreen !== "mission-select";
+  gateWatchButton.disabled = gameScreen !== "mission-select";
+  crossroadsStandButton.disabled = gameScreen !== "mission-select" || !isCampaignNodeUnlocked(profile, "crossroads-stand");
+  resetProfileButton.disabled = gameScreen !== "mission-select";
   startWaveButton.textContent = `Start wave ${state.wave + 1}`;
   updateMissionControls();
   updateTowerChoices();
@@ -426,7 +462,7 @@ function updateHud(): void {
 }
 
 function canConfigureScenario(): boolean {
-  return missionSetupVisible || state.gameOver || state.gameWon;
+  return gameScreen === "mission-select";
 }
 
 function closeGameMenu(): void {
@@ -440,7 +476,7 @@ function startNewDefense(): void {
   keyboardCursorActive = false;
   replayActions = [];
   recordedCampaignVictory = undefined;
-  missionSetupVisible = false;
+  gameScreen = beginDefense();
   outcomeDismissed = false;
 }
 
@@ -485,18 +521,19 @@ function updateBuildConfirmationControls(): void {
 
 function updateMissionControls(): void {
   const node = selectedCampaignNodeId ? CAMPAIGN_NODES.find((candidate) => candidate.id === selectedCampaignNodeId) : undefined;
-  missionContext.textContent = node ? `${node.displayName} · ${DIFFICULTY_DEFINITIONS[state.difficultyId].displayName}` : `${MAP_DEFINITIONS[state.mapId].displayName} · ${DIFFICULTY_DEFINITIONS[state.difficultyId].displayName}`;
+  missionContext.textContent = node ? `${node.displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}` : `${MAP_DEFINITIONS[selectedMap].displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}`;
+  beginMissionButton.textContent = node ? `Begin ${node.displayName}` : `Begin ${MAP_DEFINITIONS[selectedMap].displayName}`;
   gateWatchButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "gate-watch"));
   crossroadsStandButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "crossroads-stand"));
   gateWatchButton.classList.toggle("selected", selectedCampaignNodeId === "gate-watch");
   crossroadsStandButton.classList.toggle("selected", selectedCampaignNodeId === "crossroads-stand");
-  gateButton.setAttribute("aria-pressed", String(state.mapId === "gate"));
-  crossroadsButton.setAttribute("aria-pressed", String(state.mapId === "crossroads"));
-  gateButton.classList.toggle("selected", state.mapId === "gate");
-  crossroadsButton.classList.toggle("selected", state.mapId === "crossroads");
+  gateButton.setAttribute("aria-pressed", String(selectedMap === "gate"));
+  crossroadsButton.setAttribute("aria-pressed", String(selectedMap === "crossroads"));
+  gateButton.classList.toggle("selected", selectedMap === "gate");
+  crossroadsButton.classList.toggle("selected", selectedMap === "crossroads");
   for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
-    button.setAttribute("aria-pressed", String(state.difficultyId === id));
-    button.classList.toggle("selected", state.difficultyId === id);
+    button.setAttribute("aria-pressed", String(selectedDifficulty === id));
+    button.classList.toggle("selected", selectedDifficulty === id);
   }
   crossroadsUnlockCopy.textContent = isCampaignNodeUnlocked(profile, "crossroads-stand") ? "Unlocked — defend the split approach." : "Clear Gate Watch to unlock.";
 }
@@ -552,7 +589,7 @@ function updateAudioControls(): void {
 }
 
 function updateDeveloperOverlay(): void {
-  developerOverlay.hidden = !diagnosticsVisible;
+  developerOverlay.hidden = !canInteractWithBoard(gameScreen) || !diagnosticsVisible;
   if (!diagnosticsVisible) return;
   const events = state.events.length === 0 ? "(no events yet)" : state.events.map((event) => `${event.step} ${event.kind}: ${event.message}`).join("\n");
   developerOverlayText.textContent = [
@@ -564,6 +601,10 @@ function updateDeveloperOverlay(): void {
 }
 
 function updateTowerInspector(): void {
+  if (!canInteractWithBoard(gameScreen)) {
+    towerInspector.hidden = true;
+    return;
+  }
   const tower = state.towers.find((candidate) => candidate.id === inspectedTowerId);
   if (!tower) {
     inspectedTowerId = undefined;

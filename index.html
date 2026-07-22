@@ -13,7 +13,7 @@
           <p id="mission-context" class="eyebrow">Gate Watch · Standard</p>
           <h1>Dungeon Defense</h1>
         </div>
-        <div class="header-controls">
+        <div id="header-controls" class="header-controls">
           <section class="hud" aria-label="Current resources" aria-live="polite">
             <span>Gold <strong id="gold">50</strong></span>
             <span>Lives <strong id="lives">10</strong></span>
@@ -53,6 +53,13 @@
         </div>
       </header>
 
+      <section id="landing-panel" class="landing-panel" aria-labelledby="landing-title">
+        <span class="palette-label">Dungeon Defense</span>
+        <h2 id="landing-title">The dungeon needs a defender.</h2>
+        <p>Choose a mission, prepare your towers, then hold the line.</p>
+        <button id="enter-dungeon" type="button">Enter the dungeon</button>
+      </section>
+
       <section id="tutorial-panel" class="tutorial-panel" hidden aria-label="Dungeon Defense tutorial">
         <details>
           <summary>How to play</summary>
@@ -62,7 +69,7 @@
         </details>
       </section>
 
-      <section id="setup-panel" class="setup-panel" aria-label="Choose a mission">
+      <section id="setup-panel" class="setup-panel" aria-label="Choose a mission" hidden>
         <div class="setup-heading"><span class="palette-label">Choose a mission</span><p>Start with Gate Watch, then unlock the next stand.</p></div>
         <div class="mission-cards">
           <button id="campaign-gate-watch" class="mission-card selected" type="button" aria-pressed="true">
@@ -87,6 +94,10 @@
             <button id="select-veteran" class="map-choice" type="button" aria-pressed="false">Veteran</button>
           </section>
         </details>
+        <div class="setup-actions">
+          <button id="return-to-title" class="secondary" type="button">Back</button>
+          <button id="begin-mission" type="button">Begin Gate Watch</button>
+        </div>
         <button id="reset-profile" class="text-button" type="button">Reset campaign progress</button>
       </section>
 
@@ -100,7 +111,7 @@
         </div>
       </section>
 
-      <div id="board-stage" class="board-stage">
+      <div id="board-stage" class="board-stage" hidden>
         <canvas id="game-canvas" width="768" height="512" tabindex="0" aria-label="Dungeon Defense game board. Use arrow keys to move the board cursor, then Enter to build or inspect."></canvas>
         <div id="build-confirm-controls" class="build-confirm-controls" hidden aria-label="Confirm tower placement">
           <button id="cancel-build" class="placement-cancel" type="button" aria-label="Cancel tower placement" title="Cancel placement">×</button>

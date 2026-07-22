@@ -6,8 +6,8 @@
 merged into `main`. LE-S29 is prepared but not complete: the project uses an
 all-rights-reserved, no-licence policy recorded in the root `LICENSE.md`, and
 the release candidate must first incorporate the FI2/FI3 usability remediation
-branch below. The next active delivery work is therefore LE-P01, not LE-S29 or
-LE-S56. LE-S30 and every later numbered sprint remain planned.
+branch below. LE-P01 is complete; the next active delivery work is LE-P02, not
+LE-S29 or LE-S56. LE-S30 and every later numbered sprint remain planned.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -207,6 +207,8 @@ feature branches.
 | LE-S108 | Vision release | Dungeon Defense ships as the full Game Vision milestone. |
 
 ## LE-P01 — Intentional game entry (FI2)
+
+**Status: completed on 2026-07-22.**
 
 **Goal:** Ensure the player deliberately enters a mission before the tactical
 board can be seen or interacted with.
