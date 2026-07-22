@@ -5,9 +5,9 @@
 **Current position (2026-07-22):** LE-S01 through LE-S28 are implemented and
 merged into `main`. LE-S29 is prepared but not complete: the project uses an
 all-rights-reserved, no-licence policy recorded in the root `LICENSE.md`, and
-the remaining work is to publish or archive the candidate and run the external
-playtest defined in `docs/PLAYTESTER_CRITERIA.md`. LE-S30 and every later sprint
-remain planned. The next active delivery work is therefore LE-S29, not LE-S56.
+the release candidate must first incorporate the FI2/FI3 usability remediation
+branch below. The next active delivery work is therefore LE-P01, not LE-S29 or
+LE-S56. LE-S30 and every later numbered sprint remain planned.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -35,7 +35,9 @@ as late decorative polish.
   it must not quietly expand into unrelated engine work.
 
 The identifiers below are local planning identifiers. They do not replace the
-legacy identifiers in Book 03.
+legacy identifiers in Book 03. `LE-P##` identifies an inserted priority sprint:
+it preserves the historical LE-S01–LE-S28 record instead of renumbering already
+implemented work.
 
 ## Delivery sections and feature-branch plan
 
@@ -53,7 +55,8 @@ feature branches.
 | Completed combat depth | LE-S11–LE-S17 | Already merged | Difficulty, targeting, Sentinel, specialisations, elites, boss. |
 | Completed campaign polish | LE-S18–LE-S23 | Already merged | Campaign, progression, economy, audio, presentation, tutorial. |
 | Completed release foundations | LE-S24–LE-S28 | Already merged | Replays, fuzzing, performance, mobile, packaging. |
-| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | Playtest candidate, triage, and Gate 1 release. |
+| Priority game entry and HUD | LE-P01–LE-P03 | `feature/pre-game-flow-and-tactical-hud` | FI2/FI3: intentional game entry, always-visible tactical state, and regression evidence. |
+| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | Playtest candidate, triage, and Gate 1 release after the priority UX branch. |
 | Post-release learning | LE-S31–LE-S33 | `feature/post-release-foundations` | Stabilised feedback and safer content authoring. |
 | Endless challenge | LE-S34–LE-S36 | `feature/endless-challenges` | Mutators, endless mode, and optional mastery goals. |
 | Campaign expansion | LE-S37–LE-S41 | `feature/campaign-expansion` | Splitter/Bombard play, hazards, maps, and chapter two. |
@@ -91,6 +94,9 @@ feature branches.
 
 | ID | Sprint | Outcome |
 | --- | --- | --- |
+| LE-P01 | Intentional game entry (FI2) | The map is unavailable until a player chooses a mission and begins setup. |
+| LE-P02 | Persistent tactical HUD (FI3) | Gold, lives, wave, and settings stay visible in the map’s safe zones. |
+| LE-P03 | Entry and HUD hardening | Responsive, keyboard, and playtest checks prove the new interaction contract. |
 | LE-S01 | Content validation | Invalid game definitions fail clearly before a game starts. |
 | LE-S02 | Placement feedback | Players can see where and what they are about to build. |
 | LE-S03 | Targeting and combat feedback | Attacks, targets, hits, and defeats are easy to understand. |
@@ -199,6 +205,65 @@ feature branches.
 | LE-S106 | Endless performance hardening | The complete vision meets memory and frame-time budgets. |
 | LE-S107 | Vision release candidate | The complete endless experience is frozen for focused external validation. |
 | LE-S108 | Vision release | Dungeon Defense ships as the full Game Vision milestone. |
+
+## LE-P01 — Intentional game entry (FI2)
+
+**Goal:** Ensure the player deliberately enters a mission before the tactical
+board can be seen or interacted with.
+
+**Deliverables:** an explicit front-end flow from first load to campaign/mission
+selection to mission briefing/setup to active board; a named UI-state model;
+board mounting or interaction disabled until a mission is confirmed; clear
+back/cancel behaviour; and state-transition tests.
+
+**Done when:** a first-time player cannot place a tower or inspect a live map
+on load. They can always tell whether they are choosing a mission, preparing a
+mission, or actively defending it.
+
+**Not in scope:** new campaign content, a generic menu framework, or changing
+gameplay rules after a wave begins.
+
+**Source:** FI2 in `docs/FEEDBACK_AND_IDEAS.md`.
+
+**Depends on:** LE-S18, LE-S23, and LE-S27.
+
+## LE-P02 — Persistent tactical HUD (FI3)
+
+**Goal:** Put the information required for immediate tactical decisions where
+it is visible at a glance throughout active board play.
+
+**Deliverables:** a compact in-board HUD with Gold, Lives, and Wave in the
+top-left safe zone; Settings/Menu in the top-right safe zone; stable visual
+hierarchy and contrast; canvas/layout-safe positioning; and no duplicated or
+competing status panels outside the board during gameplay.
+
+**Done when:** a player can identify current gold, lives, wave, and how to open
+settings without scrolling, opening a menu, or looking away from the map at
+desktop and supported narrow viewports.
+
+**Not in scope:** adding new gameplay statistics or permanently displaying
+secondary information that does not support the next player decision.
+
+**Source:** FI3 in `docs/FEEDBACK_AND_IDEAS.md`.
+
+**Depends on:** LE-P01, LE-S10, LE-S22, and LE-S27.
+
+## LE-P03 — Entry and HUD hardening
+
+**Goal:** Prove that the new game-entry and tactical-information contract is
+clear, accessible, and release-ready before external playtesting.
+
+**Deliverables:** keyboard and touch paths through the new states; focus and
+screen-reader/status review; portrait and narrow-window checks; one
+first-time-player test script focused on entering a mission and reading the
+HUD; automated state-transition coverage; and a regression check that no tower
+can be placed before mission confirmation.
+
+**Done when:** the supported input/device matrix can enter, prepare, play, open
+settings, and return to menus without a hidden board interaction or loss of
+critical tactical information.
+
+**Depends on:** LE-P01 and LE-P02.
 
 ## LE-S01 — Content validation
 
@@ -600,7 +665,7 @@ playtest scenarios, issue triage rules, and a no-new-feature policy.
 **Done when:** feedback is categorised by severity and every accepted change is
 linked to evidence from the candidate.
 
-**Depends on:** LE-S23, LE-S26 through LE-S28.
+**Depends on:** LE-P03, LE-S23, and LE-S26 through LE-S28.
 
 ## LE-S30 — Gate 1 release
 
@@ -792,12 +857,13 @@ does not change a deterministic simulation snapshot.
 **Goal:** Improve the complete game using external accessibility feedback.
 
 **Deliverables:** assisted playtesting, remappable controls where warranted,
-screen-reader review, motion/audio alternatives, and tracked remediation work.
+screen-reader review, motion/audio alternatives, revalidation of the
+mission-entry states and in-board tactical HUD, and tracked remediation work.
 
 **Done when:** the supported play loop remains operable with the agreed input,
 contrast, motion, and audio accommodations across all maps.
 
-**Depends on:** LE-S21, LE-S27, LE-S41, and LE-S44.
+**Depends on:** LE-P03, LE-S21, LE-S27, LE-S41, and LE-S44.
 
 ## LE-S46 — Mobile completion
 
@@ -809,7 +875,7 @@ layouts, device performance checks, and clear support boundaries.
 **Done when:** campaign, upgrades, challenges, and replays work on the agreed
 mobile device matrix without hidden desktop-only dependencies.
 
-**Depends on:** LE-S27, LE-S35, LE-S42, and LE-S45.
+**Depends on:** LE-P03, LE-S27, LE-S35, LE-S42, and LE-S45.
 
 ## LE-S47 — Visual asset catalogue
 
@@ -1539,7 +1605,7 @@ audit, remediations, and regression coverage.
 **Done when:** the full era and content set retains readable controls, status,
 contrast, motion alternatives, and touch support.
 
-**Depends on:** LE-S45, LE-S95, LE-S98, and LE-S104.
+**Depends on:** LE-P03, LE-S45, LE-S95, LE-S98, and LE-S104.
 
 ## LE-S106 — Endless performance hardening
 

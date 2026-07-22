@@ -21,6 +21,9 @@ I think that wouldn't cause too much friction for the user in creating them but 
 
 ### FI2. MAP INTERACTABLE BEFORE GAME STARTS
 
+**Status: scheduled as LE-P01 (2026-07-22).** This is a priority usability
+remediation sprint that must complete before the LE-S29 playtest candidate.
+
 User feedback is that it is confusing that they can press and place towers before the game starts. The game board shouldn't be visible until it is needed.
 
 #### POTENTIAL FIXES
@@ -28,6 +31,9 @@ User feedback is that it is confusing that they can press and place towers befor
 1. Menu on first load, you click "enter the dungeon" and it loads to choose which level to select. Once selected, only then does it actually show the map. This would most likely need to utilise a state machine or something like that.
 
 ### FI3. THE GOLD, LIVES, WAVE NEED TO BE EASIER TO SEE
+
+**Status: scheduled as LE-P02 (2026-07-22).** This is a priority usability
+remediation sprint that must complete before the LE-S29 playtest candidate.
 
 They're too hidden and not obvious to actually see at all times.
 
