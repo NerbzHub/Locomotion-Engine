@@ -1,0 +1,29 @@
+# macOS and editor metadata
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# JavaScript / TypeScript build products and dependencies
+node_modules/
+.pnpm-store/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+
+# Python environments and generated Builder state
+.venv/
+__pycache__/
+*.py[cod]
+tools/builder/data/*.json
+tools/builder/logs/*
+tools/builder/output/*
+
+# Local environment and diagnostic output
+.env
+.env.*
+!.env.example
+*.log
