@@ -1,11 +1,15 @@
 # Dungeon Defense Implementation Roadmap
 
-**Status:** Proposed implementation plan
+**Status:** Active implementation plan
 
-**Starting point:** LE-S01 through LE-S05 are complete: Dungeon Defense has a
-deterministic three-wave loop, selectable and upgradeable Archer/Mage towers,
-and distinct data-defined Slime, Beetle, and Wisp behaviour. The roadmap below
-runs from LE-S06 through LE-S108. LE-S06 through LE-S55 turn the proof into a
+**Current position (2026-07-22):** LE-S01 through LE-S28 are implemented and
+merged into `main`. LE-S29 is prepared but not complete: it requires the owner
+to select a licence before a public candidate is published, followed by the
+external playtest defined in `docs/PLAYTESTER_CRITERIA.md`. LE-S30 and every
+later sprint remain planned. The next active delivery work is therefore LE-S29,
+not LE-S56.
+
+The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
 toward the full Game Vision: evolving fantasy eras, memorable run progression,
 procedural variation, and an endless defence that remains readable. LE-S101
@@ -32,6 +36,56 @@ as late decorative polish.
 
 The identifiers below are local planning identifiers. They do not replace the
 legacy identifiers in Book 03.
+
+## Delivery sections and feature-branch plan
+
+Each row is a cohesive merge unit. The suggested branch contains the complete
+range, passes its tests and browser checks, then merges into `main` before the
+next branch begins. Do not keep several long-lived feature branches open: later
+work should begin from the latest `main` so balance, saves, and visual rules do
+not drift apart. Release-candidate rows are release branches rather than normal
+feature branches.
+
+| Section | Sprint range | Suggested branch | Merge outcome |
+| --- | --- | --- | --- |
+| Completed vertical slice | LE-S01–LE-S05 | Already merged | Deterministic core loop and first content proof. |
+| Completed core depth | LE-S06–LE-S10 | Already merged | Intermissions, maps, diagnostics, saves, accessibility. |
+| Completed combat depth | LE-S11–LE-S17 | Already merged | Difficulty, targeting, Sentinel, specialisations, elites, boss. |
+| Completed campaign polish | LE-S18–LE-S23 | Already merged | Campaign, progression, economy, audio, presentation, tutorial. |
+| Completed release foundations | LE-S24–LE-S28 | Already merged | Replays, fuzzing, performance, mobile, packaging. |
+| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | Licensed playtest candidate, triage, and Gate 1 release. |
+| Post-release learning | LE-S31–LE-S33 | `feature/post-release-foundations` | Stabilised feedback and safer content authoring. |
+| Endless challenge | LE-S34–LE-S36 | `feature/endless-challenges` | Mutators, endless mode, and optional mastery goals. |
+| Campaign expansion | LE-S37–LE-S41 | `feature/campaign-expansion` | Splitter/Bombard play, hazards, maps, and chapter two. |
+| Player-facing tools | LE-S42–LE-S46 | `feature/player-tools-and-accessibility` | Custom challenges, replay gallery, localisation, accessibility, mobile. |
+| Asset and engine boundary | LE-S47–LE-S50 | `feature/visual-asset-foundation` | Asset catalogue, proven extraction, quality gates, resilience. |
+| Gate 2 operations | LE-S51–LE-S55 | `release/gate-2` | Playtest kit, balance/migration hardening, and Gate 2 release. |
+| Identity and relics | LE-S56–LE-S60 | `feature/entity-dna-and-relics` | Entity DNA, tags, relic loop, Cleric, evolution framework. |
+| Combat identities | LE-S61–LE-S63 | `feature/elemental-counterplay` | Archer/Mage paths and readable resistance rules. |
+| Frontier and Wilderness | LE-S64–LE-S67 | `feature/early-eras` | First eras, transitions, and Druid Grove. |
+| Elite bosses | LE-S68–LE-S70 | `feature/elite-bosses` | Modifier rules, elite direction, procedural boss framework. |
+| Dark Ages | LE-S71–LE-S73 | `feature/dark-ages` | Undead era, Paladin, and Necromancer play. |
+| Run characters and events | LE-S74–LE-S78 | `feature/heroes-merchants-events` | Heroes, merchants, event framework, and first events. |
+| Infernal conditions | LE-S79–LE-S83 | `feature/infernal-conditions` | Biomes, weather, Infernal War, Alchemist, Warlock. |
+| Dragon Age | LE-S84–LE-S87 | `feature/dragon-age` | Flying/large combat, Ballista, Dragon Egg, advanced bosses. |
+| Procedural identity | LE-S88–LE-S91 | `feature/procedural-identity` | Sprite resolver/workbench and enemy/character variation. |
+| Charm and readability | LE-S92–LE-S95 | `feature/charm-systems` | Feedback, battlefield memory, emergent behaviour, visual priorities. |
+| Cosmic endless play | LE-S96–LE-S100 | `feature/cosmic-endless` | Cosmic era, Portal Tower, End of Reality, pacing, story journal. |
+| Visual authoring | LE-S101–LE-S104 | `feature/visual-authoring` | Sprite-sheet import, assignment builder, editor, vision balance. |
+| Vision release | LE-S105–LE-S108 | `release/vision` | Accessibility/performance hardening, candidate, and Vision release. |
+
+### Branch acceptance rules
+
+- Keep a feature branch to one delivery section; if a section becomes larger
+  than five sprints in practice, split it at its first independently playable
+  outcome and merge that outcome first.
+- Rebase or merge the current `main` before opening a pull request, then run
+  type checks, deterministic tests, production build, and the relevant browser
+  smoke scenario.
+- Do not merge a branch that changes authored content, saves, replay formats,
+  or visual rules without its migration/validation tests.
+- Treat every `release/*` branch as a feature freeze: accept only release
+  blockers, documentation, packaging, and verified balance fixes.
 
 ## Sequence at a glance
 
