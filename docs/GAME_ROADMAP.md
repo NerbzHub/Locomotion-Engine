@@ -6,8 +6,9 @@
 merged into `main`. LE-S29 is prepared but not complete: the project uses an
 all-rights-reserved, no-licence policy recorded in the root `LICENSE.md`, and
 the release candidate must first incorporate the FI2/FI3 usability remediation
-branch below. LE-P01 is complete; the next active delivery work is LE-P02, not
-LE-S29 or LE-S56. LE-S30 and every later numbered sprint remain planned.
+branch below. LE-P01 and LE-P02 are complete; the next active delivery work is
+LE-P03, not LE-S29 or LE-S56. LE-S30 and every later numbered sprint remain
+planned.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -230,6 +231,8 @@ gameplay rules after a wave begins.
 **Depends on:** LE-S18, LE-S23, and LE-S27.
 
 ## LE-P02 — Persistent tactical HUD (FI3)
+
+**Status: completed on 2026-07-22.**
 
 **Goal:** Put the information required for immediate tactical decisions where
 it is visible at a glance throughout active board play.

@@ -13,44 +13,6 @@
           <p id="mission-context" class="eyebrow">Gate Watch · Standard</p>
           <h1>Dungeon Defense</h1>
         </div>
-        <div id="header-controls" class="header-controls">
-          <section class="hud" aria-label="Current resources" aria-live="polite">
-            <span>Gold <strong id="gold">50</strong></span>
-            <span>Lives <strong id="lives">10</strong></span>
-            <span>Wave <strong id="wave">0/3</strong></span>
-          </section>
-          <details id="game-menu" class="game-menu">
-            <summary>Menu</summary>
-            <div class="menu-panel">
-              <p class="menu-note">Combat pauses while this menu is open.</p>
-              <div class="menu-group">
-                <span class="menu-label">Game</span>
-                <div class="menu-actions">
-                  <button id="save-game" class="secondary" type="button">Save game</button>
-                  <button id="load-game" class="secondary" type="button">Load game</button>
-                  <button id="open-help" class="secondary" type="button">How to play</button>
-                </div>
-              </div>
-              <details class="menu-group">
-                <summary>Settings</summary>
-                <div class="menu-actions settings-actions">
-                  <button id="toggle-motion" class="secondary" type="button" aria-pressed="false">Motion: full</button>
-                  <button id="toggle-audio" class="secondary" type="button" aria-pressed="false">Audio: on</button>
-                </div>
-                <label class="audio-settings">Volume <input id="audio-volume" type="range" min="0" max="1" step="0.05" value="0.35"></label>
-              </details>
-              <details class="menu-group developer-tools">
-                <summary>Developer tools</summary>
-                <div class="menu-actions">
-                  <button id="export-replay" class="secondary" type="button">Export replay</button>
-                  <button id="import-replay" class="secondary" type="button">Import replay</button>
-                  <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
-                </div>
-              </details>
-              <button id="restart-game" class="danger" type="button">Restart run…</button>
-            </div>
-          </details>
-        </div>
       </header>
 
       <section id="landing-panel" class="landing-panel" aria-labelledby="landing-title">
@@ -113,6 +75,44 @@
 
       <div id="board-stage" class="board-stage" hidden>
         <canvas id="game-canvas" width="768" height="512" tabindex="0" aria-label="Dungeon Defense game board. Use arrow keys to move the board cursor, then Enter to build or inspect."></canvas>
+        <div id="header-controls" class="tactical-hud">
+          <section class="hud" aria-label="Current resources" aria-live="polite">
+            <span>Gold <strong id="gold">50</strong></span>
+            <span>Lives <strong id="lives">10</strong></span>
+            <span>Wave <strong id="wave">0/3</strong></span>
+          </section>
+          <details id="game-menu" class="game-menu">
+            <summary>Menu</summary>
+            <div class="menu-panel">
+              <p class="menu-note">Combat pauses while this menu is open.</p>
+              <div class="menu-group">
+                <span class="menu-label">Game</span>
+                <div class="menu-actions">
+                  <button id="save-game" class="secondary" type="button">Save game</button>
+                  <button id="load-game" class="secondary" type="button">Load game</button>
+                  <button id="open-help" class="secondary" type="button">How to play</button>
+                </div>
+              </div>
+              <details class="menu-group">
+                <summary>Settings</summary>
+                <div class="menu-actions settings-actions">
+                  <button id="toggle-motion" class="secondary" type="button" aria-pressed="false">Motion: full</button>
+                  <button id="toggle-audio" class="secondary" type="button" aria-pressed="false">Audio: on</button>
+                </div>
+                <label class="audio-settings">Volume <input id="audio-volume" type="range" min="0" max="1" step="0.05" value="0.35"></label>
+              </details>
+              <details class="menu-group developer-tools">
+                <summary>Developer tools</summary>
+                <div class="menu-actions">
+                  <button id="export-replay" class="secondary" type="button">Export replay</button>
+                  <button id="import-replay" class="secondary" type="button">Import replay</button>
+                  <button id="toggle-diagnostics" class="secondary" type="button" aria-pressed="false">Diagnostics</button>
+                </div>
+              </details>
+              <button id="restart-game" class="danger" type="button">Restart run…</button>
+            </div>
+          </details>
+        </div>
         <div id="build-confirm-controls" class="build-confirm-controls" hidden aria-label="Confirm tower placement">
           <button id="cancel-build" class="placement-cancel" type="button" aria-label="Cancel tower placement" title="Cancel placement">×</button>
           <button id="confirm-build" class="placement-confirm" type="button" aria-label="Confirm tower placement" title="Build tower">✓</button>
