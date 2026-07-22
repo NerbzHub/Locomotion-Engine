@@ -1,14 +1,24 @@
-# Next Ninety-Five Sprints
+# Dungeon Defense Implementation Roadmap
 
 **Status:** Proposed implementation plan
 
 **Starting point:** LE-S01 through LE-S05 are complete: Dungeon Defense has a
 deterministic three-wave loop, selectable and upgradeable Archer/Mage towers,
 and distinct data-defined Slime, Beetle, and Wisp behaviour. The roadmap below
-runs from LE-S06 through LE-S100. LE-S06 through LE-S55 turn the proof into a
+runs from LE-S06 through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
 toward the full Game Vision: evolving fantasy eras, memorable run progression,
-procedural variation, and an endless defence that remains readable.
+procedural variation, and an endless defence that remains readable. LE-S101
+through LE-S108 complete the visual-first asset workflow and provide the final
+quality gates for the complete experience.
+
+**Revision basis:** Books 05 and 06 refine this roadmap in three important
+ways. Procedural visuals are modular, deterministic, and driven by an explicit
+Entity DNA model rather than by unconstrained code generation. Their authoring
+workflow proceeds from a debug workbench to sprite-sheet import and visual
+assignment. Charm systems are introduced progressively with explicit caps,
+visual-priority rules, and player-readable consequences; they are not treated
+as late decorative polish.
 
 ## Planning rules
 
@@ -73,7 +83,7 @@ legacy identifiers in Book 03.
 | LE-S44 | Localisation foundation | Player-facing copy is ready for translation without changing game rules. |
 | LE-S45 | Accessibility second pass | External accessibility feedback improves the complete feature set. |
 | LE-S46 | Mobile completion | Touch play reaches release quality on supported devices. |
-| LE-S47 | Content pack import | Validated authored content packs can extend the game safely. |
+| LE-S47 | Visual asset catalogue | Validated modular visual assets can be registered safely. |
 | LE-S48 | Proven engine extraction | Only validated reusable primitives move into the engine package. |
 | LE-S49 | Quality automation | CI gates protect deterministic, visual, and packaging quality. |
 | LE-S50 | Privacy and resilience | Local data, imports, and failures have clear, safe boundaries. |
@@ -82,7 +92,7 @@ legacy identifiers in Book 03.
 | LE-S53 | Save migration hardening | Long-lived profiles and replays migrate safely across releases. |
 | LE-S54 | Gate 2 release candidate | The expanded game is frozen for focused validation. |
 | LE-S55 | Gate 2 release | The post-release expansion ships with maintainable foundations. |
-| LE-S56 | Content-tag foundation | Towers, enemies, relics, and effects gain validated shared tags. |
+| LE-S56 | Entity DNA and content tags | Stable entity identity connects gameplay, visuals, and content rules. |
 | LE-S57 | Relic choice loop | Boss rewards create compact, meaningful build-defining choices. |
 | LE-S58 | Relic library one | The first elemental and tower-family relics make builds diverge. |
 | LE-S59 | First fantasy tower | A Cleric Shrine introduces a clear support role. |
@@ -114,19 +124,27 @@ legacy identifiers in Book 03.
 | LE-S85 | Ballista and anti-large combat | Extreme-range precision answers dragons without invalidating other towers. |
 | LE-S86 | Dragon Egg | A protected long-term investment grows through visible run stages. |
 | LE-S87 | Advanced procedural bosses | Named boss combinations create replayable capstones for late eras. |
-| LE-S88 | Procedural pixel-art foundation | Deterministic palette and part variation enriches existing content. |
-| LE-S89 | Procedural enemy variation | Enemies gain coherent generated silhouettes and accessory variation. |
-| LE-S90 | Procedural character variation | Heroes and merchants receive generated appearance and identity. |
-| LE-S91 | The Celestial and Cosmic Age | Titans and strange threats introduce late-game rule twists. |
-| LE-S92 | Portal Tower | A late-game summon tower makes controlled absurdity tactically useful. |
-| LE-S93 | End-of-Reality content | Reality-breaking encounters remain constrained by readable rules. |
-| LE-S94 | Endless pacing and combinations | Long-run scaling uses eras, composition, and events—not health alone. |
-| LE-S95 | Emergent-story journal | A run records the people, relics, bosses, and moments worth remembering. |
-| LE-S96 | Vision balance laboratory | Reference scenarios protect build diversity and late-game fairness. |
-| LE-S97 | Vision accessibility and clarity | Complex content receives a final readability and accessibility pass. |
-| LE-S98 | Endless performance hardening | The complete vision meets memory and frame-time budgets. |
-| LE-S99 | Vision release candidate | The complete endless experience is frozen for focused external validation. |
-| LE-S100 | Vision release | Dungeon Defense ships as the full Game Vision milestone. |
+| LE-S88 | Modular sprite resolver | Entity DNA resolves deterministic, layered sprite parts. |
+| LE-S89 | Sprite debug workbench | Developers can inspect seeds, parts, palettes, and generated sprites. |
+| LE-S90 | Procedural enemy variation | Enemies gain coherent generated silhouettes and accessory variation. |
+| LE-S91 | Procedural character variation | Heroes and merchants receive generated appearance and identity. |
+| LE-S92 | Charm feedback foundation | Damage, impacts, and statuses make combat consequences visible. |
+| LE-S93 | Battlefield memory | Corpses, marks, and wear add history within strict readability budgets. |
+| LE-S94 | Emergent behaviour | Bounded variation makes waves feel alive without becoming random. |
+| LE-S95 | Conditions and visual priority | World effects combine safely under a clear render hierarchy. |
+| LE-S96 | The Celestial and Cosmic Age | Titans and strange threats introduce late-game rule twists. |
+| LE-S97 | Portal Tower | A late-game summon tower makes controlled absurdity tactically useful. |
+| LE-S98 | End-of-Reality content | Reality-breaking encounters remain constrained by readable rules. |
+| LE-S99 | Endless pacing and combinations | Long-run scaling uses eras, composition, and events—not health alone. |
+| LE-S100 | Emergent-story journal | A run records the people, relics, bosses, and moments worth remembering. |
+| LE-S101 | Sprite-sheet importer | Creators can import constrained modular sprite sheets visually. |
+| LE-S102 | Visual assignment builder | Imported parts are assigned to Entity DNA categories with live preview. |
+| LE-S103 | Visual asset editor | A focused inspector makes modular visual content safe to author. |
+| LE-S104 | Vision balance laboratory | Reference scenarios protect build diversity and late-game fairness. |
+| LE-S105 | Vision accessibility and clarity | Complex content receives a final readability and accessibility pass. |
+| LE-S106 | Endless performance hardening | The complete vision meets memory and frame-time budgets. |
+| LE-S107 | Vision release candidate | The complete endless experience is frozen for focused external validation. |
+| LE-S108 | Vision release | Dungeon Defense ships as the full Game Vision milestone. |
 
 ## LE-S01 — Content validation
 
@@ -739,16 +757,20 @@ mobile device matrix without hidden desktop-only dependencies.
 
 **Depends on:** LE-S27, LE-S35, LE-S42, and LE-S45.
 
-## LE-S47 — Content pack import
+## LE-S47 — Visual asset catalogue
 
-**Goal:** Permit safe extension through authored data packs, not executable
-mod code.
+**Goal:** Register modular visual assets through validated data rather than
+ad-hoc file naming or executable mod code.
 
-**Deliverables:** a versioned pack manifest, strict content validation,
-namespacing, import/export UX, quotas, and invalid-pack test cases.
+**Deliverables:** a versioned visual-asset manifest; part categories for head,
+torso, legs, weapon, accessory, and effect; dimension/transparency checks;
+namespacing; quotas; and invalid-manifest tests.
 
-**Done when:** a valid pack can add isolated content and an unsafe or
-incompatible pack fails before it reaches gameplay.
+**Done when:** authored sprite parts can be added as safe content, while a
+missing, oversized, or incompatible asset is rejected before rendering.
+
+**Not in scope:** a player-facing sprite-sheet import tool; that follows after
+the modular renderer is proven.
 
 **Depends on:** LE-S33 and LE-S44.
 
@@ -850,18 +872,20 @@ release artifact are independently reproducible.
 
 **Depends on:** LE-S54.
 
-## LE-S56 — Content-tag foundation
+## LE-S56 — Entity DNA and content tags
 
-**Goal:** Establish a validated tag vocabulary so future content can interact
-without per-item special cases.
+**Goal:** Give every procedurally variable unit a stable, data-driven identity
+that joins gameplay semantics to visual generation.
 
-**Deliverables:** tags for damage, tower role, creature family, summon, and
-status effects; validation; inspection UI; and tag interaction tests.
+**Deliverables:** Entity DNA v1 containing species, role, biome, tier, traits,
+and a seed; tags for damage, tower role, creature family, summon, and status
+effects; validation; inspection UI; and deterministic resolver tests.
 
-**Done when:** a content rule can target a tag such as Fire, Holy, Dragon, or
-Support, and its result is visible to the player.
+**Done when:** a rule can target a tag such as Fire, Holy, Dragon, or Support,
+and the same Entity DNA always resolves to the same permitted visual identity
+without making visuals a simulation dependency.
 
-**Depends on:** LE-S33, LE-S48, and LE-S52.
+**Depends on:** LE-S33, LE-S47, LE-S48, and LE-S52.
 
 ## LE-S57 — Relic choice loop
 
@@ -1117,8 +1141,8 @@ rules or overlapping into unreadable chaos.
 
 **Goal:** Validate events with three low-complexity, highly readable examples.
 
-**Deliverables:** Treasure Goblin, Fairy Blessing, and Sheep Parade; clear
-rewards/rules; scenario tests; and playtest notes.
+**Deliverables:** Treasure Goblin/Gold Carrier, Fairy Blessing, and Sheep
+Parade; clear rewards/rules; scenario tests; and playtest notes.
 
 **Done when:** each event changes a decision or moment in the run without
 requiring a separate tutorial.
@@ -1232,31 +1256,45 @@ reproducible identity and a legible response.
 
 **Depends on:** LE-S70, LE-S84, and LE-S86.
 
-## LE-S88 — Procedural pixel-art foundation
+## LE-S88 — Modular sprite resolver
 
-**Goal:** Establish deterministic visual variation within the existing art style.
+**Goal:** Resolve Entity DNA into a deterministic layered sprite on Canvas.
 
-**Deliverables:** palette constraints, seeded part-selection API, sprite
-composition tests, fallback art, and performance measurements.
+**Deliverables:** part-selection rules; shared origins for head, torso, legs,
+weapon, accessory, and effect layers; palette constraints; fallback parts; and
+resolver snapshots.
 
-**Done when:** the same seed produces the same coherent visual result and
-generated variation does not become a simulation dependency.
+**Done when:** the same valid Entity DNA assembles the same readable sprite,
+and a missing optional part degrades safely.
 
-**Depends on:** LE-S48 and LE-S53.
+**Depends on:** LE-S47, LE-S56, and LE-S87.
 
-## LE-S89 — Procedural enemy variation
+## LE-S89 — Sprite debug workbench
+
+**Goal:** Give developers a visual-first way to validate generated identity.
+
+**Deliverables:** unit selector, seed input, generate action, Canvas preview,
+resolved-part inspector, and copyable Entity DNA.
+
+**Done when:** a designer can reproduce and diagnose a generated sprite without
+editing files or reading renderer internals.
+
+**Depends on:** LE-S88.
+
+## LE-S90 — Procedural enemy variation
 
 **Goal:** Give enemy instances personality while preserving recognition.
 
-**Deliverables:** body/head/accessory/palette variation, silhouette safeguards,
-elite/boss integration, accessibility contrast checks, and visual snapshots.
+**Deliverables:** body/head/accessory/palette variation, trait-driven visual
+rules, rarity weighting, silhouette safeguards, elite/boss integration, and
+visual snapshots.
 
 **Done when:** two goblins can look individual but are still identified at a
 glance as the same tactical enemy kind.
 
-**Depends on:** LE-S68, LE-S70, and LE-S88.
+**Depends on:** LE-S68, LE-S70, LE-S88, and LE-S89.
 
-## LE-S90 — Procedural character variation
+## LE-S91 — Procedural character variation
 
 **Goal:** Apply constrained generated identity to heroes and merchants.
 
@@ -1266,9 +1304,63 @@ merchant portraits, fallback rendering, and reproducibility tests.
 **Done when:** a named character’s visual identity remains stable throughout a
 run, replay, and supported save migration.
 
-**Depends on:** LE-S74, LE-S76, and LE-S88.
+**Depends on:** LE-S74, LE-S76, LE-S88, and LE-S89.
 
-## LE-S91 — The Celestial and Cosmic Age
+## LE-S92 — Charm feedback foundation
+
+**Goal:** Make combat consequences satisfying and visible before adding more
+systems.
+
+**Deliverables:** capped, aggregated damage numbers; critical-hit emphasis; a
+distinct kill burst; visual-first poison/burn/stun feedback; impact direction;
+and reduced-motion alternatives.
+
+**Done when:** players can distinguish damage, a defeat, and an active status
+at a glance without the board becoming text-heavy.
+
+**Depends on:** LE-S62, LE-S80, and LE-S90.
+
+## LE-S93 — Battlefield memory
+
+**Goal:** Let recent combat leave a small, readable history on the board.
+
+**Deliverables:** fresh-to-decay-to-bones corpse lifecycle, configurable corpse
+cap with oldest-first eviction, short-lived arrows/scorch marks, optional tower
+wear, biome-based decay, and budget tests.
+
+**Done when:** combat leaves charming traces that never hide enemies, paths, or
+placement decisions.
+
+**Depends on:** LE-S79, LE-S80, and LE-S92.
+
+## LE-S94 — Emergent behaviour
+
+**Goal:** Make units feel alive through constrained, observable variation.
+
+**Deliverables:** authored micro-behaviours (hesitation, clustering, occasional
+rush), rare panic state, broken-formation encounter rule, bounded elite
+mutation, rare returning-survivor evolution with optional hover names, and
+deterministic scenario tests.
+
+**Done when:** variation feels intentional and tactically meaningful, with
+every enabled behaviour disclosed through visible cues or inspection.
+
+**Depends on:** LE-S68, LE-S77, LE-S90, and LE-S93.
+
+## LE-S95 — Conditions and visual priority
+
+**Goal:** Safely combine charm systems under explicit board-readability rules.
+
+**Deliverables:** effect-interaction rules (such as fire accelerating decay),
+renderer priority of enemies over effects over corpses over background, per-type
+caps, background motion, and dense-board accessibility tests.
+
+**Done when:** a late-game board remains understandable despite layered weather,
+effects, history, and procedural variation.
+
+**Depends on:** LE-S80, LE-S92 through LE-S94.
+
+## LE-S96 — The Celestial and Cosmic Age
 
 **Goal:** Introduce titans and strange threats through comprehensible twists.
 
@@ -1278,9 +1370,9 @@ explained movement or defence rule, encounter tables, and balance scenarios.
 **Done when:** the game feels dramatically stranger while its board state is
 still readable without a glossary during combat.
 
-**Depends on:** LE-S80, LE-S87, and LE-S89.
+**Depends on:** LE-S87, LE-S90, and LE-S95.
 
-## LE-S92 — Portal Tower
+## LE-S97 — Portal Tower
 
 **Goal:** Make late-game summoning a strategic source of controlled absurdity.
 
@@ -1290,9 +1382,9 @@ target/ownership feedback, branch data, and performance tests.
 **Done when:** its summoned creatures create a distinct build path without
 overwhelming the board or invalidating other late-game towers.
 
-**Depends on:** LE-S73, LE-S83, LE-S91.
+**Depends on:** LE-S73, LE-S83, LE-S91, and LE-S96.
 
-## LE-S93 — End-of-Reality content
+## LE-S98 — End-of-Reality content
 
 **Goal:** Deliver deliberate excess while preserving bounded game rules.
 
@@ -1302,69 +1394,112 @@ effects, clear rules card, capstone boss scenario, and accessibility review.
 **Done when:** the encounter is surprising and memorable but a player can
 still identify threats, targets, ranges, and their next useful action.
 
-**Depends on:** LE-S87, LE-S91, and LE-S92.
+**Depends on:** LE-S87, LE-S95 through LE-S97.
 
-## LE-S94 — Endless pacing and combinations
+## LE-S99 — Endless pacing and combinations
 
-**Goal:** Make long-run escalation depend on eras, composition, and events.
+**Goal:** Make long-run escalation depend on eras, composition, events, and
+visible controlled chaos rather than health alone.
 
 **Deliverables:** authored era loop, combination budgets, anti-repetition
-rules, checkpoint summaries, seed scenarios, and economy/difficulty review.
+rules, progressive charm-system activation, checkpoint summaries, seed
+scenarios, and economy/difficulty review.
 
-**Done when:** survival remains strategically varied deep into a run without
-relying on an unbounded enemy-health multiplier.
+**Done when:** survival remains strategically varied deep into a run, with
+complexity increasing gradually rather than appearing all at once.
 
-**Depends on:** LE-S64 through LE-S93.
+**Depends on:** LE-S64 through LE-S98.
 
-## LE-S95 — Emergent-story journal
+## LE-S100 — Emergent-story journal
 
 **Goal:** Preserve the individual history that makes a run worth recalling.
 
 **Deliverables:** compact run chronicle for heroes, relics, bosses, events,
-eras, and notable defeats; local export; privacy-safe copy; and tests.
+eras, returning survivors, and notable defeats; local export; privacy-safe
+copy; and tests.
 
 **Done when:** a completed run produces a concise, accurate story record
 without turning gameplay into a narrative-management screen.
 
-**Depends on:** LE-S24, LE-S74 through LE-S78, LE-S87, and LE-S94.
+**Depends on:** LE-S24, LE-S74 through LE-S78, LE-S94, LE-S98, and LE-S99.
 
-## LE-S96 — Vision balance laboratory
+## LE-S101 — Sprite-sheet importer
+
+**Goal:** Let creators import constrained modular sprite sheets visually.
+
+**Deliverables:** 1024×1024 limit, transparent-background validation, tile-grid
+overlay, selectable 30×30 regions with optional padding, import diagnostics,
+and invalid-sheet tests.
+
+**Done when:** a creator can upload one compliant sheet and see its usable
+regions without manually arranging asset folders.
+
+**Depends on:** LE-S47, LE-S88, and LE-S89.
+
+## LE-S102 — Visual assignment builder
+
+**Goal:** Turn imported regions into usable modular parts through visual work.
+
+**Deliverables:** category assignment for head, torso, legs, weapon,
+accessory, and effect; live assembled preview; alignment controls; manifest
+generation; undo/reset; and validation tests.
+
+**Done when:** a creator can select, assign, preview, and save a new unit's
+parts without hand-authoring a JSON manifest.
+
+**Depends on:** LE-S56, LE-S89, and LE-S101.
+
+## LE-S103 — Visual asset editor
+
+**Goal:** Provide a compact, inspector-led authoring surface for mature assets.
+
+**Deliverables:** asset/unit list, preview canvas, Entity DNA and metadata
+inspector, validation feedback, export/import using an LLM-compatible data
+contract, and documented support limits.
+
+**Done when:** the visual workflow supports safe iteration while remaining a
+focused content tool rather than an unbounded general-purpose game editor.
+
+**Depends on:** LE-S90 through LE-S92, and LE-S102.
+
+## LE-S104 — Vision balance laboratory
 
 **Goal:** Protect build diversity and fair late-game challenge with evidence.
 
 **Deliverables:** reference seeds across every era, automated outcome reports,
 synergy/outlier review, difficulty targets, and versioned balance decisions.
 
-**Done when:** a dominant relic, tower branch, or enemy combination is found
-through repeatable scenarios before it reaches a release candidate.
+**Done when:** a dominant relic, tower branch, enemy combination, or charm
+effect is found through repeatable scenarios before release.
 
-**Depends on:** LE-S52, LE-S94, and LE-S95.
+**Depends on:** LE-S52, LE-S99 through LE-S101, and LE-S103.
 
-## LE-S97 — Vision accessibility and clarity
+## LE-S105 — Vision accessibility and clarity
 
 **Goal:** Ensure complete-game complexity remains usable and understandable.
 
 **Deliverables:** external accessibility sessions, compact glossary/inspect
-flows, information-density audit, remediations, and regression coverage.
+flows, zoom-based detail and optional deeper-stat discovery, information-density
+audit, remediations, and regression coverage.
 
 **Done when:** the full era and content set retains readable controls, status,
 contrast, motion alternatives, and touch support.
 
-**Depends on:** LE-S45, LE-S80, LE-S91, and LE-S96.
+**Depends on:** LE-S45, LE-S95, LE-S98, and LE-S104.
 
-## LE-S98 — Endless performance hardening
+## LE-S106 — Endless performance hardening
 
 **Goal:** Meet explicit frame-time and memory budgets for late-run content.
 
-**Deliverables:** stress seeds, entity/effect budgets, leak detection,
+**Deliverables:** stress seeds, entity/effect/corpse budgets, leak detection,
 procedural-art cache policy, low-power fallback, and performance CI checks.
 
 **Done when:** supported devices sustain the agreed experience through the
 defined long-run test scenarios without a progressively degraded board.
 
-**Depends on:** LE-S26, LE-S88 through LE-S94, and LE-S97.
+**Depends on:** LE-S26, LE-S95 through LE-S99, and LE-S105.
 
-## LE-S99 — Vision release candidate
+## LE-S107 — Vision release candidate
 
 **Goal:** Freeze the complete Game Vision for focused validation.
 
@@ -1374,9 +1509,9 @@ playtest, accessibility/performance sign-off, release notes, and blocker triage.
 **Done when:** only accepted release-blocking fixes can change the candidate,
 and every declared Game Vision system has test or playtest evidence.
 
-**Depends on:** LE-S95 through LE-S98.
+**Depends on:** LE-S100 through LE-S106.
 
-## LE-S100 — Vision release
+## LE-S108 — Vision release
 
 **Goal:** Ship Dungeon Defense as the complete Game Vision milestone.
 
@@ -1386,12 +1521,12 @@ known-limitations record, archived balance evidence, and roadmap retrospective.
 **Done when:** a player can begin with a small frontier defence and reach a
 replayable, performant, accessible End-of-Reality endless run.
 
-**Depends on:** LE-S99.
+**Depends on:** LE-S107.
 
 ## Replanning checkpoints
 
 Review the plan after LE-S10, LE-S15, LE-S20, LE-S25, LE-S30, LE-S40, LE-S48,
-LE-S55, LE-S60, LE-S70, LE-S80, LE-S90, and LE-S100. At each checkpoint,
-decide which capabilities have proven reusable enough to graduate into
-`packages/engine/`. Until then, favour a compact working game over generic
+LE-S55, LE-S60, LE-S70, LE-S80, LE-S90, LE-S100, LE-S104, and LE-S108. At each
+checkpoint, decide which capabilities have proven reusable enough to graduate
+into `packages/engine/`. Until then, favour a compact working game over generic
 systems such as ECS breadth, physics, inventory, or mod support.
