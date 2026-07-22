@@ -46,6 +46,7 @@ const landingPanel = requiredElement<HTMLElement>("landing-panel");
 const enterDungeonButton = requiredElement<HTMLButtonElement>("enter-dungeon");
 const returnToTitleButton = requiredElement<HTMLButtonElement>("return-to-title");
 const beginMissionButton = requiredElement<HTMLButtonElement>("begin-mission");
+const missionSelectionSummary = requiredElement<HTMLElement>("mission-selection-summary");
 const headerControls = requiredElement<HTMLElement>("header-controls");
 const gold = requiredElement<HTMLElement>("gold");
 const lives = requiredElement<HTMLElement>("lives");
@@ -523,6 +524,9 @@ function updateMissionControls(): void {
   const node = selectedCampaignNodeId ? CAMPAIGN_NODES.find((candidate) => candidate.id === selectedCampaignNodeId) : undefined;
   missionContext.textContent = node ? `${node.displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}` : `${MAP_DEFINITIONS[selectedMap].displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}`;
   beginMissionButton.textContent = node ? `Begin ${node.displayName}` : `Begin ${MAP_DEFINITIONS[selectedMap].displayName}`;
+  missionSelectionSummary.textContent = node
+    ? `${node.displayName} selected · ${MAP_DEFINITIONS[selectedMap].displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}.`
+    : `Custom game selected · ${MAP_DEFINITIONS[selectedMap].displayName} · ${DIFFICULTY_DEFINITIONS[selectedDifficulty].displayName}.`;
   gateWatchButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "gate-watch"));
   crossroadsStandButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "crossroads-stand"));
   gateWatchButton.classList.toggle("selected", selectedCampaignNodeId === "gate-watch");

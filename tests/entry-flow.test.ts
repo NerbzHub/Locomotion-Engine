@@ -11,4 +11,12 @@ describe("game entry flow", () => {
     expect(canInteractWithBoard(missionSelection)).toBe(false);
     expect(canInteractWithBoard(defense)).toBe(true);
   });
+
+  it("returns to a non-interactive title state after mission selection is cancelled", () => {
+    const missionSelection = openMissionSelection();
+
+    expect(canInteractWithBoard(missionSelection)).toBe(false);
+    expect(returnToLanding()).toBe("landing");
+    expect(canInteractWithBoard(returnToLanding())).toBe(false);
+  });
 });

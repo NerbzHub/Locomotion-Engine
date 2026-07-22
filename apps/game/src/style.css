@@ -86,6 +86,7 @@ h2 { margin: 0; color: #fff9dd; font-size: clamp(1.5rem, 4vw, 2rem); }
 .custom-mission[open] { display: grid; gap: 0.65rem; }
 .setup-actions { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.6rem; }
 .setup-actions button:last-child { margin-left: auto; }
+.setup-summary { margin: -0.1rem 0 0; padding: 0.6rem 0.7rem; border-left: 3px solid #91c4b4; color: #d8f3e8; background: #273b40; font-size: 0.88rem; }
 .map-palette { display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem; }
 .map-palette .palette-label { flex-basis: 100%; }
 .map-choice { min-height: 2.5rem; padding: 0.45rem 0.7rem; color: #c9dbcf; background: #31454b; font-size: 0.84rem; }
@@ -140,6 +141,7 @@ h2 { margin: 0; color: #fff9dd; font-size: clamp(1.5rem, 4vw, 2rem); }
   .mission-cards { grid-template-columns: 1fr; }
   .mission-card { min-height: 6.8rem; }
   .setup-heading { align-items: flex-start; flex-direction: column; gap: 0.2rem; }
+  .setup-summary { font-size: 0.82rem; }
   .setup-actions { display: grid; grid-template-columns: 1fr 1.5fr; }
   .setup-actions button:last-child { margin-left: 0; }
   .map-choice { flex: 1 1 0; min-width: 0; padding-inline: 0.35rem; }

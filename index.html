@@ -56,9 +56,10 @@
             <button id="select-veteran" class="map-choice" type="button" aria-pressed="false">Veteran</button>
           </section>
         </details>
+        <p id="mission-selection-summary" class="setup-summary" role="status">Gate Watch selected · Dungeon Gate · Standard.</p>
         <div class="setup-actions">
           <button id="return-to-title" class="secondary" type="button">Back</button>
-          <button id="begin-mission" type="button">Begin Gate Watch</button>
+          <button id="begin-mission" type="button" aria-describedby="mission-selection-summary">Begin Gate Watch</button>
         </div>
         <button id="reset-profile" class="text-button" type="button">Reset campaign progress</button>
       </section>
@@ -76,7 +77,7 @@
       <div id="board-stage" class="board-stage" hidden>
         <canvas id="game-canvas" width="768" height="512" tabindex="0" aria-label="Dungeon Defense game board. Use arrow keys to move the board cursor, then Enter to build or inspect."></canvas>
         <div id="header-controls" class="tactical-hud">
-          <section class="hud" aria-label="Current resources" aria-live="polite">
+          <section class="hud" aria-label="Current resources" aria-live="polite" aria-atomic="true">
             <span>Gold <strong id="gold">50</strong></span>
             <span>Lives <strong id="lives">10</strong></span>
             <span>Wave <strong id="wave">0/3</strong></span>
