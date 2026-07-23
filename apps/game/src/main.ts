@@ -13,7 +13,7 @@ import { exportReplay, importReplay, playReplay } from "./replay";
 import type { ReplayAction } from "./replay";
 import { beginDefense, canInteractWithBoard, openMissionSelection, returnToLanding } from "./entry-flow";
 import type { GameScreen } from "./entry-flow";
-import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
+import { BOARD, createGame, missionWaveCount, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, updateGame, upgradeTower } from "./simulation";
 import type { Cell, TargetPolicy } from "./simulation";
 
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
@@ -403,7 +403,7 @@ function updateHud(): void {
   }
   gold.textContent = String(state.gold);
   lives.textContent = String(state.lives);
-  wave.textContent = `${state.wave}/${TOTAL_WAVES}`;
+  wave.textContent = `${state.wave}/${missionWaveCount(state)}`;
   waveBriefing.textContent = nextWaveBriefing(state);
   const gameEnded = state.gameOver || state.gameWon;
   const defending = canInteractWithBoard(gameScreen);
@@ -444,7 +444,7 @@ function closeGameMenu(): void {
 }
 
 function startNewDefense(): void {
-  state = createGame(initialSeed, selectedMap, selectedDifficulty);
+  state = createGame(initialSeed, selectedMap, selectedDifficulty, selectedCampaignNodeId);
   inspectedTowerId = undefined;
   hoveredCell = undefined;
   keyboardCursorActive = false;
@@ -525,12 +525,12 @@ function updateOutcome(): void {
     const canAdvance = selectedCampaignNodeId === "gate-watch" && isCampaignNodeUnlocked(profile, "crossroads-stand");
     outcomeKicker.textContent = canAdvance ? "Mission unlocked" : "Mission complete";
     outcomeTitle.textContent = "Dungeon defended";
-    outcomeSummary.textContent = `You cleared all ${TOTAL_WAVES} waves with ${state.lives} lives remaining and built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}.`;
+    outcomeSummary.textContent = `You cleared all ${missionWaveCount(state)} waves with ${state.lives} lives remaining and built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}.`;
     outcomePrimaryButton.textContent = canAdvance ? "Play Crossroads Stand" : "Play again";
   } else {
     outcomeKicker.textContent = "Run ended";
     outcomeTitle.textContent = "The dungeon fell";
-    outcomeSummary.textContent = `You reached wave ${state.wave}/${TOTAL_WAVES}, built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}, and can try a new defense.`;
+    outcomeSummary.textContent = `You reached wave ${state.wave}/${missionWaveCount(state)}, built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}, and can try a new defense.`;
     outcomePrimaryButton.textContent = "Try again";
   }
 }

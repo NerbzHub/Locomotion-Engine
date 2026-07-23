@@ -1,8 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS, waveEconomySummary } from "../apps/game/src/content";
-import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, selectTarget, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
+import { applyDamage, createGame, enemySpeed, gameSnapshot, isBuildable, missionWaveCount, nextWaveBriefing, placementStatus, placeTower, selectNearestToExitTarget, selectTarget, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerStats, updateGame, upgradeTower } from "../apps/game/src/simulation";
 
 describe("Dungeon Defense simulation", () => {
+  it("uses the selected campaign mission's authored encounter length", () => {
+    const gateWatch = createGame(55, "gate", "standard", "gate-watch");
+
+    expect(missionWaveCount(gateWatch)).toBe(6);
+    expect(nextWaveBriefing(gateWatch)).toContain("wave 1");
+  });
+
   it("rejects towers on the enemy path", () => {
     const state = createGame();
 

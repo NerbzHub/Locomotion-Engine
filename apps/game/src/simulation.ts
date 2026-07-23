@@ -1,9 +1,10 @@
 import { SeededRandom, World } from "../../../packages/engine/src";
 import type { EntityId } from "../../../packages/engine/src";
-import { BOSS_DEFINITION, DIFFICULTY_DEFINITIONS, ELITE_DEFINITION, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
+import { BOSS_DEFINITION, CAMPAIGN_NODES, DIFFICULTY_DEFINITIONS, ELITE_DEFINITION, ENEMY_DEFINITIONS, MAP_DEFINITIONS, TOWER_DEFINITIONS, WAVE_DEFINITIONS } from "./content";
 import type { DifficultyId, EnemyKind, MapId, TowerKind } from "./content";
 
 export const BOARD = MAP_DEFINITIONS.gate;
+/** Default/sandbox wave count. Campaign missions use missionWaveCount instead. */
 export const TOTAL_WAVES = WAVE_DEFINITIONS.length;
 
 export interface Point {
@@ -119,6 +120,7 @@ export interface GameState {
   wave: number;
   mapId: MapId;
   difficultyId: DifficultyId;
+  missionId?: string;
   phase: GamePhase;
   waveActive: boolean;
   gameOver: boolean;
@@ -136,7 +138,7 @@ export interface GameState {
   message: string;
 }
 
-export function createGame(seed = 4_242, mapId: MapId = "gate", difficultyId: DifficultyId = "standard"): GameState {
+export function createGame(seed = 4_242, mapId: MapId = "gate", difficultyId: DifficultyId = "standard", missionId?: string): GameState {
   const difficulty = DIFFICULTY_DEFINITIONS[difficultyId];
   return {
     world: new World(),
@@ -147,6 +149,7 @@ export function createGame(seed = 4_242, mapId: MapId = "gate", difficultyId: Di
     wave: 0,
     mapId,
     difficultyId,
+    missionId,
     phase: "intermission",
     waveActive: false,
     gameOver: false,
@@ -163,6 +166,8 @@ export function createGame(seed = 4_242, mapId: MapId = "gate", difficultyId: Di
     message: "Prepare your defense for wave 1."
   };
 }
+
+export function missionWaveCount(state: GameState): number { return missionWaves(state).length; }
 
 export function isBuildable(cell: Cell, mapId: MapId = "gate"): boolean {
   const map = MAP_DEFINITIONS[mapId];
@@ -284,7 +289,7 @@ export function startWave(state: GameState): boolean {
     state.message = "The dungeon has fallen. Restart to begin again.";
     return false;
   }
-  if (state.wave >= TOTAL_WAVES) {
+  if (state.wave >= missionWaveCount(state)) {
     state.gameWon = true;
     state.phase = "victory";
     state.message = "The dungeon is safe. Restart to defend it again.";
@@ -295,7 +300,7 @@ export function startWave(state: GameState): boolean {
   state.waveActive = true;
   state.phase = "wave";
   state.spawnDelaySeconds = 0;
-  const definition = WAVE_DEFINITIONS[state.wave - 1];
+  const definition = missionWaves(state)[state.wave - 1];
   for (const [index, kind] of definition.enemyKinds.entries()) {
     const enemyDefinition = ENEMY_DEFINITIONS[kind];
     const isElite = definition.eliteEnemyIndices?.includes(index) ?? false;
@@ -323,7 +328,7 @@ export function startWave(state: GameState): boolean {
 export function nextWaveBriefing(state: GameState): string {
   if (state.gameWon) return "All waves cleared — the dungeon is safe.";
   if (state.gameOver) return "The dungeon has fallen. Restart to try again.";
-  const definition = WAVE_DEFINITIONS[state.wave];
+  const definition = missionWaves(state)[state.wave];
   if (!definition) return "No further waves are available.";
   return `Next: wave ${state.wave + 1} · ${waveEnemyCounts(definition)} · ${definition.clearBonus} gold clear reward.`;
 }
@@ -352,14 +357,14 @@ export function updateGame(state: GameState, deltaSeconds: number): void {
   if (state.waveActive && state.pendingSpawns.length === 0 && state.enemies.length === 0) {
     state.waveActive = false;
     state.phase = "intermission";
-    const definition = WAVE_DEFINITIONS[state.wave - 1];
+    const definition = missionWaves(state)[state.wave - 1];
     state.gold += definition.clearBonus;
     finishWaveTelemetry(state);
     recordEvent(state, "wave-clear", `Wave ${state.wave} cleared for ${definition.clearBonus} gold`);
-    if (state.wave === TOTAL_WAVES) {
+    if (state.wave === missionWaveCount(state)) {
       state.gameWon = true;
       state.phase = "victory";
-      state.message = "The dungeon is safe! All three waves have been defeated.";
+      state.message = `The dungeon is safe! All ${missionWaveCount(state)} waves have been defeated.`;
       return;
     }
     state.message = `Wave ${state.wave} cleared: +${definition.clearBonus} gold. Prepare for wave ${state.wave + 1}.`;
@@ -645,6 +650,10 @@ function cellKey(cell: Cell): string {
 
 function waveEnemyNames(definition: { readonly enemyKinds: readonly EnemyKind[] }): string {
   return [...new Set(definition.enemyKinds)].map((kind) => ENEMY_DEFINITIONS[kind].displayName.toLowerCase()).join(" and ");
+}
+
+function missionWaves(state: GameState) {
+  return CAMPAIGN_NODES.find((node) => node.id === state.missionId)?.waves ?? WAVE_DEFINITIONS;
 }
 
 function waveEnemyCounts(definition: { readonly enemyKinds: readonly EnemyKind[] }): string {

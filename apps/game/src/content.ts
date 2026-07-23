@@ -154,11 +154,26 @@ export interface CampaignNodeDefinition {
   readonly description: string;
   readonly mapId: MapId;
   readonly difficultyId: DifficultyId;
+  readonly waves: readonly WaveDefinition[];
 }
 
 export const CAMPAIGN_NODES: readonly CampaignNodeDefinition[] = [
-  { id: "gate-watch", displayName: "Gate Watch", description: "Hold the original dungeon gate.", mapId: "gate", difficultyId: "standard" },
-  { id: "crossroads-stand", displayName: "Crossroads Stand", description: "Defend the split approach against the Warden.", mapId: "crossroads", difficultyId: "standard" }
+  { id: "gate-watch", displayName: "Gate Watch", description: "Hold the original dungeon gate.", mapId: "gate", difficultyId: "standard", waves: [
+    { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "slime", "slime"], clearBonus: 12 },
+    { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "beetle", "beetle"], clearBonus: 16 },
+    { enemyKinds: ["slime", "slime", "beetle", "beetle", "wisp", "wisp"], clearBonus: 20 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [2], clearBonus: 24 },
+    { enemyKinds: ["slime", "slime", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [5], clearBonus: 28 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp", "wisp"], eliteEnemyIndices: [1, 5], boss: true, clearBonus: 34 }
+  ] },
+  { id: "crossroads-stand", displayName: "Crossroads Stand", description: "Defend the split approach against the Warden.", mapId: "crossroads", difficultyId: "standard", waves: [
+    { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "slime", "slime", "slime"], clearBonus: 14 },
+    { enemyKinds: ["slime", "slime", "slime", "beetle", "beetle", "beetle"], clearBonus: 18 },
+    { enemyKinds: ["beetle", "beetle", "wisp", "wisp", "wisp"], clearBonus: 22 },
+    { enemyKinds: ["slime", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [3], clearBonus: 26 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [0, 4], clearBonus: 30 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp", "wisp", "wisp"], eliteEnemyIndices: [1, 6], boss: true, clearBonus: 38 }
+  ] }
 ];
 
 /** Enemy balance and presentation are authored game content, not engine concerns. */
