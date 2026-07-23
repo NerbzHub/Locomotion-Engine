@@ -32,14 +32,7 @@
 
       <section id="setup-panel" class="setup-panel" aria-label="Choose a mission" hidden>
         <div class="setup-heading"><span class="palette-label">1. Select level</span></div>
-        <div class="mission-cards">
-          <button id="campaign-gate-watch" class="mission-card selected" type="button" aria-pressed="true">
-            <span class="mission-card-kicker">Mission 1</span><strong>Gate Watch</strong><small>Hold the original dungeon gate.</small>
-          </button>
-          <button id="campaign-crossroads-stand" class="mission-card" type="button" aria-pressed="false">
-            <span class="mission-card-kicker">Mission 2</span><strong>Crossroads Stand</strong><small id="crossroads-unlock-copy">Clear Gate Watch to unlock.</small>
-          </button>
-        </div>
+        <div id="mission-cards" class="mission-cards" aria-label="Campaign mission selection"></div>
         <section class="difficulty-palette" aria-label="2. Select difficulty">
           <span class="palette-label">2. Select difficulty</span>
           <button id="select-casual" class="difficulty-choice" type="button" aria-pressed="false">Casual</button>

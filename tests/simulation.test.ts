@@ -10,6 +10,14 @@ describe("Dungeon Defense simulation", () => {
     expect(nextWaveBriefing(gateWatch)).toContain("wave 1");
   });
 
+  it("uses the authored Moonlit Ruins path for its campaign mission", () => {
+    const ruins = createGame(55, "ruins", "standard", "ruins-awakening");
+
+    expect(ruins.mapId).toBe("ruins");
+    expect(isBuildable({ column: 0, row: 1 }, "ruins")).toBe(false);
+    expect(missionWaveCount(ruins)).toBe(6);
+  });
+
   it("rejects towers on the enemy path", () => {
     const state = createGame();
 
