@@ -2,14 +2,10 @@
 
 **Status:** Active implementation plan
 
-**Current position (2026-07-22):** LE-S01 through LE-S28 are implemented and
-merged into `main`. LE-S29 is prepared but not complete: the project uses an
-all-rights-reserved, no-licence policy recorded in the root `LICENSE.md`, and
-the release candidate must first incorporate the FI2/FI3 usability remediation
-branch below. LE-P01 and LE-P02 are complete. LE-P03 implementation and
-automated verification are complete, with its documented first-time-player and
-device checks remaining before it can be closed; LE-S29 must not begin first.
-LE-S30 and every later numbered sprint remain planned.
+**Current position (2026-07-23):** LE-S01 through LE-S30 are complete. The
+`0.1.0-rc.2` feedback cycle accepted FI2 through FI5, and the resulting Gate 1
+release is `v0.1.0`. Its release record and known limitations are in
+`docs/RELEASE_RECORD_0.1.0.md`. LE-S31 is the next planned sprint.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -58,7 +54,7 @@ feature branches.
 | Completed campaign polish | LE-S18–LE-S23 | Already merged | Campaign, progression, economy, audio, presentation, tutorial. |
 | Completed release foundations | LE-S24–LE-S28 | Already merged | Replays, fuzzing, performance, mobile, packaging. |
 | Priority game entry and HUD | LE-P01–LE-P03 | `feature/pre-game-flow-and-tactical-hud` | FI2/FI3: intentional game entry, always-visible tactical state, and regression evidence. |
-| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | Playtest candidate, triage, and Gate 1 release after the priority UX branch. |
+| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | RC2 feedback integration, targeted validation, triage, and Gate 1 release. |
 | Post-release learning | LE-S31–LE-S33 | `feature/post-release-foundations` | Stabilised feedback and safer content authoring. |
 | Endless challenge | LE-S34–LE-S36 | `feature/endless-challenges` | Mutators, endless mode, and optional mastery goals. |
 | Campaign expansion | LE-S37–LE-S41 | `feature/campaign-expansion` | Splitter/Bombard play, hazards, maps, and chapter two. |
@@ -127,7 +123,7 @@ feature branches.
 | LE-S26 | Performance budget | The game stays responsive under an explicit entity budget. |
 | LE-S27 | Responsive layout | The game remains usable on narrow and touch-first screens. |
 | LE-S28 | Release packaging | Builds, versioning, credits, and licence are release-ready. |
-| LE-S29 | Playtest release candidate | External feedback is collected against a stable candidate. |
+| LE-S29 | Feedback-integrated playtest candidate | RC2 validates the simplified setup and gameplay information hierarchy. |
 | LE-S30 | Gate 1 release | The polished vertical slice is shipped with reproducible evidence. |
 | LE-S31 | Post-release stabilisation | Release feedback is triaged and high-confidence defects are resolved. |
 | LE-S32 | Usability study | Observed player behaviour directs the next feature choices. |
@@ -256,22 +252,26 @@ secondary information that does not support the next player decision.
 
 ## LE-P03 — Entry and HUD hardening
 
-**Status: implementation complete on 2026-07-22; manual browser/device
-verification pending.** See the LE-P03 section in
+**Status: completed on 2026-07-23 after primary-input verification.** Desktop
+mouse and narrow touch are the supported release paths. Keyboard board controls
+remain available, while keyboard-only traversal of every setup/menu control is
+not a Gate 1 support requirement. See the LE-P03 section in
 `docs/PLAYTESTER_CRITERIA.md`.
 
 **Goal:** Prove that the new game-entry and tactical-information contract is
 clear, accessible, and release-ready before external playtesting.
 
-**Deliverables:** keyboard and touch paths through the new states; focus and
-screen-reader/status review; portrait and narrow-window checks; one
-first-time-player test script focused on entering a mission and reading the
-HUD; automated state-transition coverage; and a regression check that no tower
-can be placed before mission confirmation.
+**Deliverables:** desktop mouse and touch paths through the new states;
+keyboard board controls, focus and screen-reader/status review; portrait and
+narrow-window checks; one first-time-player test script focused on entering a
+mission and reading the HUD; automated state-transition coverage; and a
+regression check that no tower can be placed before mission confirmation.
 
-**Done when:** the supported input/device matrix can enter, prepare, play, open
-settings, and return to menus without a hidden board interaction or loss of
-critical tactical information.
+**Done when:** the supported primary input/device matrix—mouse on desktop and
+touch on narrow screens—can enter, prepare, play, open settings, and return to
+menus without a hidden board interaction or loss of critical tactical
+information. Keyboard board placement and cancellation remain usable; complete
+keyboard-only menu traversal is not claimed for Gate 1.
 
 **Depends on:** LE-P01 and LE-P02.
 
@@ -665,22 +665,33 @@ named release build without manual repair.
 
 **Depends on:** LE-S25 through LE-S27.
 
-## LE-S29 — Playtest release candidate
+## LE-S29 — Feedback-integrated playtest candidate
 
-**Status: candidate preparation created on 2026-07-22; distribution blocked
-pending LE-P03 manual verification.** See `docs/PLAYTEST_CANDIDATE_RC1.md`.
+**Status: completed on 2026-07-23.** RC2 primary-input checks, FI4/FI5
+regression checks, and the required structured feedback cycle passed. See
+`docs/PLAYTEST_CANDIDATE_RC2.md`.
 
-**Goal:** Collect focused external feedback against a stable, observable build.
+**Why it changed:** RC1 preparation pre-dated actual UI testing. The resulting
+FI4/FI5 evidence confirmed duplicated setup and gameplay information, so RC1's
+custom-game test path and its assumption that only FI2/FI3 needed validation
+are no longer current.
 
-**Deliverables:** a release-candidate build, a structured feedback form,
-playtest scenarios, issue triage rules, and a no-new-feature policy.
+**Goal:** Collect focused external feedback against a stable RC2 build that
+validates the level → difficulty → begin flow and the reduced tactical UI.
 
-**Done when:** feedback is categorised by severity and every accepted change is
-linked to evidence from the candidate.
+**Deliverables:** an `0.1.0-rc.2` package version, an RC2 candidate record,
+updated test scenarios and triage rules, focused FI4/FI5 regression checks,
+and a no-new-feature policy.
+
+**Done when:** the updated input/device checks have been recorded, feedback is
+categorised by severity, and every accepted change is linked to RC2 evidence.
 
 **Depends on:** LE-P03, LE-S23, and LE-S26 through LE-S28.
 
 ## LE-S30 — Gate 1 release
+
+**Status: completed on 2026-07-23 as `v0.1.0`.** See
+`docs/RELEASE_RECORD_0.1.0.md` and `docs/RELEASE_NOTES_0.1.0.md`.
 
 **Goal:** Ship the polished Dungeon Defense vertical slice with reproducible
 evidence of quality.

@@ -1,9 +1,9 @@
 # Project Status
 
-**Status:** Gate 1 extended through LE-S29 documentation; copyright and
-no-licence notice selected for public source viewing
+**Status:** Gate 1 released locally as `v0.1.0`; LE-S31 post-release
+stabilisation is next
 
-**Updated:** 2026-07-22
+**Updated:** 2026-07-23
 
 ## What exists
 
@@ -114,9 +114,9 @@ errors occur.
 
 ## Next delivery gate
 
-Continue LE-S29 from `docs/GAME_ROADMAP.md`: build the external-playtest
-release candidate, publish or archive the exact `dist/` artifact, and collect
-structured feedback using `docs/PLAYTESTER_CRITERIA.md`.
+Begin LE-S31 from `docs/GAME_ROADMAP.md`: triage post-release feedback using
+the release record, add regression coverage for accepted defects, and keep the
+maintenance window focused on high-confidence fixes.
 
 The owner has selected **no software licence**: repository material is
 all-rights-reserved and public source viewing does not grant reuse permission.
