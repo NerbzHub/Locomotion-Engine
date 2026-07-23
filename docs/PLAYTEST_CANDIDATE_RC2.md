@@ -35,6 +35,13 @@ distributed build record.
 - Gold, Lives, Wave, and Menu remain visible in the board safe zones.
 - The narrow layout keeps tower selection and Start Wave reachable.
 
+## Automated evidence
+
+The submitted Gate Watch / Standard replay is held as a regression test in
+`tests/rc2-playthrough.test.ts`. It verifies the recorded two-wave combat
+sequence; it is not a full-victory record and does not replace the manual input
+and viewport checks below.
+
 ## Distribution blockers
 
 - [ ] Complete and record the five updated LE-P03 entry/HUD checks on

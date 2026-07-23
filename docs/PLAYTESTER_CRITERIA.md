@@ -79,6 +79,34 @@ complete them without coaching.
 5. Repeat steps 1–4 with keyboard-only input and once on a narrow or touch
    viewport. Use **Back** from mission selection and confirm it returns to the
    title without exposing an interactive board.
+### Submitted replay evidence
+
+This is valid recorded evidence for the Gate Watch / Standard combat loop. It
+is covered by `tests/rc2-playthrough.test.ts`, which reproduces its two-wave
+intermission state on every automated test run. It is not evidence of a full
+victory: the third recorded Start Wave action occurs before wave two has
+resolved, so the deterministic replay remains at the wave-two intermission.
+
+For a full-run record, export a replay after starting wave three and reaching
+the victory screen. The export does not capture browser layout, keyboard-only
+input, or viewport size, so it does not replace the manual LE-P03 checks.
+
+```json
+{
+  "version": 1,
+  "seed": 4242,
+  "mapId": "gate",
+  "difficultyId": "standard",
+  "actions": [
+    { "step": 143, "type": "place", "cell": { "column": 2, "row": 2 }, "kind": "archer" },
+    { "step": 265, "type": "place", "cell": { "column": 4, "row": 3 }, "kind": "archer" },
+    { "step": 361, "type": "start-wave" },
+    { "step": 1066, "type": "start-wave" },
+    { "step": 1872, "type": "start-wave" },
+    { "step": 1973, "type": "place", "cell": { "column": 1, "row": 2 }, "kind": "archer" }
+  ]
+}
+```
 
 Record the viewport size, input method, and any overlap, clipping, focus-loss,
 or unclear status wording. A failed check is release-blocking for LE-P03.
