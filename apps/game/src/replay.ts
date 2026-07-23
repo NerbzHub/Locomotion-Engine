@@ -1,3 +1,4 @@
+import { CAMPAIGN_NODES } from "./content";
 import type { DifficultyId, MapId, TowerKind } from "./content";
 import { createGame, placeTower, startWave, updateGame } from "./simulation";
 import type { Cell, GameState } from "./simulation";
@@ -13,11 +14,12 @@ export interface Replay {
   readonly seed: number;
   readonly mapId: MapId;
   readonly difficultyId: DifficultyId;
+  readonly missionId?: string;
   readonly actions: readonly ReplayAction[];
 }
 
 export function exportReplay(state: GameState, actions: readonly ReplayAction[]): string {
-  return JSON.stringify({ version: REPLAY_VERSION, seed: state.seed, mapId: state.mapId, difficultyId: state.difficultyId, actions }, null, 2);
+  return JSON.stringify({ version: REPLAY_VERSION, seed: state.seed, mapId: state.mapId, difficultyId: state.difficultyId, missionId: state.missionId, actions }, null, 2);
 }
 
 export function importReplay(serialised: string): Replay | undefined {
@@ -29,7 +31,7 @@ export function importReplay(serialised: string): Replay | undefined {
 }
 
 export function playReplay(replay: Replay, finalStep: number): GameState {
-  const state = createGame(replay.seed, replay.mapId, replay.difficultyId);
+  const state = createGame(replay.seed, replay.mapId, replay.difficultyId, replay.missionId);
   for (const action of replay.actions) {
     while (state.step < action.step) updateGame(state, 1 / 60);
     if (action.type === "place") placeTower(state, action.cell, action.kind);
@@ -40,7 +42,7 @@ export function playReplay(replay: Replay, finalStep: number): GameState {
 }
 
 function isReplay(value: unknown): value is Replay {
-  if (!isRecord(value) || value.version !== REPLAY_VERSION || typeof value.seed !== "number" || typeof value.mapId !== "string" || typeof value.difficultyId !== "string" || !Array.isArray(value.actions)) return false;
+  if (!isRecord(value) || value.version !== REPLAY_VERSION || typeof value.seed !== "number" || typeof value.mapId !== "string" || typeof value.difficultyId !== "string" || (value.missionId !== undefined && (typeof value.missionId !== "string" || !CAMPAIGN_NODES.some((node) => node.id === value.missionId))) || !Array.isArray(value.actions)) return false;
   return value.actions.every((action) => isRecord(action) && typeof action.step === "number" && Number.isInteger(action.step) && action.step >= 0 && (action.type === "start-wave" || (action.type === "place" && isRecord(action.cell) && typeof action.cell.column === "number" && typeof action.cell.row === "number" && typeof action.kind === "string")));
 }
 
