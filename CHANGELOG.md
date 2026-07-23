@@ -7,7 +7,12 @@ compatible fixes increment the patch version.
 
 ## Unreleased
 
-- No released changes yet.
+- Prepared the private `0.1.0-rc.2` candidate after focused UI playtest
+  feedback.
+- Simplified mission setup to level → difficulty → begin, removing duplicate
+  custom-map controls and campaign context.
+- Removed duplicated gameplay placement/range instructions while preserving
+  accessible live status feedback.
 
 ## 0.1.0 - Unreleased
 

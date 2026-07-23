@@ -2,14 +2,13 @@
 
 **Status:** Active implementation plan
 
-**Current position (2026-07-22):** LE-S01 through LE-S28 are implemented and
-merged into `main`. LE-S29 is prepared but not complete: the project uses an
-all-rights-reserved, no-licence policy recorded in the root `LICENSE.md`, and
-the release candidate must first incorporate the FI2/FI3 usability remediation
-branch below. LE-P01 and LE-P02 are complete. LE-P03 implementation and
-automated verification are complete, with its documented first-time-player and
-device checks remaining before it can be closed; LE-S29 must not begin first.
-LE-S30 and every later numbered sprint remain planned.
+**Current position (2026-07-23):** LE-S01 through LE-S28 are implemented and
+merged into `main`. LE-S29 has been re-scoped after real tester feedback: FI2
+through FI5 are now implemented, and the next candidate is `0.1.0-rc.2`, not
+the superseded RC1 preparation. LE-P03 implementation and automated
+verification are complete, but its updated first-time-player and device checks
+must be recorded before LE-S29 can close. LE-S30 and every later numbered
+sprint remain planned.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -58,7 +57,7 @@ feature branches.
 | Completed campaign polish | LE-S18–LE-S23 | Already merged | Campaign, progression, economy, audio, presentation, tutorial. |
 | Completed release foundations | LE-S24–LE-S28 | Already merged | Replays, fuzzing, performance, mobile, packaging. |
 | Priority game entry and HUD | LE-P01–LE-P03 | `feature/pre-game-flow-and-tactical-hud` | FI2/FI3: intentional game entry, always-visible tactical state, and regression evidence. |
-| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | Playtest candidate, triage, and Gate 1 release after the priority UX branch. |
+| Gate 1 release | LE-S29–LE-S30 | `release/gate-1` | RC2 feedback integration, targeted validation, triage, and Gate 1 release. |
 | Post-release learning | LE-S31–LE-S33 | `feature/post-release-foundations` | Stabilised feedback and safer content authoring. |
 | Endless challenge | LE-S34–LE-S36 | `feature/endless-challenges` | Mutators, endless mode, and optional mastery goals. |
 | Campaign expansion | LE-S37–LE-S41 | `feature/campaign-expansion` | Splitter/Bombard play, hazards, maps, and chapter two. |
@@ -127,7 +126,7 @@ feature branches.
 | LE-S26 | Performance budget | The game stays responsive under an explicit entity budget. |
 | LE-S27 | Responsive layout | The game remains usable on narrow and touch-first screens. |
 | LE-S28 | Release packaging | Builds, versioning, credits, and licence are release-ready. |
-| LE-S29 | Playtest release candidate | External feedback is collected against a stable candidate. |
+| LE-S29 | Feedback-integrated playtest candidate | RC2 validates the simplified setup and gameplay information hierarchy. |
 | LE-S30 | Gate 1 release | The polished vertical slice is shipped with reproducible evidence. |
 | LE-S31 | Post-release stabilisation | Release feedback is triaged and high-confidence defects are resolved. |
 | LE-S32 | Usability study | Observed player behaviour directs the next feature choices. |
@@ -665,18 +664,26 @@ named release build without manual repair.
 
 **Depends on:** LE-S25 through LE-S27.
 
-## LE-S29 — Playtest release candidate
+## LE-S29 — Feedback-integrated playtest candidate
 
-**Status: candidate preparation created on 2026-07-22; distribution blocked
-pending LE-P03 manual verification.** See `docs/PLAYTEST_CANDIDATE_RC1.md`.
+**Status: re-scoped and RC2 preparation complete on 2026-07-23; distribution
+blocked pending updated manual verification.** See
+`docs/PLAYTEST_CANDIDATE_RC2.md`.
 
-**Goal:** Collect focused external feedback against a stable, observable build.
+**Why it changed:** RC1 preparation pre-dated actual UI testing. The resulting
+FI4/FI5 evidence confirmed duplicated setup and gameplay information, so RC1's
+custom-game test path and its assumption that only FI2/FI3 needed validation
+are no longer current.
 
-**Deliverables:** a release-candidate build, a structured feedback form,
-playtest scenarios, issue triage rules, and a no-new-feature policy.
+**Goal:** Collect focused external feedback against a stable RC2 build that
+validates the level → difficulty → begin flow and the reduced tactical UI.
 
-**Done when:** feedback is categorised by severity and every accepted change is
-linked to evidence from the candidate.
+**Deliverables:** an `0.1.0-rc.2` package version, an RC2 candidate record,
+updated test scenarios and triage rules, focused FI4/FI5 regression checks,
+and a no-new-feature policy.
+
+**Done when:** the updated input/device checks have been recorded, feedback is
+categorised by severity, and every accepted change is linked to RC2 evidence.
 
 **Depends on:** LE-P03, LE-S23, and LE-S26 through LE-S28.
 

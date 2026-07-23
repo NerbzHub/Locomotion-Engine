@@ -53,8 +53,8 @@ Ask testers to complete these tasks in order:
 3. Place at least two towers before starting the first wave.
 4. Complete at least one full wave.
 5. Upgrade or inspect a tower when available.
-6. Change one setting, such as audio, reduced motion, difficulty, map, or
-   targeting policy.
+6. Change one setting, such as audio, reduced motion, difficulty, or targeting
+   policy.
 7. Continue until victory, loss, or 20 minutes have passed.
 8. Restart or resume once, if the option appears relevant.
 
@@ -69,8 +69,9 @@ complete them without coaching.
 
 1. Open a fresh game. Confirm that the board, towers, Gold, Lives, Wave, and
    Menu are not shown before choosing **Enter the dungeon**.
-2. Choose **Enter the dungeon**, change a mission or custom-game option, and
-   state what mission/difficulty is selected before pressing **Begin mission**.
+2. Choose **Enter the dungeon**, select a level and difficulty, and state what
+   is selected before pressing **Begin mission**. Confirm there is no duplicate
+   map or custom-game choice to resolve.
 3. Begin the mission. Confirm that Gold, Lives, and Wave are visible at the
    board's upper-left and Menu is visible at the upper-right without scrolling.
 4. Open Menu, change one setting, close it, and confirm that the board remains
@@ -81,6 +82,22 @@ complete them without coaching.
 
 Record the viewport size, input method, and any overlap, clipping, focus-loss,
 or unclear status wording. A failed check is release-blocking for LE-P03.
+
+## RC2 information-hierarchy regression checks (FI4/FI5)
+
+Run these checks on the exact RC2 build before collecting longer feedback:
+
+1. At the title and level-selection screens, confirm no selected map or
+   difficulty is displayed above **Dungeon Defense**.
+2. Confirm setup presents exactly the player-facing choice sequence: level,
+   difficulty, then **Begin**. Campaign reset may only appear inside the
+   in-game Menu.
+3. Once a mission begins, confirm the board shows the tactical HUD, selected
+   tower cards, range/placement visuals, wave briefing, and action button—but
+   not repeated selected-tower cost/range/placement sentences.
+4. Repeat the checks at a narrow viewport. Confirm the Start Wave control is
+   reachable without horizontal scrolling and that no fixed command dock hides
+   a required control.
 
 ## Feedback questions
 
