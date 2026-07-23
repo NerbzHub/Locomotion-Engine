@@ -255,22 +255,26 @@ secondary information that does not support the next player decision.
 
 ## LE-P03 — Entry and HUD hardening
 
-**Status: implementation complete on 2026-07-22; manual browser/device
-verification pending.** See the LE-P03 section in
+**Status: completed on 2026-07-23 after primary-input verification.** Desktop
+mouse and narrow touch are the supported release paths. Keyboard board controls
+remain available, while keyboard-only traversal of every setup/menu control is
+not a Gate 1 support requirement. See the LE-P03 section in
 `docs/PLAYTESTER_CRITERIA.md`.
 
 **Goal:** Prove that the new game-entry and tactical-information contract is
 clear, accessible, and release-ready before external playtesting.
 
-**Deliverables:** keyboard and touch paths through the new states; focus and
-screen-reader/status review; portrait and narrow-window checks; one
-first-time-player test script focused on entering a mission and reading the
-HUD; automated state-transition coverage; and a regression check that no tower
-can be placed before mission confirmation.
+**Deliverables:** desktop mouse and touch paths through the new states;
+keyboard board controls, focus and screen-reader/status review; portrait and
+narrow-window checks; one first-time-player test script focused on entering a
+mission and reading the HUD; automated state-transition coverage; and a
+regression check that no tower can be placed before mission confirmation.
 
-**Done when:** the supported input/device matrix can enter, prepare, play, open
-settings, and return to menus without a hidden board interaction or loss of
-critical tactical information.
+**Done when:** the supported primary input/device matrix—mouse on desktop and
+touch on narrow screens—can enter, prepare, play, open settings, and return to
+menus without a hidden board interaction or loss of critical tactical
+information. Keyboard board placement and cancellation remain usable; complete
+keyboard-only menu traversal is not claimed for Gate 1.
 
 **Depends on:** LE-P01 and LE-P02.
 

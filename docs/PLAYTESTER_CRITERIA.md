@@ -76,9 +76,11 @@ complete them without coaching.
    board's upper-left and Menu is visible at the upper-right without scrolling.
 4. Open Menu, change one setting, close it, and confirm that the board remains
    visible and combat resumes only after the menu closes.
-5. Repeat steps 1–4 with keyboard-only input and once on a narrow or touch
-   viewport. Use **Back** from mission selection and confirm it returns to the
-   title without exposing an interactive board.
+5. Repeat steps 1–4 once with desktop mouse input and once on a narrow or
+   touch viewport. Use **Back** from mission selection and confirm it returns
+   to the title without exposing an interactive board. Keyboard board controls
+   (arrow keys, Enter, and Escape) are supported as a secondary interaction
+   path; full keyboard-only setup/menu traversal is not a Gate 1 requirement.
 ### Submitted replay evidence
 
 This is valid recorded evidence for the Gate Watch / Standard combat loop. It

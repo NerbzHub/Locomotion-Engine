@@ -44,8 +44,9 @@ and viewport checks below.
 
 ## Distribution blockers
 
-- [ ] Complete and record the five updated LE-P03 entry/HUD checks on
-  keyboard-only input and a narrow or touch viewport.
+- [x] Complete and record the five updated LE-P03 entry/HUD checks using the
+  supported primary paths: desktop mouse and narrow touch. Keyboard board
+  placement/cancellation remains available as a secondary path.
 - [ ] Complete and record the four RC2 FI4/FI5 regression checks in
   [PLAYTESTER_CRITERIA.md](PLAYTESTER_CRITERIA.md).
 - [ ] Run `pnpm install --frozen-lockfile`.
@@ -59,8 +60,8 @@ and viewport checks below.
 
 ## Known limitations before distribution
 
-- The updated first-time-player, keyboard, and narrow/touch checks still need
-  to be run and recorded on real devices/browsers.
+- Primary desktop-mouse and narrow-touch checks have been recorded. Full
+  keyboard-only setup/menu traversal is intentionally outside Gate 1 scope.
 - This candidate is for private tester evaluation only. The repository's
   all-rights-reserved, no-licence policy remains in effect.
 

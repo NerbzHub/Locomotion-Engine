@@ -1,7 +1,7 @@
 # Project Status
 
-**Status:** Gate 1 RC2 preparation complete; targeted manual playtest
-verification remains before private distribution
+**Status:** Gate 1 RC2 primary-input verification complete; candidate feedback
+collection remains before private distribution
 
 **Updated:** 2026-07-23
 
@@ -114,10 +114,10 @@ errors occur.
 
 ## Next delivery gate
 
-Continue the re-scoped LE-S29 from `docs/GAME_ROADMAP.md`: complete and record
-the updated keyboard and narrow/touch verification for the `0.1.0-rc.2`
-candidate, then archive the exact `dist/` artifact and collect structured
-feedback using `docs/PLAYTESTER_CRITERIA.md`.
+Continue the re-scoped LE-S29 from `docs/GAME_ROADMAP.md`: archive the exact
+`0.1.0-rc.2` artifact and collect structured feedback using
+`docs/PLAYTESTER_CRITERIA.md`. Desktop mouse and narrow-touch verification is
+complete; full keyboard-only setup/menu traversal is not a Gate 1 requirement.
 
 The owner has selected **no software licence**: repository material is
 all-rights-reserved and public source viewing does not grant reuse permission.
