@@ -2,10 +2,10 @@
 
 **Status:** Active implementation plan
 
-**Current position (2026-07-23):** LE-S01 through LE-S30 are complete. The
-`0.1.0-rc.2` feedback cycle accepted FI2 through FI5, and the resulting Gate 1
-release is `v0.1.0`. Its release record and known limitations are in
-`docs/RELEASE_RECORD_0.1.0.md`. LE-S31 is the next planned sprint.
+**Current position (2026-07-23):** LE-S01 through LE-S31 are complete. The
+`0.1.0-rc.2` feedback cycle accepted FI2 through FI5, the resulting Gate 1
+release is `v0.1.0`, and its maintenance policy is recorded in
+`docs/POST_RELEASE_TRIAGE.md`. LE-S32 is the next planned sprint.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -706,6 +706,10 @@ and known limitations are all documented and independently repeatable.
 **Depends on:** LE-S29.
 
 ## LE-S31 — Post-release stabilisation
+
+**Status: completed on 2026-07-23.** The fixed `v0.1.x` maintenance window,
+severity policy, FI4/FI5 regression coverage, current defect register, and
+patch-release note format are in `docs/POST_RELEASE_TRIAGE.md`.
 
 **Goal:** Resolve confirmed release defects without diluting the product
 direction.

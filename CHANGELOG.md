@@ -7,7 +7,8 @@ compatible fixes increment the patch version.
 
 ## Unreleased
 
-- No unreleased changes.
+- Added post-release defect-triage policy, patch-release traceability, and UI
+  regression guards for the accepted FI4/FI5 feedback fixes.
 
 ## 0.1.0 - 2026-07-23
 
