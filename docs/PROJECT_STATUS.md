@@ -1,7 +1,7 @@
 # Project Status
 
-**Status:** Gate 1 released locally as `v0.1.0`; LE-S31 post-release
-stabilisation is complete and LE-S32 usability study is next
+**Status:** Gate 1 released locally as `v0.1.0`; LE-E01 Campaign One
+foundation and first chapter is next
 
 **Updated:** 2026-07-23
 
@@ -114,10 +114,10 @@ errors occur.
 
 ## Next delivery gate
 
-Begin LE-S32 from `docs/GAME_ROADMAP.md`: run a consentful usability study and
-prioritise the next feature tranche from repeated first-run, build, upgrade,
-and loss-moment evidence. LE-S31's maintenance policy and current defect
-register are in `docs/POST_RELEASE_TRIAGE.md`.
+Begin LE-E01 from `docs/GAME_ROADMAP.md`: replace the three-wave vertical
+slice with a complete first campaign chapter—at least six missions across
+three maps with six-to-ten-wave encounters and a capstone boss. The larger
+expansion-sprint plan supersedes LE-S32 through LE-S108 as the active sequence.
 
 The owner has selected **no software licence**: repository material is
 all-rights-reserved and public source viewing does not grant reuse permission.
