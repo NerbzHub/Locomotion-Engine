@@ -2,13 +2,10 @@
 
 **Status:** Active implementation plan
 
-**Current position (2026-07-23):** LE-S01 through LE-S28 are implemented and
-merged into `main`. LE-S29 has been re-scoped after real tester feedback: FI2
-through FI5 are now implemented, and the next candidate is `0.1.0-rc.2`, not
-the superseded RC1 preparation. LE-P03 implementation and automated
-verification are complete, but its updated first-time-player and device checks
-must be recorded before LE-S29 can close. LE-S30 and every later numbered
-sprint remain planned.
+**Current position (2026-07-23):** LE-S01 through LE-S30 are complete. The
+`0.1.0-rc.2` feedback cycle accepted FI2 through FI5, and the resulting Gate 1
+release is `v0.1.0`. Its release record and known limitations are in
+`docs/RELEASE_RECORD_0.1.0.md`. LE-S31 is the next planned sprint.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
@@ -670,8 +667,8 @@ named release build without manual repair.
 
 ## LE-S29 — Feedback-integrated playtest candidate
 
-**Status: re-scoped and RC2 preparation complete on 2026-07-23; distribution
-blocked pending updated manual verification.** See
+**Status: completed on 2026-07-23.** RC2 primary-input checks, FI4/FI5
+regression checks, and the required structured feedback cycle passed. See
 `docs/PLAYTEST_CANDIDATE_RC2.md`.
 
 **Why it changed:** RC1 preparation pre-dated actual UI testing. The resulting
@@ -692,6 +689,9 @@ categorised by severity, and every accepted change is linked to RC2 evidence.
 **Depends on:** LE-P03, LE-S23, and LE-S26 through LE-S28.
 
 ## LE-S30 — Gate 1 release
+
+**Status: completed on 2026-07-23 as `v0.1.0`.** See
+`docs/RELEASE_RECORD_0.1.0.md` and `docs/RELEASE_NOTES_0.1.0.md`.
 
 **Goal:** Ship the polished Dungeon Defense vertical slice with reproducible
 evidence of quality.

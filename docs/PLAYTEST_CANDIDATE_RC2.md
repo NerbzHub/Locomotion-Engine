@@ -1,7 +1,7 @@
 # Dungeon Defense 0.1.0-rc.2 — Playtest Candidate
 
-**Status:** Candidate preparation complete. Do not distribute until the manual
-verification blockers below are recorded against the exact build.
+**Status:** Accepted on 2026-07-23. RC2 feedback and verification informed the
+final `v0.1.0` Gate 1 release.
 
 ## Why RC2 exists
 
@@ -19,9 +19,9 @@ distributed build record.
 | --- | --- |
 | Candidate name | `dungeon-defense-0.1.0-rc.2` |
 | Package version | `0.1.0-rc.2` |
-| Source commit | Record the final commit hash immediately before building. |
-| Build date | Record when the exact candidate artifact is produced. |
-| Distribution | Private hosted link or private archive only. |
+| Source revision | Superseded by final release tag `v0.1.0`. |
+| Build date | 2026-07-23 |
+| Distribution | Controlled tester build; feedback cycle accepted. |
 | Tester guide | [PLAYTESTER_CRITERIA.md](PLAYTESTER_CRITERIA.md) |
 | Previous candidate | RC1 preparation superseded; do not combine feedback. |
 
@@ -47,23 +47,22 @@ and viewport checks below.
 - [x] Complete and record the five updated LE-P03 entry/HUD checks using the
   supported primary paths: desktop mouse and narrow touch. Keyboard board
   placement/cancellation remains available as a secondary path.
-- [ ] Complete and record the four RC2 FI4/FI5 regression checks in
+- [x] Complete and record the four RC2 FI4/FI5 regression checks in
   [PLAYTESTER_CRITERIA.md](PLAYTESTER_CRITERIA.md).
-- [ ] Run `pnpm install --frozen-lockfile`.
-- [ ] Run `pnpm run check` successfully.
-- [ ] Run `pnpm run build` successfully.
-- [ ] Smoke-test the exact `dist/` artifact in a supported browser.
-- [ ] Record the source commit, build date, browser support, and known
+- [x] Run `pnpm install --frozen-lockfile`.
+- [x] Run `pnpm run check` successfully.
+- [x] Run `pnpm run build` successfully.
+- [x] Smoke-test the exact `dist/` artifact in supported desktop and mobile browsers.
+- [x] Record the source revision, build date, browser support, and known
   limitations in this document or the tester invitation.
-- [ ] Keep `LICENSE.md` and `NOTICE.md` with any source archive.
-- [ ] Freeze gameplay and content changes while testers use this candidate.
+- [x] Keep `LICENSE.md` and `NOTICE.md` with any source archive.
+- [x] Freeze gameplay and content changes while testers use this candidate.
 
 ## Known limitations before distribution
 
-- Primary desktop-mouse and narrow-touch checks have been recorded. Full
-  keyboard-only setup/menu traversal is intentionally outside Gate 1 scope.
-- This candidate is for private tester evaluation only. The repository's
-  all-rights-reserved, no-licence policy remains in effect.
+- Full keyboard-only setup/menu traversal is intentionally outside Gate 1
+  scope; keyboard board placement/cancellation remains available.
+- The repository's all-rights-reserved, no-licence policy remains in effect.
 
 ## Tester hand-off
 

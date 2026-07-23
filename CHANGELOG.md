@@ -7,17 +7,16 @@ compatible fixes increment the patch version.
 
 ## Unreleased
 
-- Prepared the private `0.1.0-rc.2` candidate after focused UI playtest
-  feedback.
-- Simplified mission setup to level → difficulty → begin, removing duplicate
-  custom-map controls and campaign context.
-- Removed duplicated gameplay placement/range instructions while preserving
-  accessible live status feedback.
+- No unreleased changes.
 
-## 0.1.0 - Unreleased
+## 0.1.0 - 2026-07-23
 
 - First deterministic Dungeon Defense vertical slice and its supporting browser
   engine foundations.
 - Authored campaign, progression, accessibility, audio, replay, performance,
   and responsive touch support.
 - Deterministic simulation verification, fuzz coverage, and a CI workflow.
+- Simplified mission setup to level → difficulty → begin, removing duplicate
+  custom-map controls and campaign context after focused playtest feedback.
+- Reduced gameplay UI duplication while retaining board range visuals and
+  screen-reader live status feedback.
