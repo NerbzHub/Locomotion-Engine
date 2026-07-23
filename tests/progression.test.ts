@@ -8,5 +8,7 @@ describe("campaign progression", () => {
     expect(isCampaignNodeUnlocked(profile, "crossroads-stand")).toBe(false);
     const completed = completeCampaignNode(profile, "gate-watch");
     expect(isCampaignNodeUnlocked(completed, "crossroads-stand")).toBe(true);
+    expect(isCampaignNodeUnlocked(completed, "ruins-awakening")).toBe(false);
+    expect(isCampaignNodeUnlocked(completeCampaignNode(completed, "crossroads-stand"), "ruins-awakening")).toBe(true);
   });
 });

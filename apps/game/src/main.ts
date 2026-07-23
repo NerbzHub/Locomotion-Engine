@@ -13,7 +13,7 @@ import { exportReplay, importReplay, playReplay } from "./replay";
 import type { ReplayAction } from "./replay";
 import { beginDefense, canInteractWithBoard, openMissionSelection, returnToLanding } from "./entry-flow";
 import type { GameScreen } from "./entry-flow";
-import { BOARD, createGame, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, TOTAL_WAVES, updateGame, upgradeTower } from "./simulation";
+import { BOARD, createGame, missionWaveCount, nextWaveBriefing, nextTowerUpgrade, placementStatus, placeTower, setTowerTargetPolicy, specialiseTower, startWave, telemetryReport, towerAtCell, towerStats, updateGame, upgradeTower } from "./simulation";
 import type { Cell, TargetPolicy } from "./simulation";
 
 const canvas = requiredElement<HTMLCanvasElement>("game-canvas");
@@ -37,8 +37,7 @@ const sentinelButton = requiredElement<HTMLButtonElement>("select-sentinel");
 const casualButton = requiredElement<HTMLButtonElement>("select-casual");
 const standardButton = requiredElement<HTMLButtonElement>("select-standard");
 const veteranButton = requiredElement<HTMLButtonElement>("select-veteran");
-const gateWatchButton = requiredElement<HTMLButtonElement>("campaign-gate-watch");
-const crossroadsStandButton = requiredElement<HTMLButtonElement>("campaign-crossroads-stand");
+const missionCards = requiredElement<HTMLElement>("mission-cards");
 const resetProfileButton = requiredElement<HTMLButtonElement>("reset-profile");
 const landingPanel = requiredElement<HTMLElement>("landing-panel");
 const enterDungeonButton = requiredElement<HTMLButtonElement>("enter-dungeon");
@@ -53,7 +52,6 @@ const waveBriefing = requiredElement<HTMLElement>("wave-briefing");
 const archerDetail = requiredElement<HTMLElement>("archer-detail");
 const mageDetail = requiredElement<HTMLElement>("mage-detail");
 const sentinelDetail = requiredElement<HTMLElement>("sentinel-detail");
-const crossroadsUnlockCopy = requiredElement<HTMLElement>("crossroads-unlock-copy");
 const developerOverlay = requiredElement<HTMLElement>("developer-overlay");
 const developerOverlayText = requiredElement<HTMLElement>("developer-overlay-text");
 const towerInspector = requiredElement<HTMLElement>("tower-inspector");
@@ -116,6 +114,8 @@ const audio = new GameAudio(audioSettings);
 glossary.replaceChildren(...GLOSSARY_ENTRIES.flatMap(([term, description]) => [createGlossaryTerm(term), createGlossaryDescription(description)]));
 tutorialPanel.hidden = !shouldShowTutorial(window.localStorage);
 const pointer = new PointerInput(canvas);
+
+renderCampaignMissionCards();
 
 pointer.onPointerDown((point) => {
   if (!canInteractWithBoard(gameScreen)) return;
@@ -248,8 +248,6 @@ sentinelButton.addEventListener("click", () => selectTower("sentinel"));
 casualButton.addEventListener("click", () => selectDifficulty("casual"));
 standardButton.addEventListener("click", () => selectDifficulty("standard"));
 veteranButton.addEventListener("click", () => selectDifficulty("veteran"));
-gateWatchButton.addEventListener("click", () => selectCampaignNode("gate-watch"));
-crossroadsStandButton.addEventListener("click", () => selectCampaignNode("crossroads-stand"));
 enterDungeonButton.addEventListener("click", () => {
   gameScreen = openMissionSelection();
   updateHud();
@@ -273,15 +271,14 @@ resetProfileButton.addEventListener("click", () => {
   updateHud();
 });
 outcomePrimaryButton.addEventListener("click", () => {
-  if (state.gameWon && selectedCampaignNodeId === "gate-watch" && isCampaignNodeUnlocked(profile, "crossroads-stand")) {
-    const nextMission = CAMPAIGN_NODES.find((candidate) => candidate.id === "crossroads-stand");
-    if (nextMission) {
-      selectedCampaignNodeId = nextMission.id;
-      selectedMap = nextMission.mapId;
-      selectedDifficulty = nextMission.difficultyId;
-      startNewDefense();
-      updateHud();
-    }
+  const currentIndex = CAMPAIGN_NODES.findIndex((node) => node.id === selectedCampaignNodeId);
+  const nextMission = currentIndex >= 0 ? CAMPAIGN_NODES[currentIndex + 1] : undefined;
+  if (state.gameWon && nextMission && isCampaignNodeUnlocked(profile, nextMission.id)) {
+    selectedCampaignNodeId = nextMission.id;
+    selectedMap = nextMission.mapId;
+    selectedDifficulty = nextMission.difficultyId;
+    startNewDefense();
+    updateHud();
     return;
   }
   startNewDefense();
@@ -362,6 +359,26 @@ function selectTower(kind: TowerKind): void {
   updateHud();
 }
 
+function renderCampaignMissionCards(): void {
+  missionCards.replaceChildren(...CAMPAIGN_NODES.map((node, index) => {
+    const button = document.createElement("button");
+    button.className = "mission-card";
+    button.type = "button";
+    button.dataset.missionId = node.id;
+    button.setAttribute("aria-pressed", "false");
+    const kicker = document.createElement("span");
+    kicker.className = "mission-card-kicker";
+    kicker.textContent = `Mission ${index + 1}`;
+    const title = document.createElement("strong");
+    title.textContent = node.displayName;
+    const description = document.createElement("small");
+    description.textContent = node.description;
+    button.append(kicker, title, description);
+    button.addEventListener("click", () => selectCampaignNode(node.id));
+    return button;
+  }));
+}
+
 function selectDifficulty(difficultyId: DifficultyId): void {
   if (!canConfigureScenario()) return;
   selectedDifficulty = difficultyId;
@@ -380,10 +397,6 @@ function selectCampaignNode(nodeId: string): void {
   selectedCampaignNodeId = node.id;
   selectedMap = node.mapId;
   selectedDifficulty = node.difficultyId;
-  gateWatchButton.setAttribute("aria-pressed", String(node.id === "gate-watch"));
-  crossroadsStandButton.setAttribute("aria-pressed", String(node.id === "crossroads-stand"));
-  gateWatchButton.classList.toggle("selected", node.id === "gate-watch");
-  crossroadsStandButton.classList.toggle("selected", node.id === "crossroads-stand");
   state.message = `${node.displayName}: ${node.description}`;
   updateHud();
 }
@@ -403,7 +416,7 @@ function updateHud(): void {
   }
   gold.textContent = String(state.gold);
   lives.textContent = String(state.lives);
-  wave.textContent = `${state.wave}/${TOTAL_WAVES}`;
+  wave.textContent = `${state.wave}/${missionWaveCount(state)}`;
   waveBriefing.textContent = nextWaveBriefing(state);
   const gameEnded = state.gameOver || state.gameWon;
   const defending = canInteractWithBoard(gameScreen);
@@ -422,8 +435,6 @@ function updateHud(): void {
   casualButton.disabled = gameScreen !== "mission-select";
   standardButton.disabled = gameScreen !== "mission-select";
   veteranButton.disabled = gameScreen !== "mission-select";
-  gateWatchButton.disabled = gameScreen !== "mission-select";
-  crossroadsStandButton.disabled = gameScreen !== "mission-select" || !isCampaignNodeUnlocked(profile, "crossroads-stand");
   startWaveButton.textContent = `Start wave ${state.wave + 1}`;
   updateMissionControls();
   updateTowerChoices();
@@ -444,7 +455,7 @@ function closeGameMenu(): void {
 }
 
 function startNewDefense(): void {
-  state = createGame(initialSeed, selectedMap, selectedDifficulty);
+  state = createGame(initialSeed, selectedMap, selectedDifficulty, selectedCampaignNodeId);
   inspectedTowerId = undefined;
   hoveredCell = undefined;
   keyboardCursorActive = false;
@@ -496,15 +507,20 @@ function updateBuildConfirmationControls(): void {
 function updateMissionControls(): void {
   const node = selectedCampaignNodeId ? CAMPAIGN_NODES.find((candidate) => candidate.id === selectedCampaignNodeId) : undefined;
   beginMissionButton.textContent = `Begin ${node?.displayName ?? "mission"}`;
-  gateWatchButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "gate-watch"));
-  crossroadsStandButton.setAttribute("aria-pressed", String(selectedCampaignNodeId === "crossroads-stand"));
-  gateWatchButton.classList.toggle("selected", selectedCampaignNodeId === "gate-watch");
-  crossroadsStandButton.classList.toggle("selected", selectedCampaignNodeId === "crossroads-stand");
+  for (const button of missionCards.querySelectorAll<HTMLButtonElement>("[data-mission-id]")) {
+    const missionId = button.dataset.missionId ?? "";
+    const campaignNode = CAMPAIGN_NODES.find((candidate) => candidate.id === missionId);
+    const unlocked = campaignNode ? isCampaignNodeUnlocked(profile, missionId) : false;
+    button.disabled = gameScreen !== "mission-select" || !unlocked;
+    button.setAttribute("aria-pressed", String(selectedCampaignNodeId === missionId));
+    button.classList.toggle("selected", selectedCampaignNodeId === missionId);
+    const detail = button.querySelector("small");
+    if (detail && campaignNode) detail.textContent = unlocked ? campaignNode.description : "Clear the previous mission to unlock.";
+  }
   for (const [id, button] of [["casual", casualButton], ["standard", standardButton], ["veteran", veteranButton]] as const) {
     button.setAttribute("aria-pressed", String(selectedDifficulty === id));
     button.classList.toggle("selected", selectedDifficulty === id);
   }
-  crossroadsUnlockCopy.textContent = isCampaignNodeUnlocked(profile, "crossroads-stand") ? "Unlocked — defend the split approach." : "Clear Gate Watch to unlock.";
 }
 
 function updateTowerChoices(): void {
@@ -522,15 +538,17 @@ function updateTowerChoices(): void {
 function updateOutcome(): void {
   if (!state.gameWon && !state.gameOver) return;
   if (state.gameWon) {
-    const canAdvance = selectedCampaignNodeId === "gate-watch" && isCampaignNodeUnlocked(profile, "crossroads-stand");
+    const currentIndex = CAMPAIGN_NODES.findIndex((node) => node.id === selectedCampaignNodeId);
+    const nextMission = currentIndex >= 0 ? CAMPAIGN_NODES[currentIndex + 1] : undefined;
+    const canAdvance = Boolean(nextMission && isCampaignNodeUnlocked(profile, nextMission.id));
     outcomeKicker.textContent = canAdvance ? "Mission unlocked" : "Mission complete";
     outcomeTitle.textContent = "Dungeon defended";
-    outcomeSummary.textContent = `You cleared all ${TOTAL_WAVES} waves with ${state.lives} lives remaining and built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}.`;
-    outcomePrimaryButton.textContent = canAdvance ? "Play Crossroads Stand" : "Play again";
+    outcomeSummary.textContent = `You cleared all ${missionWaveCount(state)} waves with ${state.lives} lives remaining and built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}.`;
+    outcomePrimaryButton.textContent = canAdvance ? `Play ${nextMission!.displayName}` : "Play again";
   } else {
     outcomeKicker.textContent = "Run ended";
     outcomeTitle.textContent = "The dungeon fell";
-    outcomeSummary.textContent = `You reached wave ${state.wave}/${TOTAL_WAVES}, built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}, and can try a new defense.`;
+    outcomeSummary.textContent = `You reached wave ${state.wave}/${missionWaveCount(state)}, built ${state.towers.length} tower${state.towers.length === 1 ? "" : "s"}, and can try a new defense.`;
     outcomePrimaryButton.textContent = "Try again";
   }
 }

@@ -100,6 +100,17 @@ export const MAP_DEFINITIONS = {
     grassColor: "#608fa8",
     pathColor: "#8f7456",
     pathEdgeColor: "#e5c38a"
+  },
+  ruins: {
+    displayName: "Moonlit Ruins",
+    columns: 12,
+    rows: 8,
+    tileSize: 64,
+    pathNodes: [{ x: -32, y: 96 }, { x: 160, y: 96 }, { x: 160, y: 352 }, { x: 480, y: 352 }, { x: 480, y: 224 }, { x: 800, y: 224 }],
+    pathCells: ["0:1", "1:1", "2:1", "2:2", "2:3", "2:4", "2:5", "3:5", "4:5", "5:5", "6:5", "7:5", "7:4", "7:3", "8:3", "9:3", "10:3", "11:3"],
+    grassColor: "#6f668d",
+    pathColor: "#75667d",
+    pathEdgeColor: "#c9b6dc"
   }
 } as const satisfies Record<string, MapDefinition>;
 
@@ -154,11 +165,43 @@ export interface CampaignNodeDefinition {
   readonly description: string;
   readonly mapId: MapId;
   readonly difficultyId: DifficultyId;
+  readonly waves: readonly WaveDefinition[];
 }
 
+const CAMPAIGN_WAVE_PLANS = {
+  gate: [
+    { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "slime", "slime"], clearBonus: 12 },
+    { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "beetle", "beetle"], clearBonus: 16 },
+    { enemyKinds: ["slime", "slime", "beetle", "beetle", "wisp", "wisp"], clearBonus: 20 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [2], clearBonus: 24 },
+    { enemyKinds: ["slime", "slime", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [5], clearBonus: 28 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp", "wisp"], eliteEnemyIndices: [1, 5], boss: true, clearBonus: 34 }
+  ],
+  crossroads: [
+    { enemyKinds: ["slime", "slime", "slime", "slime", "slime", "slime", "slime", "slime"], clearBonus: 14 },
+    { enemyKinds: ["slime", "slime", "slime", "beetle", "beetle", "beetle"], clearBonus: 18 },
+    { enemyKinds: ["beetle", "beetle", "wisp", "wisp", "wisp"], clearBonus: 22 },
+    { enemyKinds: ["slime", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [3], clearBonus: 26 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [0, 4], clearBonus: 30 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp", "wisp", "wisp"], eliteEnemyIndices: [1, 6], boss: true, clearBonus: 38 }
+  ],
+  ruins: [
+    { enemyKinds: ["wisp", "wisp", "slime", "slime", "slime", "slime"], clearBonus: 16 },
+    { enemyKinds: ["wisp", "wisp", "wisp", "beetle", "beetle", "slime"], clearBonus: 20 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp"], eliteEnemyIndices: [4], clearBonus: 24 },
+    { enemyKinds: ["slime", "beetle", "beetle", "wisp", "wisp", "wisp", "wisp"], eliteEnemyIndices: [1], clearBonus: 28 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "wisp", "wisp", "wisp", "wisp"], eliteEnemyIndices: [0, 5], clearBonus: 32 },
+    { enemyKinds: ["beetle", "beetle", "beetle", "beetle", "wisp", "wisp", "wisp", "wisp"], eliteEnemyIndices: [2, 6], boss: true, clearBonus: 42 }
+  ]
+} satisfies Record<string, readonly WaveDefinition[]>;
+
 export const CAMPAIGN_NODES: readonly CampaignNodeDefinition[] = [
-  { id: "gate-watch", displayName: "Gate Watch", description: "Hold the original dungeon gate.", mapId: "gate", difficultyId: "standard" },
-  { id: "crossroads-stand", displayName: "Crossroads Stand", description: "Defend the split approach against the Warden.", mapId: "crossroads", difficultyId: "standard" }
+  { id: "gate-watch", displayName: "Gate Watch", description: "Hold the original dungeon gate.", mapId: "gate", difficultyId: "standard", waves: CAMPAIGN_WAVE_PLANS.gate },
+  { id: "crossroads-stand", displayName: "Crossroads Stand", description: "Defend the split approach against the Warden.", mapId: "crossroads", difficultyId: "standard", waves: CAMPAIGN_WAVE_PLANS.crossroads },
+  { id: "ruins-awakening", displayName: "Ruins Awakening", description: "Keep the moonlit ruins from stirring.", mapId: "ruins", difficultyId: "standard", waves: CAMPAIGN_WAVE_PLANS.ruins },
+  { id: "gate-counterstrike", displayName: "Gate Counterstrike", description: "Return to the gate against a hardened assault.", mapId: "gate", difficultyId: "standard", waves: CAMPAIGN_WAVE_PLANS.gate },
+  { id: "crossroads-siege", displayName: "Crossroads Siege", description: "Hold the split route under relentless pressure.", mapId: "crossroads", difficultyId: "standard", waves: CAMPAIGN_WAVE_PLANS.crossroads },
+  { id: "ruins-warden", displayName: "Warden of the Ruins", description: "End the first chapter beneath the old stones.", mapId: "ruins", difficultyId: "standard", waves: CAMPAIGN_WAVE_PLANS.ruins }
 ];
 
 /** Enemy balance and presentation are authored game content, not engine concerns. */

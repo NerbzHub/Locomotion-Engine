@@ -2,17 +2,19 @@
 
 **Status:** Active implementation plan
 
-**Current position (2026-07-23):** LE-S01 through LE-S30 are complete. The
-`0.1.0-rc.2` feedback cycle accepted FI2 through FI5, and the resulting Gate 1
-release is `v0.1.0`. Its release record and known limitations are in
-`docs/RELEASE_RECORD_0.1.0.md`. LE-S31 is the next planned sprint.
+**Current position (2026-07-23):** LE-S01 through LE-S31 are complete. The
+`0.1.0-rc.2` feedback cycle accepted FI2 through FI5, the resulting Gate 1
+release is `v0.1.0`, and its maintenance policy is recorded in
+`docs/POST_RELEASE_TRIAGE.md`. LE-E01 is the next planned expansion sprint.
 
 The roadmap runs through LE-S108. LE-S06 through LE-S55 turn the proof into a
 clear, replayable, and maintainable game. LE-S56 through LE-S100 then build
 toward the full Game Vision: evolving fantasy eras, memorable run progression,
 procedural variation, and an endless defence that remains readable. LE-S101
 through LE-S108 complete the visual-first asset workflow and provide the final
-quality gates for the complete experience.
+quality gates for the complete experience. Those granular future entries are
+now retained as a requirement catalogue; the active plan is the larger
+LE-E01–LE-E10 expansion sequence below.
 
 **Revision basis:** Books 05 and 06 refine this roadmap in three important
 ways. Procedural visuals are modular, deterministic, and driven by an explicit
@@ -32,12 +34,49 @@ as late decorative polish.
 - A sprint may change its follow-up scope when playtesting produces evidence;
   it must not quietly expand into unrelated engine work.
 
+## Expansion re-scope — larger feature sprints
+
+**Decision date:** 2026-07-23
+
+Gate 1 proved the core loop; it should no longer constrain the game to a
+three-wave vertical slice. LE-E01 through LE-E10 supersede LE-S32 through
+LE-S108 as the active sequence. Each expansion sprint is deliberately larger:
+it must deliver a coherent, player-testable feature tranche instead of a thin
+technical increment.
+
+### Expansion rules
+
+- Preserve deterministic simulation, replay compatibility, saved-profile
+  migrations, responsive primary input paths, and the post-release triage bar.
+- Build player-facing loops and their authoring/validation tools together; new
+  content must not require simulation control-flow edits per mission.
+- Introduce one major decision category at a time. Readability takes priority
+  over raw feature count.
+- Close each expansion sprint with balance scenarios, a production build, and
+  focused playtest evidence before opening the next tranche.
+
+| Expansion sprint | Primary player outcome | Active branch |
+| --- | --- | --- |
+| LE-E01 — Campaign One | Six-mission first chapter, three maps, six-to-ten-wave missions, and a boss finale. | `feature/campaign-one` |
+| LE-E02 — Tactical roster | Five distinct towers plus readable swarm, armour, runner, support, splitter, elite, and boss counterplay. | `feature/tactical-roster` |
+| LE-E03 — Tower identity | Campaign unlocks and permanent Archer/Mage evolution choices. | `feature/tower-identity` |
+| LE-E04 — Run variety | Relics, first events, and a merchant that create legible build variation. | `feature/relics-events-merchants` |
+| LE-E05 — Endless world | Endless Defence through Frontier and Wilderness eras, with checkpoints and run summaries. | `feature/endless-world` |
+| LE-E06 — Charm and readability | Entity identity, combat feedback, battlefield memory, and strict visual-priority rules. | `feature/charm-and-clarity` |
+| LE-E07 — Dark Ages | Undead era, Paladin/Necromancer towers, heroes, and advanced boss rules. | `feature/dark-ages` |
+| LE-E08 — Infernal and Dragon | Infernal conditions, dragons, anti-large tools, and the Dragon Egg arc. | `feature/infernal-dragon` |
+| LE-E09 — Community quality | Challenges, replay gallery, diagnostics, migration, accessibility, mobile, and quality automation. | `feature/community-quality` |
+| LE-E10 — Gate 2 | Expanded-game candidate, validation, external playtest, and release. | `release/gate-2` |
+
 The identifiers below are local planning identifiers. They do not replace the
 legacy identifiers in Book 03. `LE-P##` identifies an inserted priority sprint:
 it preserves the historical LE-S01–LE-S28 record instead of renumbering already
 implemented work.
 
-## Delivery sections and feature-branch plan
+## Legacy delivery sections and feature-branch plan
+
+This table records the former granular branch plan. It is retained for history
+and dependency detail; use the LE-E01–LE-E10 table above for new work.
 
 Each row is a cohesive merge unit. The suggested branch contains the complete
 range, passes its tests and browser checks, then merges into `main` before the
@@ -707,6 +746,10 @@ and known limitations are all documented and independently repeatable.
 
 ## LE-S31 — Post-release stabilisation
 
+**Status: completed on 2026-07-23.** The fixed `v0.1.x` maintenance window,
+severity policy, FI4/FI5 regression coverage, current defect register, and
+patch-release note format are in `docs/POST_RELEASE_TRIAGE.md`.
+
 **Goal:** Resolve confirmed release defects without diluting the product
 direction.
 
@@ -717,6 +760,150 @@ window, regression tests for accepted fixes, and a patch release note format.
 either a verified fix or documented decision.
 
 **Depends on:** LE-S30.
+
+## Active expansion sprint definitions
+
+### LE-E01 — Campaign One: foundation and first chapter
+
+**Goal:** Turn the vertical slice into a meaningful first campaign rather than
+a single three-wave stand.
+
+**Deliverables:** per-mission wave/objective definitions; campaign-map flow;
+scalable profile and save migration; authoring validation; Gate Watch,
+Crossroads Stand, and four new missions across three maps; six-to-ten-wave
+encounters; escalating rewards; a chapter boss; balance scenarios; and a
+focused full-chapter playtest.
+
+**Done when:** a fresh profile can complete six missions without developer
+tools, every mission is seed-replayable, and no campaign logic relies on a
+global three-wave limit.
+
+**Draws from former:** LE-S32, LE-S33, LE-S37, LE-S39–LE-S41, LE-S52–LE-S53.
+
+### LE-E02 — Tactical roster expansion
+
+**Goal:** Give Campaign One multiple clear winning strategies.
+
+**Deliverables:** Cannon/Bombard area control, Frost crowd control, enemy-role
+framework, swarm/armoured/runner/support/splitter enemies, elite and boss
+variants, counter/inspection feedback, balance scenarios, and tutorial prompts.
+
+**Done when:** five tower families each have a useful job and campaign
+encounters reward at least three distinct tactical approaches.
+
+**Draws from former:** LE-S37–LE-S38, LE-S63, LE-S68–LE-S70.
+
+### LE-E03 — Tower identity and player progression
+
+**Goal:** Make a long campaign feel like a developing defence.
+
+**Deliverables:** campaign rewards/unlocks, a data-driven evolution framework,
+Archer and Mage branches, comparison UI, profile/replay migration, milestone
+goals, and progression/balance tests.
+
+**Done when:** two completed chapters can create meaningfully different tower
+line-ups without hidden rules or broken historic saves.
+
+**Draws from former:** LE-S36, LE-S57–LE-S62, LE-S74–LE-S75.
+
+### LE-E04 — Run variety: relics, events, and merchants
+
+**Goal:** Add compact roguelite choices that make individual runs memorable.
+
+**Deliverables:** relic-choice flow and first library; event scheduler;
+Treasure Goblin, Fairy Blessing, and Blood Moon; Wandering Merchant; visible
+effect descriptions; compatibility rules; and deterministic event/relic tests.
+
+**Done when:** players can explain how a relic or event changed their strategy
+and the same seeded run remains reproducible.
+
+**Draws from former:** LE-S34, LE-S42, LE-S57–LE-S58, LE-S76–LE-S80.
+
+### LE-E05 — Endless Defence and the living world
+
+**Goal:** Graduate the game beyond a finite campaign into durable survival.
+
+**Deliverables:** endless pacing/checkpoints, era transitions, Frontier and
+Wilderness encounter tables, biome/condition presentation, periodic boss and
+relic beats, performance coverage, and stop/resume-safe run summaries.
+
+**Done when:** a long run changes tactical and visual identity over time
+without health inflation alone or a performance-budget breach.
+
+**Draws from former:** LE-S35, LE-S64–LE-S66, LE-S79–LE-S80, LE-S99.
+
+### LE-E06 — Character, charm, and combat readability
+
+**Goal:** Make the expanded game feel alive without making combat noisy.
+
+**Deliverables:** Entity DNA/content tags, modular sprite resolver,
+status/impact feedback, bounded damage/kill feedback, capped corpse and
+battlefield memory, ambient motion, visual-priority rules, and reduced-motion
+validation.
+
+**Done when:** visual variation and battlefield memory improve readability and
+memory of a run rather than obscure the next tactical choice.
+
+**Draws from former:** LE-S47, LE-S56, LE-S88–LE-S95, and Book 05.
+
+### LE-E07 — Dark Ages and advanced defence
+
+**Goal:** Prove later-era content can introduce new systems progressively.
+
+**Deliverables:** Dark Ages, undead/resistance rules, Paladin Watchtower,
+Necromancer Tower, advanced procedural bosses, hero foundation, and authored
+entry into the era.
+
+**Done when:** players reach the era with understandable counterplay before its
+capstone boss.
+
+**Draws from former:** LE-S71–LE-S75, LE-S87.
+
+### LE-E08 — Infernal and Dragon expansion
+
+**Goal:** Deliver the first spectacular late-game arc while remaining legible.
+
+**Deliverables:** Infernal War and Dragon Age, weather/condition rules,
+Alchemist, Warlock Circle, Ballista, flying/large-target combat, Dragon Egg
+lifecycle, dragon bosses, and performance/balance scenarios.
+
+**Done when:** late-game play feels more epic than Campaign One while still
+communicating what every threat and tower is doing.
+
+**Draws from former:** LE-S81–LE-S86.
+
+### LE-E09 — Community-ready challenge and quality
+
+**Goal:** Make a larger game safe to replay, share, test, and maintain.
+
+**Deliverables:** constrained challenges/share codes, replay gallery,
+diagnostic bundle, migration hardening, localisation, mobile/accessibility
+completion, browser-smoke automation, and privacy/resilience documentation.
+
+**Done when:** a tester can reproduce a report from a compact bundle and the
+full game is supported on the agreed desktop/mobile matrix.
+
+**Draws from former:** LE-S42–LE-S53, LE-S101–LE-S106.
+
+### LE-E10 — Gate 2: expanded-game release
+
+**Goal:** Release a content-rich version that demonstrates the game vision
+without claiming the entire cosmic endgame is complete.
+
+**Deliverables:** feature freeze, final balance candidate, campaign/endless/
+accessibility/mobile/compatibility evidence, external playtest, release record,
+and Gate 2 retrospective.
+
+**Done when:** only accepted release blockers remain, the build is independently
+reproducible, and player feedback confirms the game is more than a short slice.
+
+**Draws from former:** LE-S54–LE-S55, LE-S107–LE-S108.
+
+## Legacy granular backlog (superseded as the active sequence)
+
+LE-S32 through LE-S108 remain below for detailed requirements and dependency
+notes. Plan and implement against LE-E01 through LE-E10 above; consult a
+legacy entry only when decomposing an active expansion sprint into tasks.
 
 ## LE-S32 — Usability study
 
